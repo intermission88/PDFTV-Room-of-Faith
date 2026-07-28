@@ -30,12 +30,47 @@
         </div>
     </nav>
 
-    <main class="pt-24 px-4 pb-20 max-w-lg mx-auto">
-        <section class="text-center mb-10">
-            <h1 class="text-3xl font-extrabold mb-2 tracking-tighter text-white">Room of Faith</h1>
-            <p class="text-slate-500 text-[11px] italic">"If every moment mattered, would it still be like this?"</p>
-            <p class="text-slate-700 text-[9px] mt-1 uppercase tracking-widest font-bold">- zaldnielsen</p>
+    <main class="pt-20 px-4 pb-20 max-w-lg mx-auto">
+        <!-- Section Header (Dibuat Lebih Ringkas & Kecil) -->
+        <section class="text-center mb-5">
+            <h1 class="text-xl font-black mb-1 tracking-tight text-white">Room of Faith</h1>
+            <p class="text-slate-500 text-[10px] italic">"If every moment mattered, would it still be like this?"</p>
+            <p class="text-slate-700 text-[8px] mt-0.5 uppercase tracking-widest font-bold">- zaldnielsen</p>
         </section>
+
+        <!-- IMAGE SLIDER SECTION (Gepeng & Tanpa Teks) -->
+        <section class="relative w-full mb-6 overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group">
+            <div id="slider" class="flex transition-transform duration-500 ease-out w-full">
+                <!-- Slide 1 -->
+                <div class="min-w-full aspect-[21/9] relative">
+                    <img src="assets/slider01_roster.webp" alt="Slider Image 1" class="w-full h-full object-cover">
+                </div>
+                <!-- Slide 2 -->
+                <div class="min-w-full aspect-[21/9] relative">
+                    <img src="assets/slider02_mixtape.webp" alt="Slider Image 2" class="w-full h-full object-cover">
+                </div>
+                <!-- Slide 3 -->
+                <div class="min-w-full aspect-[21/9] relative">
+                    <img src="assets/slider03_social.webp" alt="Slider Image 3" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <!-- Tombol Navigasi Kiri / Kanan -->
+            <button onclick="prevSlide()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white/70 hover:text-white p-1.5 rounded-full backdrop-blur-sm transition active:scale-95">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <button onclick="nextSlide()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white/70 hover:text-white p-1.5 rounded-full backdrop-blur-sm transition active:scale-95">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+
+            <!-- Indikator Dot Slider -->
+            <div class="absolute bottom-2 right-3 flex gap-1 z-10">
+                <button onclick="goToSlide(0)" class="dot-btn w-1.5 h-1.5 rounded-full bg-white transition-all duration-300 opacity-100"></button>
+                <button onclick="goToSlide(1)" class="dot-btn w-1.5 h-1.5 rounded-full bg-white transition-all duration-300 opacity-40"></button>
+                <button onclick="goToSlide(2)" class="dot-btn w-1.5 h-1.5 rounded-full bg-white transition-all duration-300 opacity-40"></button>
+            </div>
+        </section>
+        <!-- IMAGE SLIDER SECTION END -->
 
         <section class="glass p-5 rounded-2xl mb-8 border border-white/10 shadow-xl">
             <form id="confessionForm" class="space-y-3">
@@ -65,6 +100,56 @@
     </main>
 
     <script>
+        // --- LOGIK SLIDER INFINITE AUTO-PLAY ---
+        let currentSlide = 0;
+        const totalSlides = 3;
+        const slider = document.getElementById('slider');
+        const dots = document.querySelectorAll('.dot-btn');
+        let slideInterval;
+
+        function updateSliderUI() {
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((dot, idx) => {
+                if (idx === currentSlide) {
+                    dot.classList.remove('opacity-40');
+                    dot.classList.add('opacity-100', 'w-3');
+                } else {
+                    dot.classList.remove('opacity-100', 'w-3');
+                    dot.classList.add('opacity-40', 'w-1.5');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSliderUI();
+            resetTimer();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSliderUI();
+            resetTimer();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSliderUI();
+            resetTimer();
+        }
+
+        function startTimer() {
+            slideInterval = setInterval(nextSlide, 3500);
+        }
+
+        function resetTimer() {
+            clearInterval(slideInterval);
+            startTimer();
+        }
+
+        startTimer();
+
+        // --- APP LOGIC (SheetDB & Feed) ---
         let posts = [];
 
         const form = document.getElementById('confessionForm');
