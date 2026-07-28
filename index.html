@@ -10,14 +10,20 @@
         .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .upvoted { color: #ffffff !important; }
+        /* Toast animation */
+        #toast { transition: transform 0.3s ease, opacity 0.3s ease; }
     </style>
 </head>
 <body class="scrollbar-hide">
 
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300">
+        ✨ Pengakuan berhasil dikirim!
+    </div>
+
     <nav class="fixed top-0 w-full z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5">
         <div class="max-w-lg mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- Replaced PDFTV text with the logo image and added a height constraint so it fits nicely -->
-            <a href="#" class="flex items-center">
+            <a href="#" class="flex items-center active:scale-95 transition-transform">
                 <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-6 w-auto">
             </a>
             <div class="text-[9px] font-mono uppercase tracking-[0.2em] text-slate-700 border border-slate-800 px-2 py-0.5 rounded-full">Room.Faith</div>
@@ -31,17 +37,21 @@
             <p class="text-slate-700 text-[9px] mt-1 uppercase tracking-widest font-bold">- zaldnielsen</p>
         </section>
 
-        <section class="glass p-5 rounded-2xl mb-8 border border-white/10">
+        <section class="glass p-5 rounded-2xl mb-8 border border-white/10 shadow-xl">
             <form id="confessionForm" class="space-y-3">
                 <input type="text" id="alias" placeholder="Alias..." class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition">
-                <textarea id="confession" rows="2" placeholder="Sampaikan pengakuan..." class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition"></textarea>
                 
-                <button type="submit" id="submitBtn" class="w-full py-3 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 transition">SUBMIT PENGAKUAN</button>
+                <div class="relative">
+                    <textarea id="confession" rows="3" maxlength="300" placeholder="Sampaikan pengakuan..." oninput="updateCharCount()" class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition resize-none"></textarea>
+                    <div id="charCount" class="absolute bottom-3 right-3 text-[10px] text-slate-600 font-mono">0/300</div>
+                </div>
+                
+                <button type="submit" id="submitBtn" class="w-full py-3 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg">SUBMIT PENGAKUAN</button>
             </form>
         </section>
 
-        <div class="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-hide">
-            <select id="sortSelect" onchange="sortFeed()" class="bg-black/50 border border-white/10 text-white text-[10px] p-2 rounded-lg focus:outline-none uppercase tracking-widest w-full">
+        <div class="flex items-center gap-2 mb-6">
+            <select id="sortSelect" onchange="sortFeed()" class="bg-black/50 border border-white/10 text-white text-[10px] p-2.5 rounded-xl focus:outline-none uppercase tracking-widest w-full cursor-pointer">
                 <option value="newest">Terbaru</option>
                 <option value="oldest">Terlama</option>
                 <option value="upvotes">Upvote Terbanyak</option>
@@ -50,7 +60,7 @@
         </div>
 
         <div id="feed" class="space-y-6">
-            <!-- Feed items injected here -->
+            <!-- Feed items or Empty state injected here -->
         </div>
     </main>
 
@@ -60,8 +70,24 @@
         const form = document.getElementById('confessionForm');
         const feed = document.getElementById('feed');
         const submitBtn = document.getElementById('submitBtn');
+        const toast = document.getElementById('toast');
 
         const SHEETDB_URL = 'https://sheetdb.io/api/v1/i8abmlp9vnlzf';
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 10px)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 0)';
+            }, 3000);
+        }
+
+        function updateCharCount() {
+            const textLength = document.getElementById('confession').value.length;
+            document.getElementById('charCount').textContent = `${textLength}/300`;
+        }
 
         async function fetchPosts() {
             try {
@@ -77,10 +103,10 @@
                     timestamp: row.timestamp ? Number(row.timestamp) : Date.now()
                 }));
 
-                posts.sort((a, b) => b.timestamp - a.timestamp);
-                renderFeed();
+                sortFeed();
             } catch (error) {
                 console.error('Gagal memuat data:', error);
+                feed.innerHTML = `<div class="text-center text-slate-600 text-xs py-10 italic">Gagal memuat pengakuan. Periksa koneksi Anda.</div>`;
             }
         }
 
@@ -91,12 +117,13 @@
             const aliasInput = document.getElementById('alias');
             const confessionInput = document.getElementById('confession');
             
-            const alias = aliasInput.value || 'Anonymous';
-            const text = confessionInput.value;
+            const alias = aliasInput.value.trim() || 'Anonymous';
+            const text = confessionInput.value.trim();
             if (!text) return;
 
             submitBtn.textContent = "MENGIRIM...";
             submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70');
 
             try {
                 const payload = {
@@ -118,7 +145,9 @@
                 
                 if (response.ok) {
                     form.reset();
+                    updateCharCount();
                     fetchPosts();
+                    showToast("✨ Pengakuan berhasil dikirim!");
                 } else {
                     alert('Gagal mengirim pengakuan.');
                 }
@@ -127,6 +156,7 @@
             } finally {
                 submitBtn.textContent = "SUBMIT PENGAKUAN";
                 submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70');
             }
         });
 
@@ -150,7 +180,7 @@
         function sortFeed() {
             const sortBy = document.getElementById('sortSelect').value;
             if (sortBy === 'newest') posts.sort((a, b) => b.timestamp - a.timestamp);
-            if (sortBy === 'oldest') posts.sort((a, b) => b.timestamp - a.timestamp);
+            if (sortBy === 'oldest') posts.sort((a, b) => a.timestamp - b.timestamp);
             if (sortBy === 'upvotes') posts.sort((a, b) => b.upvotes - a.upvotes);
             if (sortBy === 'comments') posts.sort((a, b) => b.comments.length - a.comments.length);
             renderFeed();
@@ -158,24 +188,35 @@
 
         function renderFeed() {
             feed.innerHTML = '';
+            
+            if (posts.length === 0) {
+                feed.innerHTML = `
+                    <div class="text-center py-12 glass rounded-2xl border border-white/5">
+                        <p class="text-slate-500 text-xs italic">Belum ada pengakuan sama sekali.</p>
+                        <p class="text-slate-600 text-[10px] mt-1">Jadilah yang pertama bersuara di ruang ini.</p>
+                    </div>
+                `;
+                return;
+            }
+
             posts.forEach(post => {
                 const hasUpvoted = localStorage.getItem(`upvoted_${post.id}`) === 'true';
 
                 const div = document.createElement('div');
-                div.className = 'glass p-5 rounded-2xl border border-white/5 animate-in fade-in zoom-in duration-300';
+                div.className = 'glass p-5 rounded-2xl border border-white/5 transition-all duration-300 hover:border-white/10';
                 div.innerHTML = `
                     <div class="flex justify-between items-center mb-4">
                         <span class="font-bold text-white text-[11px] uppercase tracking-wider">@${post.alias}</span>
-                        <button onclick="handleUpvote('${post.id}')" id="btn-${post.id}" class="flex items-center gap-1.5 text-[10px] transition hover:text-white ${hasUpvoted ? 'upvoted' : 'text-slate-500'}">
+                        <button onclick="handleUpvote('${post.id}')" id="btn-${post.id}" class="flex items-center gap-1.5 text-[10px] transition active:scale-90 hover:text-white ${hasUpvoted ? 'upvoted' : 'text-slate-500'}">
                             <span class="heart">▲</span> <span class="count">${post.upvotes}</span>
                         </button>
                     </div>
-                    <p class="text-slate-300 text-sm mb-5 leading-relaxed">${post.text}</p>
+                    <p class="text-slate-300 text-sm mb-5 leading-relaxed break-words">${post.text}</p>
                     <div class="space-y-3">
                         <div id="replies-${post.id}" class="replyList space-y-2 text-[11px]">
-                            ${post.comments.map(c => `<div class="text-slate-500 pl-3 border-l border-white/5 italic">${c}</div>`).join('')}
+                            ${post.comments.map(c => `<div class="text-slate-500 pl-3 border-l border-white/5 italic break-words">${c}</div>`).join('')}
                         </div>
-                        <input type="text" placeholder="Balas..." onkeydown="handleReply(event, '${post.id}')" class="w-full bg-black/40 border border-white/5 text-[11px] p-3 rounded-lg text-slate-300 focus:outline-none focus:border-white/20">
+                        <input type="text" placeholder="Balas..." onkeydown="handleReply(event, '${post.id}')" class="w-full bg-black/40 border border-white/5 text-[11px] p-3 rounded-lg text-slate-300 focus:outline-none focus:border-white/20 transition">
                     </div>
                 `;
                 feed.appendChild(div);
@@ -199,11 +240,12 @@
         function handleReply(e, id) {
             if (e.key === 'Enter' && e.target.value.trim() !== '') {
                 const post = posts.find(p => p.id == id);
-                post.comments.push(e.target.value);
+                post.comments.push(e.target.value.trim());
                 e.target.value = '';
                 renderFeed();
 
                 updatePostInSheet(post);
+                showToast("💬 Balasan terkirim!");
             }
         }
     </script>
