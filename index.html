@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDFTV | Room of Faith</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: #94a3b8; }
         .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -37,7 +40,7 @@
             <p class="text-slate-700 text-[8px] mt-0.5 uppercase tracking-widest font-bold">- zaldnielsen</p>
         </section>
 
-        <!-- IMAGE SLIDER SECTION (Ditambah Lazy Loading) -->
+        <!-- IMAGE SLIDER SECTION -->
         <section class="relative w-full mb-6 overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group">
             <div id="slider" class="flex transition-transform duration-500 ease-out w-full">
                 <!-- Slide 1 -->
@@ -99,8 +102,13 @@
     </main>
 
     <script>
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = 'https://fhpyvnbsreoaiaeqfkvk.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const TABLE_NAME = 'PDFTV Room of Faith';
+
         // --- HELPER SECURITY & TIME ---
-        // Escape HTML untuk cegah XSS Injection
         function escapeHtml(str) {
             if (!str) return '';
             return String(str)
@@ -111,7 +119,6 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // Format waktu relatif (misal: "2j lalu")
         function timeAgo(timestamp) {
             const now = Date.now();
             const seconds = Math.floor((now - timestamp) / 1000);
@@ -168,14 +175,12 @@
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
-        // --- APP LOGIC (SheetDB & DOM Manipulation) ---
+        // --- APP LOGIC (Supabase & DOM) ---
         let posts = [];
         const form = document.getElementById('confessionForm');
         const feed = document.getElementById('feed');
         const submitBtn = document.getElementById('submitBtn');
         const toast = document.getElementById('toast');
-
-        const SHEETDB_URL = 'https://sheetdb.io/api/v1/i8abmlp9vnlzf';
 
         function showToast(message) {
             toast.textContent = message;
@@ -194,10 +199,13 @@
 
         async function fetchPosts() {
             try {
-                const response = await fetch(SHEETDB_URL);
-                const data = await response.json();
+                const { data, error } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .select('*');
+
+                if (error) throw error;
                 
-                posts = data.map((row, index) => {
+                posts = (data || []).map((row) => {
                     let parsedComments = [];
                     if (row.comments) {
                         try {
@@ -207,24 +215,23 @@
                         }
                     }
 
-                    // Aman terhadap parsing ISO String atau timestamp integer
-                    const rawTime = row.timestamp;
-                    const parsedTime = isNaN(Number(rawTime)) ? new Date(rawTime).getTime() : Number(rawTime);
+                    const rawTime = row.id; // Menggunakan id sebagai timestamp dasar di database kamu
+                    const parsedTime = isNaN(Number(rawTime)) ? Date.now() : Number(rawTime);
 
                     return {
-                        id: String(row.id || (Date.now() + index)),
+                        id: String(row.id),
                         alias: row.alias || 'Anonymous',
-                        text: row.confession || row.text || '',
+                        text: row.confession || '',
                         upvotes: Number(row.upvotes) || 0,
                         comments: Array.isArray(parsedComments) ? parsedComments : [],
-                        timestamp: parsedTime || Date.now()
+                        timestamp: parsedTime
                     };
                 });
 
                 sortFeed();
             } catch (error) {
                 console.error('Gagal memuat data:', error);
-                feed.innerHTML = `<div class="text-center text-slate-600 text-xs py-10 italic">Gagal memuat pengakuan. Periksa koneksi Anda.</div>`;
+                feed.innerHTML = `<div class="text-center text-slate-600 text-xs py-10 italic">Gagal memuat pengakuan dari Supabase.</div>`;
             }
         }
 
@@ -244,33 +251,28 @@
             submitBtn.classList.add('opacity-70');
 
             try {
+                const newId = Date.now();
                 const payload = {
-                    data: {
-                        id: String(Date.now()),
-                        alias: alias,
-                        confession: text,
-                        upvotes: 0,
-                        comments: JSON.stringify([]),
-                        timestamp: Date.now()
-                    }
+                    id: newId,
+                    alias: alias,
+                    confession: text,
+                    upvotes: 0,
+                    comments: JSON.stringify([])
                 };
 
-                const response = await fetch(SHEETDB_URL, {
-                    method: 'POST',
-                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                const { error } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .insert([payload]);
                 
-                if (response.ok) {
-                    form.reset();
-                    updateCharCount();
-                    await fetchPosts();
-                    showToast("✨ Pengakuan berhasil dikirim!");
-                } else {
-                    alert('Gagal mengirim pengakuan.');
-                }
+                if (error) throw error;
+
+                form.reset();
+                updateCharCount();
+                await fetchPosts();
+                showToast("✨ Pengakuan berhasil dikirim!");
             } catch (error) {
                 console.error('Error:', error);
+                alert('Gagal mengirim pengakuan ke Supabase.');
             } finally {
                 submitBtn.textContent = "SUBMIT PENGAKUAN";
                 submitBtn.disabled = false;
@@ -278,28 +280,26 @@
             }
         });
 
-        // Fixed payload PATCH SheetDB
-        async function updatePostInSheet(post) {
+        async function updatePostInSupabase(post) {
             try {
-                await fetch(`${SHEETDB_URL}/id/${post.id}`, {
-                    method: 'PATCH',
-                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        data: {
-                            upvotes: post.upvotes,
-                            comments: JSON.stringify(post.comments)
-                        }
+                const { error } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .update({
+                        upvotes: post.upvotes,
+                        comments: JSON.stringify(post.comments)
                     })
-                });
+                    .eq('id', post.id);
+
+                if (error) throw error;
             } catch (error) {
-                console.error('Gagal memperbarui database:', error);
+                console.error('Gagal memperbarui database Supabase:', error);
             }
         }
 
         function sortFeed() {
             const sortBy = document.getElementById('sortSelect').value;
-            if (sortBy === 'newest') posts.sort((a, b) => b.timestamp - a.timestamp);
-            if (sortBy === 'oldest') posts.sort((a, b) => a.timestamp - b.timestamp);
+            if (sortBy === 'newest') posts.sort((a, b) => b.id - a.id);
+            if (sortBy === 'oldest') posts.sort((a, b) => a.id - b.id);
             if (sortBy === 'upvotes') posts.sort((a, b) => b.upvotes - a.upvotes);
             if (sortBy === 'comments') posts.sort((a, b) => b.comments.length - a.comments.length);
             renderFeed();
@@ -325,7 +325,6 @@
                 div.id = `post-card-${post.id}`;
                 div.className = 'glass p-5 rounded-2xl border border-white/5 transition-all duration-300 hover:border-white/10';
                 
-                // Gunakan escapeHtml untuk cegah XSS
                 div.innerHTML = `
                     <div class="flex justify-between items-center mb-4">
                         <div class="flex items-center gap-2">
@@ -348,7 +347,6 @@
             });
         }
 
-        // Perbaikan: Update DOM lokal langsung tanpa render ulang seluruh feed
         function handleUpvote(id) {
             if (localStorage.getItem(`upvoted_${id}`) === 'true') return;
 
@@ -358,7 +356,6 @@
             post.upvotes += 1;
             localStorage.setItem(`upvoted_${id}`, 'true');
 
-            // Update UI secara parsial
             const btn = document.getElementById(`btn-${id}`);
             const countSpan = document.getElementById(`count-${id}`);
             if (btn && countSpan) {
@@ -366,10 +363,9 @@
                 countSpan.textContent = post.upvotes;
             }
 
-            updatePostInSheet(post);
+            updatePostInSupabase(post);
         }
 
-        // Perbaikan: Append komentar baru ke DOM langsung tanpa render ulang feed
         function handleReply(e, id) {
             if (e.key === 'Enter' && e.target.value.trim() !== '') {
                 const text = e.target.value.trim();
@@ -379,16 +375,15 @@
                 post.comments.push(text);
                 e.target.value = '';
 
-                // Insert div balasan langsung ke container replies
                 const repliesContainer = document.getElementById(`replies-${id}`);
                 if (repliesContainer) {
                     const replyDiv = document.createElement('div');
                     replyDiv.className = 'text-slate-500 pl-3 border-l border-white/5 italic break-words';
-                    replyDiv.textContent = text; // Otomatis aman dari XSS
+                    replyDiv.textContent = text;
                     repliesContainer.appendChild(replyDiv);
                 }
 
-                updatePostInSheet(post);
+                updatePostInSupabase(post);
                 showToast("💬 Balasan terkirim!");
             }
         }
