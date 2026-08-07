@@ -9,11 +9,14 @@
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #94a3b8; }
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #94a3b8; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .upvoted { color: #ffffff !important; }
         #toast { transition: transform 0.3s ease, opacity 0.3s ease; }
+        #confessionModal { transition: opacity 0.25s ease, transform 0.25s ease; }
+        #confessionModal.hidden-modal { opacity: 0; pointer-events: none; transform: scale(0.95); }
+        #confessionModal.show-modal { opacity: 1; pointer-events: auto; transform: scale(1); }
     </style>
 </head>
 <body class="scrollbar-hide">
@@ -23,7 +26,38 @@
         ✨ Pengakuan berhasil dikirim!
     </div>
 
-    <nav class="fixed top-0 w-full z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5">
+    <!-- Floating Action Button (FAB) untuk membuka Pop-up Form -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button onclick="toggleModal(true)" class="flex items-center gap-2 bg-white text-black px-4 py-3 rounded-full shadow-2xl hover:bg-slate-200 active:scale-95 transition-all font-black text-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+            <span class="hidden sm:inline tracking-wide">TULIS PENGAKUAN</span>
+        </button>
+    </div>
+
+    <!-- POP-UP MODAL FORM -->
+    <div id="confessionModal" class="hidden-modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="glass w-full max-w-md p-6 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0a]">
+            <!-- Tombol Close Modal -->
+            <button onclick="toggleModal(false)" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/5 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <h2 class="text-base font-black text-white mb-4 tracking-tight">Sampaikan Pengakuan</h2>
+
+            <form id="confessionForm" class="space-y-3">
+                <input type="text" id="alias" placeholder="Alias..." class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition">
+                
+                <div class="relative">
+                    <textarea id="confession" rows="4" maxlength="300" placeholder="Tulis pengakuanmu di sini..." oninput="updateCharCount()" class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition resize-none"></textarea>
+                    <div id="charCount" class="absolute bottom-3 right-3 text-[10px] text-slate-600 font-mono">0/300</div>
+                </div>
+                
+                <button type="submit" id="submitBtn" class="w-full py-3 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg">SUBMIT PENGAKUAN</button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="fixed top-0 w-full z-30 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5">
         <div class="max-w-lg mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="flex items-center active:scale-95 transition-transform">
                 <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-6 w-auto">
@@ -32,7 +66,7 @@
         </div>
     </nav>
 
-    <main class="pt-20 px-4 pb-20 max-w-lg mx-auto">
+    <main class="pt-20 px-4 pb-12 max-w-lg mx-auto">
         <!-- Section Header -->
         <section class="text-center mb-5">
             <h1 class="text-xl font-black mb-1 tracking-tight text-white">Room of Faith</h1>
@@ -73,22 +107,8 @@
             </div>
         </section>
 
-        <!-- Form Pengakuan -->
-        <section class="glass p-5 rounded-2xl mb-8 border border-white/10 shadow-xl">
-            <form id="confessionForm" class="space-y-3">
-                <input type="text" id="alias" placeholder="Alias..." class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition">
-                
-                <div class="relative">
-                    <textarea id="confession" rows="3" maxlength="300" placeholder="Sampaikan pengakuan..." oninput="updateCharCount()" class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition resize-none"></textarea>
-                    <div id="charCount" class="absolute bottom-3 right-3 text-[10px] text-slate-600 font-mono">0/300</div>
-                </div>
-                
-                <button type="submit" id="submitBtn" class="w-full py-3 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg">SUBMIT PENGAKUAN</button>
-            </form>
-        </section>
-
         <!-- Filter Sort -->
-        <div class="flex items-center gap-2 mb-6">
+        <div class="mb-4">
             <select id="sortSelect" onchange="sortFeed()" class="bg-black/50 border border-white/10 text-white text-[10px] p-2.5 rounded-xl focus:outline-none uppercase tracking-widest w-full cursor-pointer">
                 <option value="newest">Terbaru</option>
                 <option value="oldest">Terlama</option>
@@ -97,8 +117,23 @@
             </select>
         </div>
 
-        <!-- Feed List -->
-        <div id="feed" class="space-y-6"></div>
+        <!-- SWIPE / TINDER CARD FEED CONTAINER -->
+        <div id="swipeContainer" class="relative w-full select-none touch-pan-y">
+            <div id="feed" class="w-full transition-all duration-200 ease-out"></div>
+        </div>
+        
+        <!-- Desktop Friendly Navigation Buttons & Subtle Hint -->
+        <div class="flex items-center justify-between mt-4 px-1">
+            <button onclick="prevCard()" class="p-2.5 glass rounded-xl border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition active:scale-90 flex items-center gap-1.5 text-[10px] font-mono">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Sebelumnya
+            </button>
+            <p class="text-[9px] text-slate-600 font-mono tracking-widest uppercase text-center hidden sm:block">‹ Geser / Tombol ›</p>
+            <button onclick="nextCard('right')" class="p-2.5 glass rounded-xl border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition active:scale-90 flex items-center gap-1.5 text-[10px] font-mono">
+                Selanjutnya
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+        </div>
     </main>
 
     <script>
@@ -107,6 +142,18 @@
         const SUPABASE_KEY = 'sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const TABLE_NAME = 'PDFTV Room of Faith';
+
+        // --- MODAL TOGGLE ---
+        function toggleModal(open) {
+            const modal = document.getElementById('confessionModal');
+            if (open) {
+                modal.classList.remove('hidden-modal');
+                modal.classList.add('show-modal');
+            } else {
+                modal.classList.remove('show-modal');
+                modal.classList.add('hidden-modal');
+            }
+        }
 
         // --- HELPER SECURITY & TIME ---
         function escapeHtml(str) {
@@ -133,7 +180,7 @@
             return `${days}hr yang lalu`;
         }
 
-        // --- LOGIKA SLIDER ---
+        // --- LOGIKA SLIDER GAMBAR ATAS ---
         let currentSlide = 0;
         const totalSlides = 3;
         const slider = document.getElementById('slider');
@@ -175,8 +222,9 @@
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
-        // --- APP LOGIC (Supabase & DOM) ---
+        // --- APP LOGIC & INFINITE SWIPE DECK ---
         let posts = [];
+        let currentIndex = 0;
         const form = document.getElementById('confessionForm');
         const feed = document.getElementById('feed');
         const submitBtn = document.getElementById('submitBtn');
@@ -215,7 +263,7 @@
                         }
                     }
 
-                    const rawTime = row.id; // Menggunakan id sebagai timestamp dasar di database kamu
+                    const rawTime = row.id; 
                     const parsedTime = isNaN(Number(rawTime)) ? Date.now() : Number(rawTime);
 
                     return {
@@ -268,7 +316,10 @@
 
                 form.reset();
                 updateCharCount();
+                toggleModal(false); // Tutup modal otomatis setelah berhasil
                 await fetchPosts();
+                currentIndex = 0; 
+                renderFeed();
                 showToast("✨ Pengakuan berhasil dikirim!");
             } catch (error) {
                 console.error('Error:', error);
@@ -302,7 +353,70 @@
             if (sortBy === 'oldest') posts.sort((a, b) => a.id - b.id);
             if (sortBy === 'upvotes') posts.sort((a, b) => b.upvotes - a.upvotes);
             if (sortBy === 'comments') posts.sort((a, b) => b.comments.length - a.comments.length);
+            
+            currentIndex = 0; 
             renderFeed();
+        }
+
+        // --- INFINITE LOOP SWIPE ENGINE ---
+        function nextCard(direction = 'left') {
+            if (posts.length === 0) return;
+            
+            feed.style.transform = direction === 'left' ? 'translateX(-30px)' : 'translateX(30px)';
+            feed.style.opacity = '0';
+
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % posts.length;
+                renderFeed();
+                
+                feed.style.transform = direction === 'left' ? 'translateX(30px)' : 'translateX(-30px)';
+                setTimeout(() => {
+                    feed.style.transform = 'translateX(0)';
+                    feed.style.opacity = '1';
+                }, 50);
+            }, 150);
+        }
+
+        function prevCard() {
+            if (posts.length === 0) return;
+            
+            feed.style.transform = 'translateX(30px)';
+            feed.style.opacity = '0';
+
+            setTimeout(() => {
+                currentIndex = (currentIndex - 1 + posts.length) % posts.length;
+                renderFeed();
+                
+                feed.style.transform = 'translateX(-30px)';
+                setTimeout(() => {
+                    feed.style.transform = 'translateX(0)';
+                    feed.style.opacity = '1';
+                }, 50);
+            }, 150);
+        }
+
+        // Touch & Mouse Swipe Listener
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        const swipeContainer = document.getElementById('swipeContainer');
+        
+        swipeContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        swipeContainer.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipeGesture();
+        }, {passive: true});
+
+        function handleSwipeGesture() {
+            const threshold = 40; 
+            if (touchEndX < touchStartX - threshold) {
+                nextCard('left');
+            } else if (touchEndX > touchStartX + threshold) {
+                prevCard();
+            }
         }
 
         function renderFeed() {
@@ -310,7 +424,7 @@
             
             if (posts.length === 0) {
                 feed.innerHTML = `
-                    <div class="text-center py-12 glass rounded-2xl border border-white/5">
+                    <div class="text-center py-10 glass rounded-2xl border border-white/5">
                         <p class="text-slate-500 text-xs italic">Belum ada pengakuan sama sekali.</p>
                         <p class="text-slate-600 text-[10px] mt-1">Jadilah yang pertama bersuara di ruang ini.</p>
                     </div>
@@ -318,33 +432,32 @@
                 return;
             }
 
-            posts.forEach(post => {
-                const hasUpvoted = localStorage.getItem(`upvoted_${post.id}`) === 'true';
+            const post = posts[currentIndex];
+            const hasUpvoted = localStorage.getItem(`upvoted_${post.id}`) === 'true';
 
-                const div = document.createElement('div');
-                div.id = `post-card-${post.id}`;
-                div.className = 'glass p-5 rounded-2xl border border-white/5 transition-all duration-300 hover:border-white/10';
-                
-                div.innerHTML = `
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-white text-[11px] uppercase tracking-wider">@${escapeHtml(post.alias)}</span>
-                            <span class="text-[9px] text-slate-600 font-mono">• ${timeAgo(post.timestamp)}</span>
-                        </div>
-                        <button onclick="handleUpvote('${post.id}')" id="btn-${post.id}" class="flex items-center gap-1.5 text-[10px] transition active:scale-90 hover:text-white ${hasUpvoted ? 'upvoted' : 'text-slate-500'}">
-                            <span class="heart">▲</span> <span id="count-${post.id}">${post.upvotes}</span>
-                        </button>
+            const div = document.createElement('div');
+            div.id = `post-card-${post.id}`;
+            div.className = 'glass p-5 rounded-2xl border border-white/10 transition-all duration-300 shadow-xl';
+            
+            div.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-white text-[11px] uppercase tracking-wider">@${escapeHtml(post.alias)}</span>
+                        <span class="text-[9px] text-slate-600 font-mono">• ${timeAgo(post.timestamp)}</span>
                     </div>
-                    <p class="text-slate-300 text-sm mb-5 leading-relaxed break-words">${escapeHtml(post.text)}</p>
-                    <div class="space-y-3">
-                        <div id="replies-${post.id}" class="replyList space-y-2 text-[11px]">
-                            ${post.comments.map(c => `<div class="text-slate-500 pl-3 border-l border-white/5 italic break-words">${escapeHtml(c)}</div>`).join('')}
-                        </div>
-                        <input type="text" placeholder="Balas..." onkeydown="handleReply(event, '${post.id}')" class="w-full bg-black/40 border border-white/5 text-[11px] p-3 rounded-lg text-slate-300 focus:outline-none focus:border-white/20 transition">
+                    <button onclick="handleUpvote('${post.id}')" id="btn-${post.id}" class="flex items-center gap-1.5 text-[10px] transition active:scale-90 hover:text-white ${hasUpvoted ? 'upvoted' : 'text-slate-500'}">
+                        <span class="heart">▲</span> <span id="count-${post.id}">${post.upvotes}</span>
+                    </button>
+                </div>
+                <p class="text-slate-300 text-sm mb-5 leading-relaxed break-words">${escapeHtml(post.text)}</p>
+                <div class="space-y-3">
+                    <div id="replies-${post.id}" class="replyList space-y-2 text-[11px] max-h-32 overflow-y-auto scrollbar-hide">
+                        ${post.comments.length > 0 ? post.comments.map(c => `<div class="text-slate-500 pl-3 border-l border-white/5 italic break-words">${escapeHtml(c)}</div>`).join('') : '<div class="text-slate-600 text-[10px] italic">Belum ada balasan.</div>'}
                     </div>
-                `;
-                feed.appendChild(div);
-            });
+                    <input type="text" placeholder="Balas..." onkeydown="handleReply(event, '${post.id}')" class="w-full bg-black/40 border border-white/5 text-[11px] p-3 rounded-lg text-slate-300 focus:outline-none focus:border-white/20 transition">
+                </div>
+            `;
+            feed.appendChild(div);
         }
 
         function handleUpvote(id) {
@@ -375,14 +488,7 @@
                 post.comments.push(text);
                 e.target.value = '';
 
-                const repliesContainer = document.getElementById(`replies-${id}`);
-                if (repliesContainer) {
-                    const replyDiv = document.createElement('div');
-                    replyDiv.className = 'text-slate-500 pl-3 border-l border-white/5 italic break-words';
-                    replyDiv.textContent = text;
-                    repliesContainer.appendChild(replyDiv);
-                }
-
+                renderFeed(); 
                 updatePostInSupabase(post);
                 showToast("💬 Balasan terkirim!");
             }
