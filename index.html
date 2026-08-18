@@ -18,14 +18,33 @@
         .hidden-modal { opacity: 0; pointer-events: none; transform: scale(0.96) translateY(10px); }
         .show-modal { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); }
 
-        /* Card Animation for Blackjack */
-        @keyframes cardPop {
-            0% { transform: scale(0) translateY(-50px) rotate(-10deg); opacity: 0; }
-            70% { transform: scale(1.1) translateY(0) rotate(3deg); opacity: 1; }
-            100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+        /* --- ANIMASI KARTU BLACKJACK IMERSIF & FLIP --- */
+        .card-container {
+            perspective: 1000px;
         }
+
+        @keyframes cardDeal {
+            0% { transform: translateY(-80px) scale(0.5) rotate(-15deg); opacity: 0; }
+            60% { transform: translateY(5px) scale(1.05) rotate(2deg); opacity: 1; }
+            100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+        }
+        
         .card-animate {
-            animation: cardPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: cardDeal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Animasi Card Flip 3D (Terbalik ke Terbuka) */
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .card-flipped .card-inner {
+            transform: rotateY(180deg);
         }
 
         /* Gold Glow for #1 Leaderboard */
@@ -158,10 +177,10 @@
             <div class="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/5">
                 <div>
                     <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                        <span class="font-bold tracking-wider">DEALER</span>
+                        <span class="font-bold tracking-wider flex items-center gap-1">DEALER <span id="dealerStatusText" class="text-[9px] font-normal text-amber-400"></span></span>
                         <span id="dealerScore" class="font-mono text-slate-200 font-bold">0</span>
                     </div>
-                    <div id="dealerCards" class="flex gap-2 min-h-[64px] items-center"></div>
+                    <div id="dealerCards" class="flex gap-2 min-h-[64px] items-center overflow-x-auto scrollbar-hide py-1"></div>
                 </div>
 
                 <div class="border-b border-white/10 my-2"></div>
@@ -171,7 +190,7 @@
                         <span class="font-bold tracking-wider">KAMU</span>
                         <span id="playerScore" class="font-mono text-slate-200 font-bold">0</span>
                     </div>
-                    <div id="playerCards" class="flex gap-2 min-h-[64px] items-center"></div>
+                    <div id="playerCards" class="flex gap-2 min-h-[64px] items-center overflow-x-auto scrollbar-hide py-1"></div>
                 </div>
             </div>
 
@@ -740,7 +759,7 @@
         }
 
         // ===================================================
-        // --- LOGIKA BLACKJACK ROGUELITE GAME & LEADERBOARD ---
+        // --- LOGIKA BLACKJACK ROGUELITE GAME & ANIMASI ---
         // ===================================================
         let deck = [];
         let playerHand = [];
@@ -751,8 +770,9 @@
         let isPeeked = false;
         let isDoubleDownActive = false;
 
-        // TRACKER COOLDOWN RESET
+        // TRACKER COOLDOWN RESET & ANIMASI
         let isResetCoolingDown = false;
+        let isDealerDrawing = false;
 
         // RESET COUNTER TRACKER
         let totalResets = parseInt(localStorage.getItem('bj_total_resets') || '0');
@@ -823,16 +843,35 @@
             return score;
         }
 
+        /* --- RENDERING ANIMASI KARTU LENGKAP DENGAN KARTU TERTUTUP (HIDDEN) & PEEK --- */
         function renderCardHTML(card, hidden = false) {
-            if (hidden && !isPeeked) {
-                return `<div class="card-animate w-11 h-16 bg-gradient-to-br from-slate-800 to-slate-900 border border-white/20 rounded-xl flex items-center justify-center font-bold text-slate-500 text-xs shadow-lg">?</div>`;
-            }
             const isRed = card.suit === '♥' || card.suit === '♦';
             const colorClass = isRed ? 'text-red-500' : 'text-slate-900';
-            const peekBorder = hidden && isPeeked ? 'ring-2 ring-indigo-400 opacity-90' : '';
 
+            if (hidden) {
+                if (isPeeked) {
+                    // Animasi Mode Mengintip (Peek)
+                    return `
+                    <div class="card-animate w-11 h-16 bg-indigo-900/90 border-2 border-indigo-400 rounded-xl flex flex-col justify-between p-1.5 shadow-xl relative overflow-hidden select-none transform transition-all duration-300">
+                        <span class="text-[10px] font-black leading-none ${colorClass}">${card.value}</span>
+                        <span class="text-[10px] ${colorClass} self-start leading-none">${card.suit}</span>
+                        <div class="absolute inset-0 bg-indigo-500/20 backdrop-blur-[1px] flex items-center justify-center">
+                            <span class="text-[9px] font-mono font-bold text-indigo-200 uppercase bg-indigo-950/80 px-1 rounded">PEEK</span>
+                        </div>
+                    </div>`;
+                }
+
+                // Kartu Tertutup Dealer (Hidden Card)
+                return `
+                <div class="card-animate w-11 h-16 bg-gradient-to-br from-slate-800 to-slate-950 border border-slate-700/80 rounded-xl flex flex-col items-center justify-center font-bold text-slate-500 shadow-xl relative select-none">
+                    <span class="text-xs text-amber-500/70">🂠</span>
+                    <span class="text-[10px] text-slate-400 font-mono">?</span>
+                </div>`;
+            }
+
+            // Kartu Terbuka Normal
             return `
-            <div class="card-animate w-11 h-16 bg-white rounded-xl flex flex-col justify-between p-1.5 shadow-xl relative overflow-hidden select-none ${peekBorder}">
+            <div class="card-animate w-11 h-16 bg-white rounded-xl flex flex-col justify-between p-1.5 shadow-xl relative overflow-hidden select-none">
                 <span class="text-[11px] font-black leading-none ${colorClass}">${card.value}</span>
                 <span class="text-xs ${colorClass} self-start leading-none">${card.suit}</span>
                 <span class="absolute -bottom-1 -right-1 text-xl opacity-10 font-bold ${colorClass}">${card.suit}</span>
@@ -844,9 +883,8 @@
             document.getElementById('shieldCount').textContent = sessionBuffs.shieldCount;
             document.getElementById('totalResetsText').textContent = totalResets;
             
-            document.getElementById('btnPeek').disabled = !isGameActive || sessionBuffs.peekCharges <= 0 || isPeeked;
+            document.getElementById('btnPeek').disabled = !isGameActive || sessionBuffs.peekCharges <= 0 || isPeeked || isDealerDrawing;
             
-            // Logika Double Down (Label ringkas)
             const btnDoubleDown = document.getElementById('btnDoubleDown');
 
             if (totalResets < UNLOCK_RESET_THRESHOLD) {
@@ -854,12 +892,11 @@
                 btnDoubleDown.innerHTML = `🔒 2X DOWN`;
                 btnDoubleDown.disabled = true;
             } else {
-                btnDoubleDown.disabled = !isGameActive || playerHand.length !== 2;
+                btnDoubleDown.disabled = !isGameActive || playerHand.length !== 2 || isDealerDrawing;
                 btnDoubleDown.className = "py-2 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition shadow-[0_0_10px_rgba(245,158,11,0.2)]";
                 btnDoubleDown.innerHTML = `⚡ 2X DOWN`;
             }
 
-            // Logika Toggle Shield
             const btnShieldToggle = document.getElementById('btnShieldToggle');
             const shieldStatus = document.getElementById('shieldStatus');
             
@@ -871,7 +908,7 @@
                 shieldStatus.textContent = "OFF";
             }
 
-            btnShieldToggle.disabled = sessionBuffs.shieldCount <= 0 && !sessionBuffs.isShieldActive;
+            btnShieldToggle.disabled = (sessionBuffs.shieldCount <= 0 && !sessionBuffs.isShieldActive) || isDealerDrawing;
             if (btnShieldToggle.disabled) {
                 btnShieldToggle.classList.add('opacity-30', 'pointer-events-none');
             } else {
@@ -880,6 +917,7 @@
         }
 
         function toggleShield() {
+            if (isDealerDrawing) return;
             if (!sessionBuffs.isShieldActive) {
                 if (sessionBuffs.shieldCount > 0) {
                     sessionBuffs.isShieldActive = true;
@@ -893,15 +931,13 @@
         }
 
         function toggleDoubleDown() {
-            if (!isGameActive || totalResets < UNLOCK_RESET_THRESHOLD || playerHand.length !== 2) return;
+            if (!isGameActive || totalResets < UNLOCK_RESET_THRESHOLD || playerHand.length !== 2 || isDealerDrawing) return;
 
-            // Konfirmasi keamanan agar pemain yakin
             const confirmAction = confirm("⚡ Yakin ingin memakai Double Down?\n\nKamu akan mengambil 1 kartu tambahan dan sesi/ronde ini akan LANGSUNG BERAKHIR.");
             if (!confirmAction) return;
 
             isDoubleDownActive = true;
 
-            // Reset hitungan reset ke 0 setelah digunakan
             totalResets = 0;
             localStorage.setItem('bj_total_resets', '0');
 
@@ -930,9 +966,15 @@
             playerScoreEl.textContent = calculateHand(playerHand);
 
             if (hideDealerCard && dealerHand.length > 0) {
-                dealerCardsEl.innerHTML = renderCardHTML(dealerHand[0]) + renderCardHTML(dealerHand[1], true);
+                // Kartu pertama terbuka, kartu kedua tetap tertutup (Hidden)
+                let html = renderCardHTML(dealerHand[0]);
+                for (let i = 1; i < dealerHand.length; i++) {
+                    html += renderCardHTML(dealerHand[i], true);
+                }
+                dealerCardsEl.innerHTML = html;
                 dealerScoreEl.textContent = isPeeked ? calculateHand(dealerHand) : getCardValue(dealerHand[0]);
             } else {
+                // Kartu Dealer terbuka secara transparan saat ronde berakhir
                 dealerCardsEl.innerHTML = dealerHand.map(c => renderCardHTML(c)).join('');
                 dealerScoreEl.textContent = calculateHand(dealerHand);
             }
@@ -942,15 +984,14 @@
         }
 
         function startNewGame() {
+            if (isDealerDrawing) return;
             const btnStart = document.getElementById('btnStart');
 
-            // Proteksi Cooldown 3 Detik
             if (isResetCoolingDown) {
                 showToast("⏳ Mohon tunggu sebentar sebelum reset lagi!");
                 return;
             }
 
-            // Tambah hitungan reset
             totalResets++;
             localStorage.setItem('bj_total_resets', totalResets.toString());
 
@@ -958,7 +999,6 @@
                 showToast("🎉 UNLOCKED! Power-Up ⚡ DOUBLE DOWN kini dapat digunakan!");
             }
 
-            // Aktifkan Cooldown selama 3 Detik
             isResetCoolingDown = true;
             btnStart.disabled = true;
             btnStart.classList.add('opacity-50');
@@ -979,28 +1019,39 @@
                 }
             }, 1000);
 
-            // Inisialisasi Game Baru
+            // Inisialisasi Game Baru dengan Animasi Pembagian Kartu Berurutan
             playCardSound();
             buildDeck();
-            playerHand = [drawWeightedCard(), drawWeightedCard()];
-            dealerHand = [drawWeightedCard(), drawWeightedCard()];
+            
+            playerHand = [];
+            dealerHand = [];
             isGameActive = true;
             isPeeked = false;
             isDoubleDownActive = false;
+            isDealerDrawing = false;
 
+            document.getElementById('dealerStatusText').textContent = "";
             document.getElementById('gameStatus').textContent = "";
             document.getElementById('btnHit').disabled = false;
             document.getElementById('btnStand').disabled = false;
 
-            updateGameUI(true);
+            // Animasi gradual saat kartu awal dibagikan
+            setTimeout(() => { playerHand.push(drawWeightedCard()); playCardSound(); updateGameUI(true); }, 100);
+            setTimeout(() => { dealerHand.push(drawWeightedCard()); playCardSound(); updateGameUI(true); }, 300);
+            setTimeout(() => { playerHand.push(drawWeightedCard()); playCardSound(); updateGameUI(true); }, 500);
+            setTimeout(() => { 
+                dealerHand.push(drawWeightedCard()); 
+                playCardSound(); 
+                updateGameUI(true); 
 
-            if (calculateHand(playerHand) === 21) {
-                endGame('win', 'BLACKJACK! KAMU MENANG! 🎉');
-            }
+                if (calculateHand(playerHand) === 21) {
+                    endGame('win', 'BLACKJACK! KAMU MENANG! 🎉');
+                }
+            }, 700);
         }
 
         function hit() {
-            if (!isGameActive) return;
+            if (!isGameActive || isDealerDrawing) return;
             playCardSound();
             playerHand.push(drawWeightedCard());
             updateGameUI(true);
@@ -1010,17 +1061,34 @@
             }
         }
 
-        function stand() {
-            if (!isGameActive) return;
-            playCardSound();
+        /* --- ANIMASI DEALER SAKTI & BERURUTAN KARTU TERTUTUP (HIDDEN) --- */
+        async function stand() {
+            if (!isGameActive || isDealerDrawing) return;
             
+            isDealerDrawing = true;
+            document.getElementById('btnHit').disabled = true;
+            document.getElementById('btnStand').disabled = true;
+            updatePowerUpUI();
+
+            const dealerStatusText = document.getElementById('dealerStatusText');
+            dealerStatusText.textContent = "• mengambil kartu...";
+
+            // Dealer mengambil kartu satu per satu dengan delay animasi untuk imersifitas
             while (calculateHand(dealerHand) < 17) {
+                await new Promise(resolve => setTimeout(resolve, 600));
+                playCardSound();
                 dealerHand.push(drawWeightedCard());
+                // Kartu tambahan Dealer tetap disembunyikan dalam mode hidden selama giliran berjalan
+                updateGameUI(true); 
             }
+
+            await new Promise(resolve => setTimeout(resolve, 500));
+            dealerStatusText.textContent = "";
 
             const pScore = calculateHand(playerHand);
             const dScore = calculateHand(dealerHand);
 
+            // Buka seluruh kartu Dealer saat babak penentuan
             updateGameUI(false);
 
             if (pScore > 21) {
@@ -1037,7 +1105,7 @@
         }
 
         function usePeek() {
-            if (!isGameActive || sessionBuffs.peekCharges <= 0 || isPeeked) return;
+            if (!isGameActive || sessionBuffs.peekCharges <= 0 || isPeeked || isDealerDrawing) return;
             sessionBuffs.peekCharges--;
             isPeeked = true;
             playCardSound();
@@ -1047,6 +1115,7 @@
 
         function endGame(result, message) {
             isGameActive = false;
+            isDealerDrawing = false;
             document.getElementById('btnHit').disabled = true;
             document.getElementById('btnStand').disabled = true;
             document.getElementById('gameStatus').textContent = message;
