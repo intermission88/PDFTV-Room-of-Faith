@@ -139,7 +139,7 @@
             </div>
 
             <!-- Panel Power-Up Active (3 Power-Up Grid) -->
-            <div class="grid grid-cols-3 gap-2 mb-3">
+            <div class="grid grid-cols-3 gap-2 mb-1">
                 <button onclick="usePeek()" id="btnPeek" class="py-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl text-[10px] font-black hover:bg-indigo-500/30 transition disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center gap-1" disabled>
                     👁️ PEEK (<span id="peekCount">3</span>)
                 </button>
@@ -149,6 +149,10 @@
                 <button onclick="toggleShield()" id="btnShieldToggle" class="py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition">
                     🛡️ SHIELD: <span id="shieldStatus" class="font-bold">OFF</span> (<span id="shieldCount">1</span>)
                 </button>
+            </div>
+            <!-- Petunjuk Penggunaan Double Down -->
+            <div class="text-[9px] text-amber-400/80 font-mono text-center mb-3 italic">
+                ⚠️ Gunakan 2X DOWN saat kamu yakin! Menekan tombol ini akan mengambil 1 kartu & langsung mengakhiri sesi/ronde.
             </div>
 
             <div class="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/5">
@@ -211,8 +215,8 @@
                             <p class="text-[10px] text-slate-400 mt-0.5">Mengintip kartu tertutup (*Hole Card*) milik Dealer sebelum kamu mengambil keputusan Hit/Stand. Dapat digunakan hingga 3 kali per sesi!</p>
                         </div>
                         <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
-                            <span class="font-bold text-amber-300 text-[11px]">⚡ 2. DOUBLE DOWN (Toggle Manual - Unlock @ 17 Resets)</span>
-                            <p class="text-[10px] text-slate-400 mt-0.5">Toggle ke <b>ON</b> saat giliranmu untuk mengambil 1 kartu tambahan & otomatis Stand. Jika menang, <b>Total Streak dikali 2 (misal: 18 × 2 = 36 Streak)</b>! Memakainya akan mereset hitungan reset ke 0.</p>
+                            <span class="font-bold text-amber-300 text-[11px]">⚡ 2. DOUBLE DOWN (Unlock @ 17 Resets)</span>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Memakai Double Down akan mengambil 1 kartu tambahan & <b>otomatis mengakhiri sesi (Stand)</b>. Pastikan kamu yakin sebelum menggunakannya! Jika menang, <b>Streak dikali 2</b> & hitungan reset kembali ke 0.</p>
                         </div>
                         <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
                             <span class="font-bold text-emerald-300 text-[11px]">🛡️ 3. SHIELD (Toggle Manual)</span>
@@ -842,7 +846,7 @@
             
             document.getElementById('btnPeek').disabled = !isGameActive || sessionBuffs.peekCharges <= 0 || isPeeked;
             
-            // Logika Toggle Double Down (Dibersihkan dari display angka tambahan)
+            // Logika Double Down (Label ringkas)
             const btnDoubleDown = document.getElementById('btnDoubleDown');
 
             if (totalResets < UNLOCK_RESET_THRESHOLD) {
@@ -851,13 +855,8 @@
                 btnDoubleDown.disabled = true;
             } else {
                 btnDoubleDown.disabled = !isGameActive || playerHand.length !== 2;
-                if (isDoubleDownActive) {
-                    btnDoubleDown.className = "py-2 bg-amber-500/20 border border-amber-500/30 text-amber-300 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition shadow-[0_0_10px_rgba(245,158,11,0.3)]";
-                    btnDoubleDown.innerHTML = `⚡ 2X DOWN: <span id="doubleDownStatus" class="font-bold">ON</span>`;
-                } else {
-                    btnDoubleDown.className = "py-2 bg-amber-500/10 border border-amber-500/20 text-amber-400/70 hover:text-amber-300 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition";
-                    btnDoubleDown.innerHTML = `⚡ 2X DOWN: <span id="doubleDownStatus" class="font-bold">OFF</span>`;
-                }
+                btnDoubleDown.className = "py-2 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition shadow-[0_0_10px_rgba(245,158,11,0.2)]";
+                btnDoubleDown.innerHTML = `⚡ 2X DOWN`;
             }
 
             // Logika Toggle Shield
@@ -896,29 +895,28 @@
         function toggleDoubleDown() {
             if (!isGameActive || totalResets < UNLOCK_RESET_THRESHOLD || playerHand.length !== 2) return;
 
-            if (!isDoubleDownActive) {
-                isDoubleDownActive = true;
+            // Konfirmasi keamanan agar pemain yakin
+            const confirmAction = confirm("⚡ Yakin ingin memakai Double Down?\n\nKamu akan mengambil 1 kartu tambahan dan sesi/ronde ini akan LANGSUNG BERAKHIR.");
+            if (!confirmAction) return;
 
-                totalResets = 0;
-                localStorage.setItem('bj_total_resets', '0');
+            isDoubleDownActive = true;
 
-                playCardSound();
-                showToast("⚡ DOUBLE DOWN DIAKTIFKAN! Mengambil 1 Kartu & Stand...");
+            // Reset hitungan reset ke 0 setelah digunakan
+            totalResets = 0;
+            localStorage.setItem('bj_total_resets', '0');
 
-                updatePowerUpUI();
+            playCardSound();
+            showToast("⚡ DOUBLE DOWN! Mengambil 1 Kartu & Sesi Berakhir...");
 
-                playerHand.push(drawWeightedCard());
-                updateGameUI(true);
+            updatePowerUpUI();
 
-                if (calculateHand(playerHand) > 21) {
-                    endGame('lose', 'DOUBLE DOWN BUST! 💥');
-                } else {
-                    stand();
-                }
+            playerHand.push(drawWeightedCard());
+            updateGameUI(true);
+
+            if (calculateHand(playerHand) > 21) {
+                endGame('lose', 'DOUBLE DOWN BUST! 💥');
             } else {
-                isDoubleDownActive = false;
-                showToast("⚡ Double Down DIMATIKAN.");
-                updatePowerUpUI();
+                stand();
             }
         }
 
@@ -943,11 +941,10 @@
             updatePowerUpUI();
         }
 
-        // FUNGSI RESET TERBARU: LANSUNG MENAMBAHKAN TOTAL RESETS
         function startNewGame() {
             const btnStart = document.getElementById('btnStart');
 
-            // 1. Proteksi Cooldown 3 Detik
+            // Proteksi Cooldown 3 Detik
             if (isResetCoolingDown) {
                 showToast("⏳ Mohon tunggu sebentar sebelum reset lagi!");
                 return;
