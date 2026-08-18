@@ -90,6 +90,7 @@
         </button>
     </div>
 
+    <!-- Modal Pengakuan -->
     <div id="confessionModal" class="modal-base hidden-modal fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div class="glass w-full max-w-md p-6 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0a]">
             <button onclick="toggleModal(false)" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
@@ -117,18 +118,34 @@
             
             <div class="flex justify-between items-center mb-3">
                 <h2 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                    <span>🃏</span> BlackJack <span class="text-[9px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full uppercase tracking-widest font-mono">High Stakes</span>
+                    <span>🃏</span> BlackJack <span class="text-[9px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full uppercase tracking-widest font-mono">Roguelite</span>
                 </h2>
-                <button onclick="toggleBlackjackModal(false)" class="text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <div class="flex items-center gap-1">
+                    <button onclick="toggleRulesModal(true)" class="text-xs bg-white/10 hover:bg-white/20 text-slate-300 font-bold px-2.5 py-1 rounded-lg transition border border-white/10">📜 Rules</button>
+                    <button onclick="toggleBlackjackModal(false)" class="text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
             </div>
 
-            <div class="flex items-center justify-between mb-4 bg-white/5 px-3 py-2 rounded-xl border border-white/5">
+            <div class="flex items-center justify-between mb-3 bg-white/5 px-3 py-2 rounded-xl border border-white/5">
                 <span class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Current Record</span>
                 <div class="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-bold">
                     Streak: <span id="currentStreak">0</span> 🔥
                 </div>
+            </div>
+
+            <!-- Panel Power-Up Active (Tombol Shield sebagai Toggle Manual) -->
+            <div class="grid grid-cols-3 gap-2 mb-3">
+                <button onclick="usePeek()" id="btnPeek" class="py-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl text-[10px] font-black hover:bg-indigo-500/30 transition disabled:opacity-30 disabled:pointer-events-none" disabled>
+                    👁️ PEEK (<span id="peekCount">1</span>)
+                </button>
+                <button onclick="useMulligan()" id="btnMulligan" class="py-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-xl text-[10px] font-black hover:bg-purple-500/30 transition disabled:opacity-30 disabled:pointer-events-none" disabled>
+                    🔄 REDRAW (<span id="mulliganCount">1</span>)
+                </button>
+                <button onclick="toggleShield()" id="btnShieldToggle" class="py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition">
+                    🛡️ SHIELD: <span id="shieldStatus" class="font-bold">OFF</span> (<span id="shieldCount">1</span>)
+                </button>
             </div>
 
             <div class="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/5">
@@ -158,6 +175,46 @@
                 <button onclick="stand()" id="btnStand" class="py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none" disabled>STAND ✋</button>
             </div>
             <button onclick="startNewGame()" id="btnStart" class="w-full mt-2 py-3 bg-emerald-500 text-black text-xs font-black rounded-xl hover:bg-emerald-400 active:scale-[0.98] transition shadow-lg tracking-wider">MAIN SEKARANG 🎰</button>
+        </div>
+    </div>
+
+    <!-- Modal Rules & Power-Ups -->
+    <div id="rulesModal" class="modal-base hidden-modal fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass w-full max-w-sm p-6 rounded-3xl border border-white/10 shadow-2xl bg-[#0a0a0a] relative max-h-[85vh] overflow-y-auto scrollbar-hide">
+            <button onclick="toggleRulesModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <h3 class="text-sm font-black text-white mb-3 uppercase tracking-wider flex items-center gap-2">
+                📜 Aturan & Power-Up
+            </h3>
+
+            <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
+                <div>
+                    <h4 class="font-bold text-amber-400 border-b border-white/10 pb-1 mb-1">🎮 Aturan Dasar Blackjack</h4>
+                    <p class="text-[11px] text-slate-400">Dapatkan nilai kartu sedekat mungkin ke angka <b>21</b> tanpa melebihinya. Jika nilaimu melebihi 21, kamu dinyatakan <b>BUST</b> (kalah). Kartu bergambar (J, Q, K) bernilai 10, As bernilai 1 atau 11.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-emerald-400 border-b border-white/10 pb-1 mb-2">⚡ 3 Power-Up Roguelite (1 Sesi)</h4>
+                    <div class="space-y-2.5">
+                        <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+                            <span class="font-bold text-indigo-300 text-[11px]">👁️ 1. PEEK (Active - 1x)</span>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Mengintip kartu tertutup (*Hole Card*) milik Dealer sebelum kamu mengambil keputusan Hit/Stand.</p>
+                        </div>
+                        <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+                            <span class="font-bold text-purple-300 text-[11px]">🔄 2. MULLIGAN / REDRAW (Active - 1x)</span>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Jika kamu mengambil kartu (*Hit*) dan nilaimu Bust (>21), kamu bisa membuang kartu terakhir tersebut untuk selamat.</p>
+                        </div>
+                        <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+                            <span class="font-bold text-emerald-300 text-[11px]">🛡️ 3. SHIELD (Toggle Manual)</span>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Proteksi kekalahan! Default OFF. Toggle ON untuk menahan kekalahan berikutnya (Streak hanya berkurang 1 alih-alih hancur). Stok terpakai setelah menahan damage.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="toggleRulesModal(false)" class="w-full mt-5 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 transition">SAYA PAHAM 👍</button>
         </div>
     </div>
 
@@ -301,7 +358,7 @@
 
         function playWinSound() {
             initAudio();
-            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (Arpeggio)
+            const notes = [523.25, 659.25, 783.99, 1046.50];
             notes.forEach((freq, idx) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
@@ -347,7 +404,7 @@
         function triggerScreenShake() {
             const card = document.getElementById('blackjackCard');
             card.classList.remove('shake-effect');
-            void card.offsetWidth; // trigger reflow
+            void card.offsetWidth;
             card.classList.add('shake-effect');
         }
 
@@ -365,27 +422,23 @@
         const TABLE_NAME = 'PDFTV Room of Faith';
         const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
 
-        // --- MODAL TOGGLE ---
+        // --- MODAL TOGGLES ---
         function toggleModal(open) {
             const modal = document.getElementById('confessionModal');
-            if (open) {
-                modal.classList.remove('hidden-modal');
-                modal.classList.add('show-modal');
-            } else {
-                modal.classList.remove('show-modal');
-                modal.classList.add('hidden-modal');
-            }
+            if (open) { modal.classList.remove('hidden-modal'); modal.classList.add('show-modal'); }
+            else { modal.classList.remove('show-modal'); modal.classList.add('hidden-modal'); }
         }
 
         function toggleBlackjackModal(open) {
             const modal = document.getElementById('blackjackModal');
-            if (open) {
-                modal.classList.remove('hidden-modal');
-                modal.classList.add('show-modal');
-            } else {
-                modal.classList.remove('show-modal');
-                modal.classList.add('hidden-modal');
-            }
+            if (open) { modal.classList.remove('hidden-modal'); modal.classList.add('show-modal'); }
+            else { modal.classList.remove('show-modal'); modal.classList.add('hidden-modal'); }
+        }
+
+        function toggleRulesModal(open) {
+            const modal = document.getElementById('rulesModal');
+            if (open) { modal.classList.remove('hidden-modal'); modal.classList.add('show-modal'); }
+            else { modal.classList.remove('show-modal'); modal.classList.add('hidden-modal'); }
         }
 
         function closeScoreModal() {
@@ -393,23 +446,20 @@
             modal.classList.remove('show-modal');
             modal.classList.add('hidden-modal');
             streakToSubmit = 0;
+            
+            // Auto Reset Session Buffs saat Game Over & Batal/Tutup Modal
+            resetSessionBuffs();
         }
 
         // --- HELPER SECURITY & TIME ---
         function escapeHtml(str) {
             if (!str) return '';
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
         function timeAgo(timestamp) {
             const now = Date.now();
             const seconds = Math.floor((now - timestamp) / 1000);
-            
             if (isNaN(seconds) || seconds < 0) return 'baru saja';
             if (seconds < 60) return `${seconds}d yang lalu`;
             const minutes = Math.floor(seconds / 60);
@@ -440,24 +490,9 @@
             });
         }
 
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            updateSliderUI();
-            resetTimer();
-        }
-
-        function prevSlide() {
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-            updateSliderUI();
-            resetTimer();
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            updateSliderUI();
-            resetTimer();
-        }
-
+        function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateSliderUI(); resetTimer(); }
+        function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateSliderUI(); resetTimer(); }
+        function goToSlide(index) { currentSlide = index; updateSliderUI(); resetTimer(); }
         function startTimer() { slideInterval = setInterval(nextSlide, 3500); }
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
@@ -487,22 +522,15 @@
 
         async function fetchPosts() {
             try {
-                const { data, error } = await supabaseClient
-                    .from(TABLE_NAME)
-                    .select('*');
-
+                const { data, error } = await supabaseClient.from(TABLE_NAME).select('*');
                 if (error) throw error;
                 
                 posts = (data || []).map((row) => {
                     let parsedComments = [];
                     if (row.comments) {
-                        try {
-                            parsedComments = typeof row.comments === 'string' ? JSON.parse(row.comments) : row.comments;
-                        } catch (e) {
-                            parsedComments = [];
-                        }
+                        try { parsedComments = typeof row.comments === 'string' ? JSON.parse(row.comments) : row.comments; } 
+                        catch (e) { parsedComments = []; }
                     }
-
                     const rawTime = row.id; 
                     const parsedTime = isNaN(Number(rawTime)) ? Date.now() : Number(rawTime);
 
@@ -539,19 +567,15 @@
             submitBtn.classList.add('opacity-70');
 
             try {
-                const newId = Date.now();
                 const payload = {
-                    id: newId,
+                    id: Date.now(),
                     alias: alias,
                     confession: text,
                     upvotes: 0,
                     comments: JSON.stringify([])
                 };
 
-                const { error } = await supabaseClient
-                    .from(TABLE_NAME)
-                    .insert([payload]);
-                
+                const { error } = await supabaseClient.from(TABLE_NAME).insert([payload]);
                 if (error) throw error;
 
                 form.reset();
@@ -575,12 +599,8 @@
             try {
                 const { error } = await supabaseClient
                     .from(TABLE_NAME)
-                    .update({
-                        upvotes: post.upvotes,
-                        comments: JSON.stringify(post.comments)
-                    })
+                    .update({ upvotes: post.upvotes, comments: JSON.stringify(post.comments) })
                     .eq('id', post.id);
-
                 if (error) throw error;
             } catch (error) {
                 console.error('Gagal memperbarui database Supabase:', error);
@@ -601,80 +621,53 @@
         // --- INFINITE LOOP SWIPE ENGINE ---
         function nextCard(direction = 'left') {
             if (posts.length === 0) return;
-            
             feed.style.transform = direction === 'left' ? 'translateX(-30px)' : 'translateX(30px)';
             feed.style.opacity = '0';
 
             setTimeout(() => {
                 currentIndex = (currentIndex + 1) % posts.length;
                 renderFeed();
-                
                 feed.style.transform = direction === 'left' ? 'translateX(30px)' : 'translateX(-30px)';
-                setTimeout(() => {
-                    feed.style.transform = 'translateX(0)';
-                    feed.style.opacity = '1';
-                }, 50);
+                setTimeout(() => { feed.style.transform = 'translateX(0)'; feed.style.opacity = '1'; }, 50);
             }, 150);
         }
 
         function prevCard() {
             if (posts.length === 0) return;
-            
             feed.style.transform = 'translateX(30px)';
             feed.style.opacity = '0';
 
             setTimeout(() => {
                 currentIndex = (currentIndex - 1 + posts.length) % posts.length;
                 renderFeed();
-                
                 feed.style.transform = 'translateX(-30px)';
-                setTimeout(() => {
-                    feed.style.transform = 'translateX(0)';
-                    feed.style.opacity = '1';
-                }, 50);
+                setTimeout(() => { feed.style.transform = 'translateX(0)'; feed.style.opacity = '1'; }, 50);
             }, 150);
         }
 
         let touchStartX = 0;
         let touchEndX = 0;
-
         const swipeContainer = document.getElementById('swipeContainer');
-        
-        swipeContainer.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, {passive: true});
-
-        swipeContainer.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipeGesture();
-        }, {passive: true});
+        swipeContainer.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+        swipeContainer.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipeGesture(); }, {passive: true});
 
         function handleSwipeGesture() {
             const threshold = 40; 
-            if (touchEndX < touchStartX - threshold) {
-                nextCard('left');
-            } else if (touchEndX > touchStartX + threshold) {
-                prevCard();
-            }
+            if (touchEndX < touchStartX - threshold) nextCard('left');
+            else if (touchEndX > touchStartX + threshold) prevCard();
         }
 
         function renderFeed() {
             feed.innerHTML = '';
-            
             const cardCounterEl = document.getElementById('cardCounter');
-            if (posts.length > 0) {
-                cardCounterEl.textContent = `${currentIndex + 1} / ${posts.length}`;
-            } else {
-                cardCounterEl.textContent = `0 / 0`;
-            }
+            cardCounterEl.textContent = posts.length > 0 ? `${currentIndex + 1} / ${posts.length}` : `0 / 0`;
 
             if (posts.length === 0) {
                 feed.innerHTML = `
                     <div class="text-center py-10 glass rounded-2xl border border-white/5">
                         <p class="text-slate-400 text-xs italic">Belum ada pengakuan sama sekali.</p>
                         <p class="text-slate-500 text-[10px] mt-1">Jadilah yang pertama bersuara di ruang ini.</p>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
 
@@ -701,14 +694,12 @@
                         ${post.comments.length > 0 ? post.comments.map(c => `<div class="text-slate-400 pl-3 border-l border-white/10 italic break-words">${escapeHtml(c)}</div>`).join('') : '<div class="text-slate-500 text-[10px] italic">Belum ada balasan.</div>'}
                     </div>
                     <input type="text" placeholder="Balas..." onkeydown="handleReply(event, '${post.id}')" class="w-full bg-black/40 border border-white/10 text-[11px] p-3 rounded-lg text-slate-200 focus:outline-none focus:border-white/20 transition">
-                </div>
-            `;
+                </div>`;
             feed.appendChild(div);
         }
 
         function handleUpvote(id) {
             if (localStorage.getItem(`upvoted_${id}`) === 'true') return;
-
             const post = posts.find(p => p.id === id);
             if (!post) return;
 
@@ -721,7 +712,6 @@
                 btn.classList.add('upvoted');
                 countSpan.textContent = post.upvotes;
             }
-
             updatePostInSupabase(post);
         }
 
@@ -733,22 +723,37 @@
 
                 post.comments.push(text);
                 e.target.value = '';
-
                 renderFeed(); 
                 updatePostInSupabase(post);
                 showToast("💬 Balasan terkirim!");
             }
         }
 
-        // ==========================================
-        // --- LOGIKA BLACKJACK GAME & LEADERBOARD ---
-        // ==========================================
+        // ===================================================
+        // --- LOGIKA BLACKJACK ROGUELITE GAME & LEADERBOARD ---
+        // ===================================================
         let deck = [];
         let playerHand = [];
         let dealerHand = [];
         let winningStreak = 0;
         let streakToSubmit = 0; 
         let isGameActive = false;
+        let isPeeked = false;
+
+        // POWER-UP SYSTEM STATE
+        const DEFAULT_BUFFS = {
+            peekCharges: 1,
+            mulliganCharges: 1,
+            shieldCount: 1,
+            isShieldActive: false // Default Toggle: OFF
+        };
+
+        let sessionBuffs = { ...DEFAULT_BUFFS };
+
+        function resetSessionBuffs() {
+            sessionBuffs = { ...DEFAULT_BUFFS };
+            updatePowerUpUI();
+        }
 
         const suits = ['♠', '♥', '♦', '♣'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
@@ -784,17 +789,62 @@
         }
 
         function renderCardHTML(card, hidden = false) {
-            if (hidden) {
+            if (hidden && !isPeeked) {
                 return `<div class="card-animate w-11 h-16 bg-gradient-to-br from-slate-800 to-slate-900 border border-white/20 rounded-xl flex items-center justify-center font-bold text-slate-500 text-xs shadow-lg">?</div>`;
             }
             const isRed = card.suit === '♥' || card.suit === '♦';
             const colorClass = isRed ? 'text-red-500' : 'text-slate-900';
+            const peekBorder = hidden && isPeeked ? 'ring-2 ring-indigo-400 opacity-90' : '';
+
             return `
-            <div class="card-animate w-11 h-16 bg-white rounded-xl flex flex-col justify-between p-1.5 shadow-xl relative overflow-hidden select-none">
+            <div class="card-animate w-11 h-16 bg-white rounded-xl flex flex-col justify-between p-1.5 shadow-xl relative overflow-hidden select-none ${peekBorder}">
                 <span class="text-[11px] font-black leading-none ${colorClass}">${card.value}</span>
                 <span class="text-xs ${colorClass} self-start leading-none">${card.suit}</span>
                 <span class="absolute -bottom-1 -right-1 text-xl opacity-10 font-bold ${colorClass}">${card.suit}</span>
             </div>`;
+        }
+
+        function updatePowerUpUI() {
+            document.getElementById('peekCount').textContent = sessionBuffs.peekCharges;
+            document.getElementById('mulliganCount').textContent = sessionBuffs.mulliganCharges;
+            document.getElementById('shieldCount').textContent = sessionBuffs.shieldCount;
+            
+            document.getElementById('btnPeek').disabled = !isGameActive || sessionBuffs.peekCharges <= 0 || isPeeked;
+            
+            const isBust = calculateHand(playerHand) > 21;
+            document.getElementById('btnMulligan').disabled = !isGameActive || sessionBuffs.mulliganCharges <= 0 || !isBust;
+
+            const btnShieldToggle = document.getElementById('btnShieldToggle');
+            const shieldStatus = document.getElementById('shieldStatus');
+            
+            if (sessionBuffs.isShieldActive) {
+                btnShieldToggle.className = "py-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition shadow-[0_0_10px_rgba(16,185,129,0.3)]";
+                shieldStatus.textContent = "ON";
+            } else {
+                btnShieldToggle.className = "py-2 bg-slate-800/40 border border-white/5 text-slate-500 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition opacity-60";
+                shieldStatus.textContent = "OFF";
+            }
+
+            // Disable tombol toggle jika stok habis & tidak sedang aktif
+            btnShieldToggle.disabled = sessionBuffs.shieldCount <= 0 && !sessionBuffs.isShieldActive;
+            if (btnShieldToggle.disabled) {
+                btnShieldToggle.classList.add('opacity-30', 'pointer-events-none');
+            } else {
+                btnShieldToggle.classList.remove('opacity-30', 'pointer-events-none');
+            }
+        }
+
+        function toggleShield() {
+            if (!sessionBuffs.isShieldActive) {
+                if (sessionBuffs.shieldCount > 0) {
+                    sessionBuffs.isShieldActive = true;
+                    showToast("🛡️ Shield DIAKTIFKAN! Siap menahan kekalahan.");
+                }
+            } else {
+                sessionBuffs.isShieldActive = false;
+                showToast("🛡️ Shield DIMATIKAN.");
+            }
+            updatePowerUpUI();
         }
 
         function updateGameUI(hideDealerCard = true) {
@@ -807,14 +857,15 @@
             playerScoreEl.textContent = calculateHand(playerHand);
 
             if (hideDealerCard && dealerHand.length > 0) {
-                dealerCardsEl.innerHTML = renderCardHTML(dealerHand[0]) + renderCardHTML(null, true);
-                dealerScoreEl.textContent = getCardValue(dealerHand[0]);
+                dealerCardsEl.innerHTML = renderCardHTML(dealerHand[0]) + renderCardHTML(dealerHand[1], true);
+                dealerScoreEl.textContent = isPeeked ? calculateHand(dealerHand) : getCardValue(dealerHand[0]);
             } else {
                 dealerCardsEl.innerHTML = dealerHand.map(c => renderCardHTML(c)).join('');
                 dealerScoreEl.textContent = calculateHand(dealerHand);
             }
 
             document.getElementById('currentStreak').textContent = winningStreak;
+            updatePowerUpUI();
         }
 
         function startNewGame() {
@@ -823,6 +874,7 @@
             playerHand = [deck.pop(), deck.pop()];
             dealerHand = [deck.pop(), deck.pop()];
             isGameActive = true;
+            isPeeked = false;
 
             document.getElementById('gameStatus').textContent = "";
             document.getElementById('btnHit').disabled = false;
@@ -843,7 +895,11 @@
             updateGameUI(true);
 
             if (calculateHand(playerHand) > 21) {
-                endGame('lose', 'BUST! MELEBIHI 21! 💥');
+                if (sessionBuffs.mulliganCharges > 0) {
+                    document.getElementById('gameStatus').textContent = "⚠️ BUST! GUNAKAN MULLIGAN ATAU STAND!";
+                } else {
+                    endGame('lose', 'BUST! MELEBIHI 21! 💥');
+                }
             }
         }
 
@@ -860,7 +916,9 @@
 
             updateGameUI(false);
 
-            if (dScore > 21) {
+            if (pScore > 21) {
+                endGame('lose', 'BUST! MELEBIHI 21! 💥');
+            } else if (dScore > 21) {
                 endGame('win', 'DEALER BUST! KAMU MENANG! 🎉');
             } else if (pScore > dScore) {
                 endGame('win', 'KAMU MENANG! 🎉');
@@ -869,6 +927,26 @@
             } else {
                 endGame('draw', 'SERI / PUSH! 🤝');
             }
+        }
+
+        // --- POWER-UP ACTIONS ---
+        function usePeek() {
+            if (!isGameActive || sessionBuffs.peekCharges <= 0 || isPeeked) return;
+            sessionBuffs.peekCharges--;
+            isPeeked = true;
+            playCardSound();
+            showToast("👁️ Kartu dealer terungkap!");
+            updateGameUI(true);
+        }
+
+        function useMulligan() {
+            if (!isGameActive || sessionBuffs.mulliganCharges <= 0 || calculateHand(playerHand) <= 21) return;
+            sessionBuffs.mulliganCharges--;
+            const discardedCard = playerHand.pop();
+            playCardSound();
+            showToast(`🔄 Dibuang: ${discardedCard.value}${discardedCard.suit}. Kamu Selamat!`);
+            document.getElementById('gameStatus').textContent = "";
+            updateGameUI(true);
         }
 
         function endGame(result, message) {
@@ -883,19 +961,39 @@
                 spawnCoins();
                 triggerWinPulse();
                 winningStreak++;
+                
+                // Tambah Stok Shield tiap kelipatan 3 Streak
+                if (winningStreak % 3 === 0) {
+                    sessionBuffs.shieldCount++;
+                    showToast("🛡️ Stok Shield bertambah karena 3-Win Streak!");
+                }
+                
                 document.getElementById('currentStreak').textContent = winningStreak;
             } else if (result === 'lose') {
                 playBustSound();
                 triggerScreenShake();
-                if (winningStreak >= 3) {
-                    streakToSubmit = winningStreak;
-                    document.getElementById('finalStreak').textContent = streakToSubmit;
-                    document.getElementById('scoreSubmitModal').classList.remove('hidden-modal');
-                    document.getElementById('scoreSubmitModal').classList.add('show-modal');
+
+                // Cek Toggle Passive Shield jika sedang ON
+                if (sessionBuffs.isShieldActive) {
+                    sessionBuffs.isShieldActive = false; // Matikan toggle setelah terpakai
+                    sessionBuffs.shieldCount--; // Kurangi stok
+                    winningStreak = Math.max(0, winningStreak - 1); // Kurangi 1 bukannya reset ke 0
+                    showToast("🛡️ SHIELD TERPAKAI! Streak tidak habis sepenuhnya!");
+                    document.getElementById('currentStreak').textContent = winningStreak;
+                } else {
+                    if (winningStreak >= 3) {
+                        streakToSubmit = winningStreak;
+                        document.getElementById('finalStreak').textContent = streakToSubmit;
+                        document.getElementById('scoreSubmitModal').classList.remove('hidden-modal');
+                        document.getElementById('scoreSubmitModal').classList.add('show-modal');
+                    } else {
+                        resetSessionBuffs(); // Refresh power-ups saat kalah & streak kecil
+                    }
+                    winningStreak = 0;
+                    document.getElementById('currentStreak').textContent = 0;
                 }
-                winningStreak = 0;
-                document.getElementById('currentStreak').textContent = 0;
             }
+            updatePowerUpUI();
         }
 
         function toggleNameInput(isChecked) {
