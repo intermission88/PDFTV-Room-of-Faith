@@ -195,7 +195,7 @@
             <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
                 <div>
                     <h4 class="font-bold text-amber-400 border-b border-white/10 pb-1 mb-1">🎮 Aturan Dasar Blackjack</h4>
-                    <p class="text-[11px] text-slate-400">Dapatkan nilai kartu sedekat mungkin ke angka <b>21</b> tanpa melebihinya[cite: 1]. Jika nilaimu melebihi 21, kamu dinyatakan <b>BUST</b> (kalah)[cite: 1]. Kartu bergambar (J, Q, K) bernilai 10, As bernilai 1 atau 11[cite: 1]. Kartu 8-10 hanya berpeluang muncul sebesar 10%.</p>
+                    <p class="text-[11px] text-slate-400">Dapatkan nilai kartu sedekat mungkin ke angka <b>21</b> tanpa melebihinya. Jika nilaimu melebihi 21, kamu dinyatakan <b>BUST</b> (kalah). Kartu bergambar (J, Q, K) bernilai 10, As bernilai 1 atau 11. Kartu 8-10 hanya berpeluang muncul sebesar 10%.</p>
                 </div>
 
                 <div class="bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl">
@@ -208,15 +208,15 @@
                     <div class="space-y-2.5">
                         <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
                             <span class="font-bold text-indigo-300 text-[11px]">👁️ 1. PEEK (Active - 3x)</span>
-                            <p class="text-[10px] text-slate-400 mt-0.5">Mengintip kartu tertutup (*Hole Card*) milik Dealer sebelum kamu mengambil keputusan Hit/Stand[cite: 1]. Dapat digunakan hingga 3 kali per sesi!</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Mengintip kartu tertutup (*Hole Card*) milik Dealer sebelum kamu mengambil keputusan Hit/Stand. Dapat digunakan hingga 3 kali per sesi!</p>
                         </div>
                         <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
                             <span class="font-bold text-amber-300 text-[11px]">⚡ 2. DOUBLE DOWN (Toggle Manual - Unlock @ 17 Resets)</span>
-                            <p class="text-[10px] text-slate-400 mt-0.5">Toggle ke <b>ON</b> saat giliranmu untuk mengambil 1 kartu tambahan & otomatis Stand. Jika menang, <b>Streak +2</b>! Memakainya akan mereset hitungan ke 0.</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Toggle ke <b>ON</b> saat giliranmu untuk mengambil 1 kartu tambahan & otomatis Stand. Jika menang, <b>Total Streak dikali 2 (misal: 18 × 2 = 36 Streak)</b>! Memakainya akan mereset hitungan reset ke 0.</p>
                         </div>
                         <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
                             <span class="font-bold text-emerald-300 text-[11px]">🛡️ 3. SHIELD (Toggle Manual)</span>
-                            <p class="text-[10px] text-slate-400 mt-0.5">Proteksi kekalahan! Default OFF[cite: 1]. Toggle ON untuk menahan kekalahan berikutnya (Streak hanya berkurang 1 alih-alih hancur)[cite: 1]. <b>Stok bertambah +1 setiap kali kamu menang 3 kali (3-Win Streak)!</b></p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Proteksi kekalahan! Default OFF. Toggle ON untuk menahan kekalahan berikutnya (Streak hanya berkurang 1 alih-alih hancur). <b>Stok bertambah +1 setiap kali kamu menang 3 kali (3-Win Streak)!</b></p>
                         </div>
                     </div>
                 </div>
@@ -1075,20 +1075,18 @@
                 spawnCoins();
                 triggerWinPulse();
                 
-                const streakGain = isDoubleDownActive ? 2 : 1;
-                
-                for (let i = 1; i <= streakGain; i++) {
-                    winningStreak++;
-                    if (winningStreak % 3 === 0) {
-                        sessionBuffs.shieldCount++;
-                        setTimeout(() => {
-                            showToast("🛡️ BONUS! Stok Shield bertambah +1 karena menang 3x!");
-                        }, 500);
-                    }
-                }
-                
                 if (isDoubleDownActive) {
-                    showToast("⚡ DOUBLE DOWN SUCCESS! +2 STREAKS!");
+                    winningStreak = winningStreak > 0 ? winningStreak * 2 : 2;
+                    showToast("⚡ DOUBLE DOWN SUCCESS! TOTAL STREAK X2!");
+                } else {
+                    winningStreak++;
+                }
+
+                if (winningStreak % 3 === 0 && winningStreak > 0) {
+                    sessionBuffs.shieldCount++;
+                    setTimeout(() => {
+                        showToast("🛡️ BONUS! Stok Shield bertambah +1!");
+                    }, 500);
                 }
 
                 document.getElementById('currentStreak').textContent = winningStreak;
