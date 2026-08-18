@@ -42,13 +42,17 @@
             <button onclick="toggleModal(false)" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/5 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
+
             <h2 class="text-base font-black text-white mb-4 tracking-tight">Sampaikan Pengakuan</h2>
+
             <form id="confessionForm" class="space-y-3">
                 <input type="text" id="alias" placeholder="Alias..." class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition">
+                
                 <div class="relative">
                     <textarea id="confession" rows="4" maxlength="300" placeholder="Tulis pengakuanmu di sini..." oninput="updateCharCount()" class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition resize-none"></textarea>
                     <div id="charCount" class="absolute bottom-3 right-3 text-[10px] text-slate-600 font-mono">0/300</div>
                 </div>
+                
                 <button type="submit" id="submitBtn" class="w-full py-3 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg">SUBMIT PENGAKUAN</button>
             </form>
         </div>
@@ -75,7 +79,7 @@
                         <span>DEALER</span>
                         <span id="dealerScore" class="font-mono text-slate-300">0</span>
                     </div>
-                    <div id="dealerCards" class="flex gap-2 min-h-[48px] items-center"></div>
+                    <div id="dealerCards" class="flex gap-2 min-h-[56px] items-center"></div>
                 </div>
 
                 <div class="border-b border-white/10 my-2"></div>
@@ -85,7 +89,7 @@
                         <span>KAMU</span>
                         <span id="playerScore" class="font-mono text-slate-300">0</span>
                     </div>
-                    <div id="playerCards" class="flex gap-2 min-h-[48px] items-center"></div>
+                    <div id="playerCards" class="flex gap-2 min-h-[56px] items-center"></div>
                 </div>
             </div>
 
@@ -121,7 +125,7 @@
         </div>
     </nav>
 
-    <main class="pt-20 px-4 pb-12 max-w-lg mx-auto">
+    <main class="pt-20 px-4 pb-20 max-w-lg mx-auto">
         <section class="text-center mb-5">
             <h1 class="text-xl font-black mb-1 tracking-tight text-white">Room of Faith</h1>
             <p class="text-slate-500 text-[10px] italic">"If every moment mattered, would it still be like this?"</p>
@@ -387,7 +391,7 @@
 
                 form.reset();
                 updateCharCount();
-                toggleModal(false);
+                toggleModal(false); 
                 await fetchPosts();
                 currentIndex = 0; 
                 renderFeed();
@@ -571,6 +575,7 @@
         let playerHand = [];
         let dealerHand = [];
         let winningStreak = 0;
+        let streakToSubmit = 0; // Menampung streak yang siap dikirim saat kalah
         let isGameActive = false;
 
         const suits = ['♠', '♥', '♦', '♣'];
@@ -701,12 +706,14 @@
                 document.getElementById('currentStreak').textContent = winningStreak;
             } else if (result === 'lose') {
                 if (winningStreak >= 2) {
-                    // Tampilkan modal highscore jika streak minimal 2
-                    document.getElementById('finalStreak').textContent = winningStreak;
+                    // Simpan streak sebelum direset ke 0
+                    streakToSubmit = winningStreak;
+                    document.getElementById('finalStreak').textContent = streakToSubmit;
                     document.getElementById('scoreSubmitModal').classList.remove('hidden-modal');
                     document.getElementById('scoreSubmitModal').classList.add('show-modal');
                 }
                 winningStreak = 0;
+                document.getElementById('currentStreak').textContent = 0;
             }
         }
 
@@ -725,7 +732,7 @@
                     .insert([{
                         id: Date.now(),
                         name: name,
-                        streak: winningStreak
+                        streak: streakToSubmit // Mengirim streak yang tersimpan di streakToSubmit
                     }]);
 
                 if (error) throw error;
@@ -733,10 +740,10 @@
                 document.getElementById('scoreSubmitModal').classList.remove('show-modal');
                 document.getElementById('scoreSubmitModal').classList.add('hidden-modal');
                 nameInput.value = '';
-                winningStreak = 0;
-                document.getElementById('currentStreak').textContent = 0;
+                streakToSubmit = 0;
+                
                 showToast("🏆 Rekor berhasil disimpan!");
-                fetchLeaderboard();
+                await fetchLeaderboard();
             } catch (err) {
                 console.error(err);
                 alert("Gagal menyimpan rekor.");
