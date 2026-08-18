@@ -20,17 +20,53 @@
 
         /* Card Animation for Blackjack */
         @keyframes cardPop {
-            0% { transform: scale(0.7) translateY(12px); opacity: 0; }
-            100% { transform: scale(1) translateY(0); opacity: 1; }
+            0% { transform: scale(0) translateY(-50px) rotate(-10deg); opacity: 0; }
+            70% { transform: scale(1.1) translateY(0) rotate(3deg); opacity: 1; }
+            100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
         }
         .card-animate {
-            animation: cardPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: cardPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
         /* Gold Glow for #1 Leaderboard */
         .gold-rank {
             background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
             border: 1px solid rgba(245, 158, 11, 0.35) !important;
+        }
+
+        /* --- ANIMASI GAMBLING & DOPAMIN --- */
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-6px, 4px); }
+            40% { transform: translate(6px, -4px); }
+            60% { transform: translate(-4px, -2px); }
+            80% { transform: translate(4px, 2px); }
+        }
+        .shake-effect { animation: shake 0.3s ease-in-out; }
+
+        @keyframes winPulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .win-pulse { animation: winPulse 0.8s ease-out; }
+
+        @keyframes goldGlow {
+            0%, 100% { border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+            50% { border-color: rgba(245, 158, 11, 0.9); box-shadow: 0 0 25px rgba(245, 158, 11, 0.6); }
+        }
+        .casino-glow { animation: goldGlow 1.5s infinite; }
+
+        .coin-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            font-size: 20px;
+            animation: floatUp 1.2s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.5) rotate(360deg); }
         }
     </style>
 </head>
@@ -41,7 +77,7 @@
     </div>
 
     <div class="fixed bottom-6 left-6 z-40">
-        <button onclick="toggleBlackjackModal(true)" class="flex items-center gap-2 bg-emerald-500 text-black px-4 py-3 rounded-full shadow-2xl hover:bg-emerald-400 active:scale-95 transition-all font-black text-xs">
+        <button onclick="toggleBlackjackModal(true)" class="flex items-center gap-2 bg-emerald-500 text-black px-4 py-3 rounded-full shadow-2xl hover:bg-emerald-400 active:scale-95 transition-all font-black text-xs casino-glow">
             <span class="text-sm">🃏</span>
             <span class="hidden sm:inline tracking-wide uppercase">Blackjack</span>
         </button>
@@ -75,12 +111,13 @@
         </div>
     </div>
 
+    <!-- Modal Blackjack -->
     <div id="blackjackModal" class="modal-base hidden-modal fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="glass w-full max-w-md p-6 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0a]">
+        <div id="blackjackCard" class="glass w-full max-w-md p-6 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0a]">
             
             <div class="flex justify-between items-center mb-3">
                 <h2 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                    <span>🃏</span> BlackJack
+                    <span>🃏</span> BlackJack <span class="text-[9px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full uppercase tracking-widest font-mono">High Stakes</span>
                 </h2>
                 <button onclick="toggleBlackjackModal(false)" class="text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -114,25 +151,26 @@
                 </div>
             </div>
 
-            <div id="gameStatus" class="text-center text-xs font-bold my-3 min-h-[20px] text-emerald-400"></div>
+            <div id="gameStatus" class="text-center text-xs font-black my-3 min-h-[20px] text-emerald-400 uppercase tracking-wider"></div>
 
             <div class="grid grid-cols-2 gap-2" id="gameControls">
-                <button onclick="hit()" id="btnHit" class="py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition active:scale-95 disabled:opacity-30" disabled>HIT</button>
-                <button onclick="stand()" id="btnStand" class="py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl transition active:scale-95 disabled:opacity-30" disabled>STAND</button>
+                <button onclick="hit()" id="btnHit" class="py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none" disabled>HIT 🃏</button>
+                <button onclick="stand()" id="btnStand" class="py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none" disabled>STAND ✋</button>
             </div>
-            <button onclick="startNewGame()" id="btnStart" class="w-full mt-2 py-3 bg-emerald-500 text-black text-xs font-black rounded-xl hover:bg-emerald-400 active:scale-[0.98] transition shadow-lg">MAIN SEKARANG</button>
+            <button onclick="startNewGame()" id="btnStart" class="w-full mt-2 py-3 bg-emerald-500 text-black text-xs font-black rounded-xl hover:bg-emerald-400 active:scale-[0.98] transition shadow-lg tracking-wider">MAIN SEKARANG 🎰</button>
         </div>
     </div>
 
+    <!-- Modal Highscore -->
     <div id="scoreSubmitModal" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-6 rounded-3xl border border-white/10 shadow-2xl text-center bg-[#0a0a0a] relative">
+        <div class="glass w-full max-w-xs p-6 rounded-3xl border border-amber-500/30 shadow-2xl text-center bg-[#0a0a0a] relative casino-glow">
             <button onclick="closeScoreModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
-            <div class="text-3xl mb-2">🔥</div>
-            <h3 class="text-base font-black text-white mb-1">Winning Streak Luar Biasa!</h3>
-            <p class="text-slate-400 text-xs mb-4">Kamu berhasil mencapai <span id="finalStreak" class="text-emerald-400 font-bold">0</span> win streak.</p>
+            <div class="text-4xl mb-2 animate-bounce">👑</div>
+            <h3 class="text-base font-black text-amber-400 mb-1 uppercase tracking-wider">Streak Terhenti!</h3>
+            <p class="text-slate-400 text-xs mb-4">Kamu berhasil mencapai <span id="finalStreak" class="text-emerald-400 font-bold text-sm">0</span> win streak.</p>
 
             <form id="scoreForm" onsubmit="submitHighScore(event)" class="space-y-3">
                 <label class="flex items-center justify-between p-2.5 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition text-left">
@@ -141,10 +179,10 @@
                 </label>
 
                 <div id="nameInputContainer">
-                    <input type="text" id="playerName" maxlength="12" placeholder="Nama / Alias..." required class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl text-center focus:outline-none focus:border-emerald-500 transition">
+                    <input type="text" id="playerName" maxlength="12" placeholder="Nama / Alias..." required class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl text-center focus:outline-none focus:border-amber-500 transition">
                 </div>
 
-                <button type="submit" id="btnSubmitScore" class="w-full py-3 bg-emerald-500 text-black text-xs font-black rounded-xl hover:bg-emerald-400 active:scale-[0.98] transition">SIMPAN REKOR</button>
+                <button type="submit" id="btnSubmitScore" class="w-full py-3 bg-amber-500 text-black text-xs font-black rounded-xl hover:bg-amber-400 active:scale-[0.98] transition">SIMPAN REKOR 🏆</button>
                 <button type="button" onclick="closeScoreModal()" class="w-full py-2 bg-transparent text-slate-400 hover:text-white text-xs transition">Batal / Tutup</button>
             </form>
         </div>
@@ -237,6 +275,89 @@
     </main>
 
     <script>
+        // --- SOUND EFFECTS ENGINE (WEB AUDIO API) ---
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playCardSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+        }
+
+        function playWinSound() {
+            initAudio();
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (Arpeggio)
+            notes.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + idx * 0.08);
+                osc.stop(audioCtx.currentTime + idx * 0.08 + 0.3);
+            });
+        }
+
+        function playBustSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function spawnCoins() {
+            const emojis = ['🪙', '💰', '✨', '🔥'];
+            for (let i = 0; i < 15; i++) {
+                const coin = document.createElement('div');
+                coin.className = 'coin-particle';
+                coin.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                coin.style.left = (window.innerWidth / 2 + (Math.random() * 200 - 100)) + 'px';
+                coin.style.top = (window.innerHeight / 2 + (Math.random() * 100 - 50)) + 'px';
+                document.body.appendChild(coin);
+                setTimeout(() => coin.remove(), 1200);
+            }
+        }
+
+        function triggerScreenShake() {
+            const card = document.getElementById('blackjackCard');
+            card.classList.remove('shake-effect');
+            void card.offsetWidth; // trigger reflow
+            card.classList.add('shake-effect');
+        }
+
+        function triggerWinPulse() {
+            const card = document.getElementById('blackjackCard');
+            card.classList.remove('win-pulse');
+            void card.offsetWidth;
+            card.classList.add('win-pulse');
+        }
+
         // --- KONFIGURASI SUPABASE ---
         const SUPABASE_URL = 'https://fhpyvnbsreoaiaeqfkvk.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky';
@@ -697,6 +818,7 @@
         }
 
         function startNewGame() {
+            playCardSound();
             buildDeck();
             playerHand = [deck.pop(), deck.pop()];
             dealerHand = [deck.pop(), deck.pop()];
@@ -710,22 +832,24 @@
             updateGameUI(true);
 
             if (calculateHand(playerHand) === 21) {
-                endGame('win', 'Blackjack! Kamu menang! 🎉');
+                endGame('win', 'BLACKJACK! KAMU MENANG! 🎉');
             }
         }
 
         function hit() {
             if (!isGameActive) return;
+            playCardSound();
             playerHand.push(deck.pop());
             updateGameUI(true);
 
             if (calculateHand(playerHand) > 21) {
-                endGame('lose', 'Bust! Nilai kamu melebihi 21. 💥');
+                endGame('lose', 'BUST! MELEBIHI 21! 💥');
             }
         }
 
         function stand() {
             if (!isGameActive) return;
+            playCardSound();
             
             while (calculateHand(dealerHand) < 17) {
                 dealerHand.push(deck.pop());
@@ -737,13 +861,13 @@
             updateGameUI(false);
 
             if (dScore > 21) {
-                endGame('win', 'Dealer Bust! Kamu menang! 🎉');
+                endGame('win', 'DEALER BUST! KAMU MENANG! 🎉');
             } else if (pScore > dScore) {
-                endGame('win', 'Kamu menang! 🎉');
+                endGame('win', 'KAMU MENANG! 🎉');
             } else if (pScore < dScore) {
-                endGame('lose', 'Dealer menang! 😞');
+                endGame('lose', 'DEALER MENANG! 😞');
             } else {
-                endGame('draw', 'Seri / Push! 🤝');
+                endGame('draw', 'SERI / PUSH! 🤝');
             }
         }
 
@@ -752,13 +876,17 @@
             document.getElementById('btnHit').disabled = true;
             document.getElementById('btnStand').disabled = true;
             document.getElementById('gameStatus').textContent = message;
-            document.getElementById('btnStart').textContent = "MAIN LAGI";
+            document.getElementById('btnStart').textContent = "MAIN LAGI 🎰";
 
             if (result === 'win') {
+                playWinSound();
+                spawnCoins();
+                triggerWinPulse();
                 winningStreak++;
                 document.getElementById('currentStreak').textContent = winningStreak;
             } else if (result === 'lose') {
-                // Minimal streak 3 untuk memicu modal highscore
+                playBustSound();
+                triggerScreenShake();
                 if (winningStreak >= 3) {
                     streakToSubmit = winningStreak;
                     document.getElementById('finalStreak').textContent = streakToSubmit;
@@ -770,7 +898,6 @@
             }
         }
 
-        // Toggle Tampilan Input Nama Berdasarkan Checkbox Opsi
         function toggleNameInput(isChecked) {
             const container = document.getElementById('nameInputContainer');
             const nameInput = document.getElementById('playerName');
@@ -779,11 +906,11 @@
             if (isChecked) {
                 container.style.display = 'block';
                 nameInput.required = true;
-                submitBtn.textContent = "SIMPAN REKOR";
+                submitBtn.textContent = "SIMPAN REKOR 🏆";
             } else {
                 container.style.display = 'none';
                 nameInput.required = false;
-                submitBtn.textContent = "LANJUT TANPA SIMPAN";
+                submitBtn.textContent = "LANJUT TANPA SIMPAN ➡️";
             }
         }
 
@@ -791,14 +918,12 @@
             e.preventDefault();
             const shouldSave = document.getElementById('saveToLeaderboard').checked;
 
-            // Jika user memilih untuk TIDAK menyimpan ke leaderboard
             if (!shouldSave) {
                 closeScoreModal();
                 showToast("🎮 Permainan selesai. Ayo coba lagi!");
                 return;
             }
 
-            // Jika user memilih YA
             const nameInput = document.getElementById('playerName');
             const name = nameInput.value.trim() || 'Anonymous';
             const btn = document.getElementById('btnSubmitScore');
@@ -820,6 +945,8 @@
                 closeScoreModal();
                 nameInput.value = '';
                 
+                playWinSound();
+                spawnCoins();
                 showToast("🏆 Rekor berhasil disimpan!");
                 await fetchLeaderboard();
             } catch (err) {
@@ -827,7 +954,7 @@
                 alert("Gagal menyimpan rekor.");
             } finally {
                 btn.disabled = false;
-                btn.textContent = "SIMPAN REKOR";
+                btn.textContent = "SIMPAN REKOR 🏆";
             }
         }
 
