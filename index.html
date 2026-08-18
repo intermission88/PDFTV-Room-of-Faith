@@ -195,12 +195,12 @@
             <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
                 <div>
                     <h4 class="font-bold text-amber-400 border-b border-white/10 pb-1 mb-1">🎮 Aturan Dasar Blackjack</h4>
-                    <p class="text-[11px] text-slate-400">Dapatkan nilai kartu sedekat mungkin ke angka <b>21</b> tanpa melebihinya[cite: 1]. Jika nilaimu melebihi 21, kamu dinyatakan <b>BUST</b> (kalah)[cite: 1]. Kartu bergambar (J, Q, K) bernilai 10, As bernilai 1 atau 11[cite: 1].</p>
+                    <p class="text-[11px] text-slate-400">Dapatkan nilai kartu sedekat mungkin ke angka <b>21</b> tanpa melebihinya[cite: 1]. Jika nilaimu melebihi 21, kamu dinyatakan <b>BUST</b> (kalah)[cite: 1]. Kartu bergambar (J, Q, K) bernilai 10, As bernilai 1 atau 11[cite: 1]. Kartu 8-10 hanya berpeluang muncul sebesar 10%.</p>
                 </div>
 
                 <div class="bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl">
                     <span class="font-bold text-amber-300 text-[11px]">🔒 Syarat Unlock Power-Up ⚡ DOUBLE DOWN</span>
-                    <p class="text-[10px] text-slate-300 mt-1">Opsi Toggle <b>⚡ Double Down</b> baru terbuka setelah kamu melakukan <b>reset game sebanyak 17 kali</b>! Toggle default dalam keadaan <b>OFF</b>. Setelah di-ON-kan dan digunakan, counter reset kembali ke 0 dan dikunci ulang.</p>
+                    <p class="text-[10px] text-slate-300 mt-1">Opsi Toggle <b>⚡ Double Down</b> baru terbuka setelah kamu melakukan <b>reset game valid sebanyak 17 kali</b>! Terdapat proteksi anti-spam cooldown 3 detik & reset baru terhitung jika permainan sudah sempat dimainkan.</p>
                 </div>
 
                 <div>
@@ -216,7 +216,7 @@
                         </div>
                         <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
                             <span class="font-bold text-emerald-300 text-[11px]">🛡️ 3. SHIELD (Toggle Manual)</span>
-                            <p class="text-[10px] text-slate-400 mt-0.5">Proteksi kekalahan! Default OFF[cite: 1]. Toggle ON untuk menahan kekalahan berikutnya (Streak hanya berkurang 1 alih-alih hancur)[cite: 1]. Stok terpakai setelah menahan damage[cite: 1].</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Proteksi kekalahan! Default OFF[cite: 1]. Toggle ON untuk menahan kekalahan berikutnya (Streak hanya berkurang 1 alih-alih hancur)[cite: 1]. <b>Stok bertambah +1 setiap kali kamu menang 3 kali (3-Win Streak)!</b></p>
                         </div>
                     </div>
                 </div>
@@ -747,11 +747,15 @@
         let isPeeked = false;
         let isDoubleDownActive = false;
 
-        // RESET COUNTER TRACKER (Memuat dari LocalStorage agar tersimpan walau di-refresh)
+        // TRACKER PENCEGAH SPAM RESET
+        let hasPlayerActed = false; // Flag apakah pemain sudah berinteraksi di ronde aktif
+        let isResetCoolingDown = false; // Cooldown timer untuk reset
+
+        // RESET COUNTER TRACKER
         let totalResets = parseInt(localStorage.getItem('bj_total_resets') || '0');
         const UNLOCK_RESET_THRESHOLD = 17;
 
-        // POWER-UP SYSTEM STATE (Peek ditambahi jadi 3x, Redraw dihapus)
+        // POWER-UP SYSTEM STATE
         const DEFAULT_BUFFS = {
             peekCharges: 3,
             shieldCount: 1,
@@ -768,11 +772,16 @@
         const suits = ['♠', '♥', '♦', '♣'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
+        // METODE BOBOT KARTU BARU: Angka 8-10 (Termasuk J, Q, K) Dibatasi Persentase Sering Munculnya ke 10%
         function buildDeck() {
             deck = [];
             for (let suit of suits) {
                 for (let value of values) {
-                    let weight = ['J', 'Q', 'K'].includes(value) ? 0.55 : 1.0;
+                    let weight = 1.0; 
+                    // Set bobot kartu 8, 9, 10, J, Q, K menjadi jauh lebih rendah (10% persentase relatif)
+                    if (['8', '9', '10', 'J', 'Q', 'K'].includes(value)) {
+                        weight = 0.10; 
+                    }
                     deck.push({ suit, value, weight });
                 }
             }
@@ -887,15 +896,14 @@
             updatePowerUpUI();
         }
 
-        // --- TOGGLE DOUBLE DOWN: SAKLAR MANUAL ON/OFF ---
+        // --- TOGGLE DOUBLE DOWN ---
         function toggleDoubleDown() {
             if (!isGameActive || totalResets < UNLOCK_RESET_THRESHOLD || playerHand.length !== 2) return;
 
             if (!isDoubleDownActive) {
-                // Aktifkan Toggle Double Down (ON)
                 isDoubleDownActive = true;
+                hasPlayerActed = true; // Tandai aksi aktif
 
-                // Reset hitungan reset kembali ke 0 & simpan di localStorage
                 totalResets = 0;
                 localStorage.setItem('bj_total_resets', '0');
 
@@ -904,7 +912,6 @@
 
                 updatePowerUpUI();
 
-                // Eksekusi aksi Double Down
                 playerHand.push(drawWeightedCard());
                 updateGameUI(true);
 
@@ -941,28 +948,62 @@
             updatePowerUpUI();
         }
 
+        // PERBAIKAN SISTEM RESET (ANTI SPAM EKSPLOITASI)
         function startNewGame() {
-            playCardSound();
+            const btnStart = document.getElementById('btnStart');
 
-            // Tambah hitungan reset & simpan langsung di LocalStorage
-            totalResets++;
-            localStorage.setItem('bj_total_resets', totalResets.toString());
-
-            if (totalResets === UNLOCK_RESET_THRESHOLD) {
-                showToast("🎉 UNLOCKED! Power-Up ⚡ DOUBLE DOWN kini dapat digunakan!");
+            // 1. Proteksi Cooldown 3 Detik
+            if (isResetCoolingDown) {
+                showToast("⏳ Mohon tunggu sebentar sebelum reset lagi!");
+                return;
             }
 
+            // 2. Batasi Penambahan Reset: Hanya dihitung jika ronde sebelumnya sudah aktif & pemain sempat melakukan setidaknya 1x tindakan (Hit/Stand/Double Down)
+            if (isGameActive && hasPlayerActed) {
+                totalResets++;
+                localStorage.setItem('bj_total_resets', totalResets.toString());
+
+                if (totalResets === UNLOCK_RESET_THRESHOLD) {
+                    showToast("🎉 UNLOCKED! Power-Up ⚡ DOUBLE DOWN kini dapat digunakan!");
+                }
+            } else if (isGameActive && !hasPlayerActed) {
+                showToast("⚠️ Mainkan setidaknya 1 langkah sebelum dapat melakukan Reset valid!");
+            }
+
+            // Aktifkan Cooldown selama 3 Detik
+            isResetCoolingDown = true;
+            btnStart.disabled = true;
+            btnStart.classList.add('opacity-50');
+
+            let countdown = 3;
+            btnStart.textContent = `TUNGGU (${countdown}s)...`;
+
+            const timer = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    btnStart.textContent = `TUNGGU (${countdown}s)...`;
+                } else {
+                    clearInterval(timer);
+                    isResetCoolingDown = false;
+                    btnStart.disabled = false;
+                    btnStart.classList.remove('opacity-50');
+                    btnStart.textContent = isGameActive ? "RESET GAME" : "MAIN SEKARANG 🎰";
+                }
+            }, 1000);
+
+            // Inisialisasi Game Baru
+            playCardSound();
             buildDeck();
             playerHand = [drawWeightedCard(), drawWeightedCard()];
             dealerHand = [drawWeightedCard(), drawWeightedCard()];
             isGameActive = true;
             isPeeked = false;
-            isDoubleDownActive = false; // Default OFF setiap game baru
+            isDoubleDownActive = false;
+            hasPlayerActed = false; // Reset status aksi pemain
 
             document.getElementById('gameStatus').textContent = "";
             document.getElementById('btnHit').disabled = false;
             document.getElementById('btnStand').disabled = false;
-            document.getElementById('btnStart').textContent = "RESET GAME";
 
             updateGameUI(true);
 
@@ -973,6 +1014,7 @@
 
         function hit() {
             if (!isGameActive) return;
+            hasPlayerActed = true; // Tandai pemain telah berinteraksi di ronde ini
             playCardSound();
             playerHand.push(drawWeightedCard());
             updateGameUI(true);
@@ -984,6 +1026,7 @@
 
         function stand() {
             if (!isGameActive) return;
+            hasPlayerActed = true; // Tandai pemain telah berinteraksi di ronde ini
             playCardSound();
             
             while (calculateHand(dealerHand) < 17) {
@@ -1022,7 +1065,10 @@
             document.getElementById('btnHit').disabled = true;
             document.getElementById('btnStand').disabled = true;
             document.getElementById('gameStatus').textContent = message;
-            document.getElementById('btnStart').textContent = "MAIN LAGI 🎰";
+            
+            if (!isResetCoolingDown) {
+                document.getElementById('btnStart').textContent = "MAIN LAGI 🎰";
+            }
 
             if (result === 'win') {
                 playWinSound();
@@ -1030,17 +1076,21 @@
                 triggerWinPulse();
                 
                 const streakGain = isDoubleDownActive ? 2 : 1;
-                winningStreak += streakGain;
+                
+                for (let i = 1; i <= streakGain; i++) {
+                    winningStreak++;
+                    if (winningStreak % 3 === 0) {
+                        sessionBuffs.shieldCount++;
+                        setTimeout(() => {
+                            showToast("🛡️ BONUS! Stok Shield bertambah +1 karena menang 3x!");
+                        }, 500);
+                    }
+                }
                 
                 if (isDoubleDownActive) {
                     showToast("⚡ DOUBLE DOWN SUCCESS! +2 STREAKS!");
                 }
 
-                if (winningStreak % 3 === 0) {
-                    sessionBuffs.shieldCount++;
-                    showToast("🛡️ Stok Shield bertambah karena 3-Win Streak!");
-                }
-                
                 document.getElementById('currentStreak').textContent = winningStreak;
             } else if (result === 'lose') {
                 playBustSound();
