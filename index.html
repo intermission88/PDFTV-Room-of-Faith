@@ -144,7 +144,7 @@
                     👁️ PEEK (<span id="peekCount">3</span>)
                 </button>
                 <button onclick="toggleDoubleDown()" id="btnDoubleDown" class="py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition" disabled>
-                    ⚡ 2X DOWN: <span id="doubleDownStatus" class="font-bold">OFF</span>
+                    🔒 2X DOWN
                 </button>
                 <button onclick="toggleShield()" id="btnShieldToggle" class="py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition">
                     🛡️ SHIELD: <span id="shieldStatus" class="font-bold">OFF</span> (<span id="shieldCount">1</span>)
@@ -200,7 +200,7 @@
 
                 <div class="bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl">
                     <span class="font-bold text-amber-300 text-[11px]">🔒 Syarat Unlock Power-Up ⚡ DOUBLE DOWN</span>
-                    <p class="text-[10px] text-slate-300 mt-1">Opsi Toggle <b>⚡ Double Down</b> baru terbuka setelah kamu melakukan <b>reset game valid sebanyak 17 kali</b>! Terdapat proteksi anti-spam cooldown 3 detik & reset baru terhitung jika permainan sudah sempat dimainkan.</p>
+                    <p class="text-[10px] text-slate-300 mt-1">Opsi Toggle <b>⚡ Double Down</b> baru terbuka setelah kamu melakukan <b>reset game sebanyak 17 kali</b>! Terdapat proteksi anti-spam cooldown 3 detik.</p>
                 </div>
 
                 <div>
@@ -747,9 +747,8 @@
         let isPeeked = false;
         let isDoubleDownActive = false;
 
-        // TRACKER PENCEGAH SPAM RESET
-        let hasPlayerActed = false; // Flag apakah pemain sudah berinteraksi di ronde aktif
-        let isResetCoolingDown = false; // Cooldown timer untuk reset
+        // TRACKER COOLDOWN RESET
+        let isResetCoolingDown = false;
 
         // RESET COUNTER TRACKER
         let totalResets = parseInt(localStorage.getItem('bj_total_resets') || '0');
@@ -772,13 +771,11 @@
         const suits = ['♠', '♥', '♦', '♣'];
         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
-        // METODE BOBOT KARTU BARU: Angka 8-10 (Termasuk J, Q, K) Dibatasi Persentase Sering Munculnya ke 10%
         function buildDeck() {
             deck = [];
             for (let suit of suits) {
                 for (let value of values) {
                     let weight = 1.0; 
-                    // Set bobot kartu 8, 9, 10, J, Q, K menjadi jauh lebih rendah (10% persentase relatif)
                     if (['8', '9', '10', 'J', 'Q', 'K'].includes(value)) {
                         weight = 0.10; 
                     }
@@ -845,12 +842,12 @@
             
             document.getElementById('btnPeek').disabled = !isGameActive || sessionBuffs.peekCharges <= 0 || isPeeked;
             
-            // Logika Toggle Double Down (Default OFF, Unlock @ 17 Resets)
+            // Logika Toggle Double Down (Dibersihkan dari display angka tambahan)
             const btnDoubleDown = document.getElementById('btnDoubleDown');
 
             if (totalResets < UNLOCK_RESET_THRESHOLD) {
                 btnDoubleDown.className = "py-2 bg-slate-800/40 border border-white/5 text-slate-500 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition opacity-40 pointer-events-none";
-                btnDoubleDown.innerHTML = `🔒 2X DOWN (${totalResets}/17)`;
+                btnDoubleDown.innerHTML = `🔒 2X DOWN`;
                 btnDoubleDown.disabled = true;
             } else {
                 btnDoubleDown.disabled = !isGameActive || playerHand.length !== 2;
@@ -896,13 +893,11 @@
             updatePowerUpUI();
         }
 
-        // --- TOGGLE DOUBLE DOWN ---
         function toggleDoubleDown() {
             if (!isGameActive || totalResets < UNLOCK_RESET_THRESHOLD || playerHand.length !== 2) return;
 
             if (!isDoubleDownActive) {
                 isDoubleDownActive = true;
-                hasPlayerActed = true; // Tandai aksi aktif
 
                 totalResets = 0;
                 localStorage.setItem('bj_total_resets', '0');
@@ -948,7 +943,7 @@
             updatePowerUpUI();
         }
 
-        // PERBAIKAN SISTEM RESET (ANTI SPAM EKSPLOITASI)
+        // FUNGSI RESET TERBARU: LANSUNG MENAMBAHKAN TOTAL RESETS
         function startNewGame() {
             const btnStart = document.getElementById('btnStart');
 
@@ -958,16 +953,12 @@
                 return;
             }
 
-            // 2. Batasi Penambahan Reset: Hanya dihitung jika ronde sebelumnya sudah aktif & pemain sempat melakukan setidaknya 1x tindakan (Hit/Stand/Double Down)
-            if (isGameActive && hasPlayerActed) {
-                totalResets++;
-                localStorage.setItem('bj_total_resets', totalResets.toString());
+            // Tambah hitungan reset
+            totalResets++;
+            localStorage.setItem('bj_total_resets', totalResets.toString());
 
-                if (totalResets === UNLOCK_RESET_THRESHOLD) {
-                    showToast("🎉 UNLOCKED! Power-Up ⚡ DOUBLE DOWN kini dapat digunakan!");
-                }
-            } else if (isGameActive && !hasPlayerActed) {
-                showToast("⚠️ Mainkan setidaknya 1 langkah sebelum dapat melakukan Reset valid!");
+            if (totalResets === UNLOCK_RESET_THRESHOLD) {
+                showToast("🎉 UNLOCKED! Power-Up ⚡ DOUBLE DOWN kini dapat digunakan!");
             }
 
             // Aktifkan Cooldown selama 3 Detik
@@ -999,7 +990,6 @@
             isGameActive = true;
             isPeeked = false;
             isDoubleDownActive = false;
-            hasPlayerActed = false; // Reset status aksi pemain
 
             document.getElementById('gameStatus').textContent = "";
             document.getElementById('btnHit').disabled = false;
@@ -1014,7 +1004,6 @@
 
         function hit() {
             if (!isGameActive) return;
-            hasPlayerActed = true; // Tandai pemain telah berinteraksi di ronde ini
             playCardSound();
             playerHand.push(drawWeightedCard());
             updateGameUI(true);
@@ -1026,7 +1015,6 @@
 
         function stand() {
             if (!isGameActive) return;
-            hasPlayerActed = true; // Tandai pemain telah berinteraksi di ronde ini
             playCardSound();
             
             while (calculateHand(dealerHand) < 17) {
