@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDFTV | Experience Room</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="assets/PDFTV-white.webp">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -54,6 +57,29 @@
         .page-transition {
             animation: pageIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             will-change: opacity, transform;
+        }
+
+        /* --- ANIMASI TYPING EFFECT --- */
+        .typing-container {
+            display: inline-block;
+        }
+        .typing-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid rgba(255, 255, 255, 0.75);
+            width: 0;
+            animation: typing 4s steps(52, end) forwards, blink 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            from, to { border-color: transparent; }
+            50% { border-color: rgba(255, 255, 255, 0.75); }
         }
 
         /* --- KARTU BLACKJACK CLASSY --- */
@@ -132,20 +158,24 @@
         ✨ Notifikasi
     </div>
 
-    <!-- NAVBAR -->
-    <nav id="appNavbar" class="hidden fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all">
+    <!-- NAVBAR (SEAMLESS HEADER FOR ALL MODES) -->
+    <nav id="appNavbar" class="fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all">
         <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
-            <button onclick="switchMode('landing')" class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition active:scale-95">
-                <span>🏠</span> <span class="font-bold text-[10px] tracking-wider uppercase">Home</span>
+            <!-- Left Logo -->
+            <button onclick="switchMode('landing')" class="flex items-center active:scale-95 transition">
+                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-6 w-auto">
             </button>
             
-            <!-- Tab Mode Switcher -->
-            <div class="flex bg-white/5 p-1 rounded-full border border-white/10 text-[11px] font-bold">
-                <button id="tabFeeds" onclick="switchMode('feeds')" class="px-3.5 py-1.5 rounded-full text-white bg-white/10 transition-all flex items-center gap-1.5">
-                    <span>💬</span> Feeds
+            <!-- Unified Navigation Tabs (HOME, FEEDS, ARCADE) -->
+            <div class="flex bg-white/5 p-1 rounded-full border border-white/10 text-[10px] font-bold tracking-wider uppercase">
+                <button id="tabHome" onclick="switchMode('landing')" class="px-3 py-1.5 rounded-full text-white bg-white/10 transition-all">
+                    HOME
                 </button>
-                <button id="tabArcade" onclick="switchMode('arcade')" class="px-3.5 py-1.5 rounded-full text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
-                    <span>🎰</span> Arcade
+                <button id="tabFeeds" onclick="switchMode('feeds')" class="px-3 py-1.5 rounded-full text-slate-400 hover:text-white transition-all">
+                    FEEDS
+                </button>
+                <button id="tabArcade" onclick="switchMode('arcade')" class="px-3 py-1.5 rounded-full text-slate-400 hover:text-white transition-all">
+                    ARCADE
                 </button>
             </div>
         </div>
@@ -163,12 +193,14 @@
     <main class="px-4 pb-12 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
         
         <!-- ================= MODE 0: LANDING PAGE ================= -->
-        <div id="viewLanding" class="space-y-5 py-8 my-auto text-center">
-            <header class="space-y-1.5">
-                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-8 w-auto mx-auto mb-2">
-                <h1 class="text-2xl font-black text-white tracking-tight">Selamat Datang</h1>
-                <p class="text-slate-400 text-xs italic max-w-xs mx-auto">"If every moment mattered, would it still be like this?"</p>
-                <p class="text-slate-600 text-[9px] uppercase tracking-widest font-bold font-mono-custom">- zaldnielsen</p>
+        <div id="viewLanding" class="space-y-5 pt-20 my-auto text-center">
+            <header class="space-y-2 py-2">
+                <div class="typing-container max-w-full">
+                    <p class="typing-text text-base sm:text-lg font-semibold text-white italic tracking-tight">
+                        "If every moment mattered, would it still be like this?"
+                    </p>
+                </div>
+                <p class="text-slate-500 text-[10px] uppercase tracking-widest font-bold font-mono-custom block">- zaldnielsen</p>
             </header>
 
             <section class="relative w-full overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group my-2">
@@ -543,42 +575,48 @@
             const viewLanding = document.getElementById('viewLanding');
             const viewFeeds = document.getElementById('viewFeeds');
             const viewArcade = document.getElementById('viewArcade');
-            const appNavbar = document.getElementById('appNavbar');
+            const tabHome = document.getElementById('tabHome');
             const tabFeeds = document.getElementById('tabFeeds');
             const tabArcade = document.getElementById('tabArcade');
             const fab = document.getElementById('fabConfession');
+
+            const activeClass = "px-3 py-1.5 rounded-full text-white bg-white/10 transition-all";
+            const inactiveClass = "px-3 py-1.5 rounded-full text-slate-400 hover:text-white transition-all";
 
             if (mode === 'landing') {
                 viewLanding.classList.remove('hidden');
                 viewFeeds.classList.add('hidden');
                 viewArcade.classList.add('hidden');
-                appNavbar.classList.add('hidden');
                 fab.classList.add('hidden');
+                
+                tabHome.className = activeClass;
+                tabFeeds.className = inactiveClass;
+                tabArcade.className = inactiveClass;
                 
                 triggerPageAnimation(viewLanding);
             } else if (mode === 'feeds') {
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.remove('hidden');
                 viewArcade.classList.add('hidden');
-                appNavbar.classList.remove('hidden');
                 fab.classList.remove('hidden');
                 
-                tabFeeds.className = "px-3.5 py-1.5 rounded-full text-white bg-white/10 transition-all flex items-center gap-1.5";
-                tabArcade.className = "px-3.5 py-1.5 rounded-full text-slate-400 hover:text-white transition-all flex items-center gap-1.5";
+                tabHome.className = inactiveClass;
+                tabFeeds.className = activeClass;
+                tabArcade.className = inactiveClass;
                 
                 triggerPageAnimation(viewFeeds);
             } else if (mode === 'arcade') {
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.add('hidden');
                 viewArcade.classList.remove('hidden');
-                appNavbar.classList.remove('hidden');
                 fab.classList.add('hidden');
                 
                 // Pastikan selalu ke Lobby dulu saat masuk tab Arcade
                 exitCasinoGame();
 
-                tabArcade.className = "px-3.5 py-1.5 rounded-full text-white bg-white/10 transition-all flex items-center gap-1.5";
-                tabFeeds.className = "px-3.5 py-1.5 rounded-full text-slate-400 hover:text-white transition-all flex items-center gap-1.5";
+                tabHome.className = inactiveClass;
+                tabFeeds.className = inactiveClass;
+                tabArcade.className = activeClass;
                 
                 triggerPageAnimation(viewArcade);
             }
