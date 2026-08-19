@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDFTV | Experience Room</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/webp" href="assets/PDFTV-white.webp">
+    <link rel="icon" type="image/webp" href="assets/PDFTV_favicon.webp">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -46,6 +46,17 @@
             transform: translateY(-4px) scale(1.02);
             border-color: rgba(255, 255, 255, 0.25);
             box-shadow: 0 10px 30px -10px rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- TYPEWRITER EFFECT --- */
+        .typewriter-cursor::after {
+            content: '|';
+            animation: blink 0.7s infinite;
+            color: #10b981;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
         /* --- ANIMASI TRANSISI HALAMAN --- */
@@ -164,10 +175,10 @@
         <!-- ================= MODE 0: LANDING PAGE ================= -->
         <div id="viewLanding" class="space-y-5 pt-16 my-auto text-center">
             <header class="space-y-2 py-2">
-                <p class="text-base sm:text-lg font-semibold text-white italic tracking-tight leading-snug">
-                    "If every moment mattered,<br>would it still be like this?"
+                <p class="text-base sm:text-lg font-black text-white uppercase tracking-tight leading-snug min-h-[56px] flex items-center justify-center">
+                    <span id="typewriterText" class="typewriter-cursor"></span>
                 </p>
-                <p class="text-slate-500 text-[10px] uppercase tracking-widest font-bold font-mono-custom block">- zaldnielsen</p>
+                <p class="text-slate-500 text-[10px] uppercase tracking-widest font-bold font-mono-custom block">- ZALDNIELSEN</p>
             </header>
 
             <section class="relative w-full overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group my-2">
@@ -217,7 +228,17 @@
                 </div>
             </div>
 
-            <p class="text-[10px] text-slate-600 font-mono-custom pt-2">© PDFTV Experience. All rights reserved.</p>
+            <!-- FOOTER DENGAN IKON INSTAGRAM DI ATAS COPYRIGHT -->
+            <div class="pt-4 flex flex-col items-center justify-center gap-2">
+                <a href="https://instagram.com/pdftv_life" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-white transition-colors duration-200 p-1" aria-label="Instagram">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+                <p class="text-[10px] text-slate-600 font-mono-custom">
+                    © PDFTV Experience. All rights reserved.
+                </p>
+            </div>
         </div>
 
         <!-- ================= MODE 1: FEEDS ================= -->
@@ -233,7 +254,7 @@
                     </div>
                 </div>
 
-                <!-- Tombol Static Tulis Pengakuan (Di bagian atas Room of Faith) -->
+                <!-- Tombol Static Tulis Pengakuan -->
                 <button onclick="toggleModal(true)" class="w-full flex items-center justify-center gap-2 bg-white text-black py-3 rounded-2xl shadow-xl hover:bg-slate-200 active:scale-95 transition-all font-black text-xs uppercase tracking-wider">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     <span>Tulis Pengakuan</span>
@@ -452,6 +473,19 @@
 
     <!-- SCRIPT ENGINE LOGIC -->
     <script>
+        // --- TYPEWRITER ENGINE ---
+        const taglineText = '"IF EVERY MOMENT MATTERED, WOULD IT STILL BE LIKE THIS?"';
+        let taglineIndex = 0;
+        
+        function typeWriter() {
+            if (taglineIndex < taglineText.length) {
+                document.getElementById("typewriterText").innerHTML += taglineText.charAt(taglineIndex);
+                taglineIndex++;
+                setTimeout(typeWriter, 50);
+            }
+        }
+        typeWriter();
+
         // --- SOUND EFFECTS ENGINE (WEB AUDIO API) ---
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
