@@ -7,37 +7,48 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #cbd5e1; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.07); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,800;1,400&family=Space+Grotesk:wght@500;700&display=swap');
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #050508; 
+            color: #cbd5e1; 
+            overflow-x: hidden; 
+        }
+
+        .font-mono-custom { font-family: 'Space Grotesk', monospace; }
+
+        .glass { 
+            background: rgba(18, 18, 26, 0.65); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+        }
+
+        .casino-card-bg {
+            background: radial-gradient(circle at top, rgba(16, 185, 129, 0.08) 0%, rgba(5, 5, 8, 0.95) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .upvoted { color: #ffffff !important; }
-        #toast { transition: transform 0.3s ease, opacity 0.3s ease; }
+        #toast { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
         
         /* Modal Transitions & Bottom Sheet support */
         .modal-base { transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
         .hidden-modal { opacity: 0; pointer-events: none; transform: scale(0.96) translateY(10px); }
         .show-modal { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); }
 
-        /* Animation Landing Card Hover & Glow */
-        .landing-card {
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .landing-card { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .landing-card:hover {
             transform: translateY(-4px) scale(1.02);
             border-color: rgba(255, 255, 255, 0.25);
             box-shadow: 0 10px 30px -10px rgba(255, 255, 255, 0.1);
         }
 
-        /* --- ANIMASI TRANSISI ANTAR HALAMAN (HOME / FEEDS / GAME) --- */
+        /* --- ANIMASI TRANSISI HALAMAN --- */
         @keyframes pageIn {
-            0% {
-                opacity: 0;
-                transform: translateY(16px) scale(0.98);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            0% { opacity: 0; transform: translateY(14px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .page-transition {
@@ -45,68 +56,84 @@
             will-change: opacity, transform;
         }
 
-        /* --- ANIMASI KARTU BLACKJACK --- */
+        /* --- KARTU BLACKJACK CLASSY --- */
         @keyframes cardDeal {
-            0% { transform: translateY(-40px) scale(0.6) rotate(-10deg); opacity: 0; }
+            0% { transform: translateY(-30px) scale(0.7) rotate(-8deg); opacity: 0; }
             100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
         }
         
         .card-animate {
             animation: cardDeal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             transform-style: preserve-3d;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
 
         /* Gold Glow for #1 Leaderboard */
         .gold-rank {
-            background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
-            border: 1px solid rgba(245, 158, 11, 0.35) !important;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(20, 20, 30, 0.6) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.4) !important;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
         }
 
-        /* --- ANIMASI GAMBLING & DOPAMIN --- */
+        /* --- GAMBLING DOPAMINE EFFECTS --- */
         @keyframes shake {
             0%, 100% { transform: translate(0, 0); }
-            20% { transform: translate(-6px, 4px); }
-            40% { transform: translate(6px, -4px); }
-            60% { transform: translate(-4px, -2px); }
-            80% { transform: translate(4px, 2px); }
+            20% { transform: translate(-5px, 3px); }
+            40% { transform: translate(5px, -3px); }
+            60% { transform: translate(-3px, -2px); }
+            80% { transform: translate(3px, 2px); }
         }
         .shake-effect { animation: shake 0.3s ease-in-out; }
 
         @keyframes winPulse {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8); }
+            70% { box-shadow: 0 0 0 25px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
         .win-pulse { animation: winPulse 0.8s ease-out; }
 
-        .casino-glow { animation: goldGlow 1.5s infinite; }
+        .casino-glow { animation: goldGlow 2s infinite ease-in-out; }
         @keyframes goldGlow {
-            0%, 100% { border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
-            50% { border-color: rgba(245, 158, 11, 0.9); box-shadow: 0 0 25px rgba(245, 158, 11, 0.6); }
+            0%, 100% { border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 0 15px rgba(245, 158, 11, 0.15); }
+            50% { border-color: rgba(245, 158, 11, 0.8); box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); }
         }
 
         .coin-particle {
             position: fixed;
             pointer-events: none;
             z-index: 100;
-            font-size: 20px;
-            animation: floatUp 1.2s ease-out forwards;
+            font-size: 22px;
+            animation: floatUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-120px) scale(1.5) rotate(360deg); }
+            0% { opacity: 1; transform: translateY(0) scale(0.8) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-130px) scale(1.6) rotate(360deg); }
+        }
+
+        /* High-Roller Play Button Glow */
+        .btn-dopamine {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-dopamine:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        .btn-dopamine:active {
+            transform: translateY(1px) scale(0.98);
         }
     </style>
 </head>
 <body class="scrollbar-hide min-h-screen flex flex-col justify-between">
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300">
-        ✨ Pengakuan berhasil dikirim!
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-5 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none border border-white/20">
+        ✨ Notifikasi
     </div>
 
-    <!-- NAVBAR (TAMPIL HANYA SETELAH KELUAR DARI LANDING PAGE) -->
-    <nav id="appNavbar" class="hidden fixed top-0 w-full z-40 bg-[#050505]/90 backdrop-blur-xl border-b border-white/5 transition-all">
+    <!-- NAVBAR -->
+    <nav id="appNavbar" class="hidden fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all">
         <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
             <button onclick="switchMode('landing')" class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition active:scale-95">
                 <span>🏠</span> <span class="font-bold text-[10px] tracking-wider uppercase">Home</span>
@@ -124,7 +151,7 @@
         </div>
     </nav>
 
-    <!-- FLOATING ACTION BUTTON (KHUSUS MODE FEEDS) -->
+    <!-- FLOATING ACTION BUTTON (FEEDS) -->
     <div id="fabConfession" class="hidden fixed bottom-6 right-6 z-30 transition-transform duration-300">
         <button onclick="toggleModal(true)" class="flex items-center gap-2 bg-white text-black px-4 py-3 rounded-full shadow-2xl hover:bg-slate-200 active:scale-95 transition-all font-black text-xs">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
@@ -135,16 +162,15 @@
     <!-- MAIN CONTAINER -->
     <main class="px-4 pb-12 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
         
-        <!-- ================= MODE 0: LANDING PAGE SPLASH ================= -->
+        <!-- ================= MODE 0: LANDING PAGE ================= -->
         <div id="viewLanding" class="space-y-5 py-8 my-auto text-center">
             <header class="space-y-1.5">
                 <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-8 w-auto mx-auto mb-2">
                 <h1 class="text-2xl font-black text-white tracking-tight">Selamat Datang</h1>
                 <p class="text-slate-400 text-xs italic max-w-xs mx-auto">"If every moment mattered, would it still be like this?"</p>
-                <p class="text-slate-600 text-[9px] uppercase tracking-widest font-bold">- zaldnielsen</p>
+                <p class="text-slate-600 text-[9px] uppercase tracking-widest font-bold font-mono-custom">- zaldnielsen</p>
             </header>
 
-            <!-- Banner Slider dipindah ke Home -->
             <section class="relative w-full overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group my-2">
                 <div id="slider" class="flex transition-transform duration-500 ease-out w-full">
                     <div class="min-w-full aspect-[21/9] relative">
@@ -173,43 +199,40 @@
             </section>
 
             <div class="grid grid-cols-1 gap-3 pt-2">
-                <!-- Card Option 1: Feeds -->
                 <div onclick="switchMode('feeds')" class="landing-card glass p-4 rounded-2xl border border-white/10 cursor-pointer text-left relative overflow-hidden group">
                     <div class="flex items-center justify-between mb-1">
                         <span class="text-xl">💬</span>
-                        <span class="text-[10px] font-mono font-bold text-slate-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full group-hover:border-white/30 transition">MASUK FEEDS ➔</span>
+                        <span class="text-[10px] font-mono-custom font-bold text-slate-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full group-hover:border-white/30 transition">MASUK FEEDS ➔</span>
                     </div>
                     <h2 class="text-sm font-black text-white tracking-wide">Room of Faith</h2>
                     <p class="text-slate-400 text-[11px] mt-0.5">Ruang anonim tempat berbagi cerita, pengakuan, dan membaca curhatan sesama.</p>
                 </div>
 
-                <!-- Card Option 2: Arcade -->
                 <div onclick="switchMode('arcade')" class="landing-card glass p-4 rounded-2xl border border-amber-500/20 cursor-pointer text-left relative overflow-hidden group bg-gradient-to-br from-amber-500/5 to-transparent">
                     <div class="flex items-center justify-between mb-1">
                         <span class="text-xl">🎰</span>
-                        <span class="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full group-hover:border-amber-500/40 transition">MAIN GAME ➔</span>
+                        <span class="text-[10px] font-mono-custom font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full group-hover:border-amber-500/40 transition">MAIN GAME ➔</span>
                     </div>
                     <h2 class="text-sm font-black text-amber-400 tracking-wide">Blackjack Roguelite</h2>
                     <p class="text-slate-400 text-[11px] mt-0.5">Uji keberuntungan dan strategi, kumpulkan win-streak, serta catat namamu di Hall of Fame.</p>
                 </div>
             </div>
 
-            <p class="text-[10px] text-slate-600 font-mono pt-2">© PDFTV Experience. All rights reserved.</p>
+            <p class="text-[10px] text-slate-600 font-mono-custom pt-2">© PDFTV Experience. All rights reserved.</p>
         </div>
 
-        <!-- ================= MODE 1: FEEDS (ROOM OF FAITH - SCROLL VERTICAL) ================= -->
+        <!-- ================= MODE 1: FEEDS ================= -->
         <div id="viewFeeds" class="hidden space-y-4 pt-20">
             <section class="text-center py-1 flex items-center justify-between">
                 <div>
                     <h1 class="text-xl font-black tracking-tight text-white text-left">Room of Faith</h1>
                     <p class="text-slate-400 text-[10px] italic text-left">"Ruang Dengar Anonim"</p>
                 </div>
-                <div id="totalPostsCount" class="text-[10px] font-mono text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
+                <div id="totalPostsCount" class="text-[10px] font-mono-custom text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
                     0 Pengakuan
                 </div>
             </section>
 
-            <!-- Filter Controls -->
             <div class="flex items-center justify-between gap-2">
                 <select id="sortSelect" onchange="sortFeed()" class="bg-black/50 border border-white/10 text-white text-[10px] p-2.5 rounded-xl focus:outline-none uppercase tracking-widest w-full cursor-pointer">
                     <option value="newest">Terbaru</option>
@@ -219,28 +242,74 @@
                 </select>
             </div>
 
-            <!-- Scroll Feed Container (Display Semua Postingan) -->
             <div id="feed" class="space-y-4 w-full"></div>
         </div>
 
-        <!-- ================= MODE 2: ARCADE (BLACKJACK & LEADERBOARD) ================= -->
-        <div id="viewArcade" class="hidden space-y-6 pt-20">
-            <!-- Game Card Section -->
-            <div id="blackjackCard" class="glass w-full p-5 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0a]">
+        <!-- ================= MODE 2: ARCADE (OVERHAULED CLASSY CASINO UI) ================= -->
+        <div id="viewArcade" class="hidden space-y-5 pt-20">
+
+            <!-- A. ARCADE LOBBY VIEW (DEFAULT FIRST SHOW) -->
+            <div id="arcadeLobby" class="space-y-5">
                 
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-base font-black text-white tracking-tight flex items-center gap-2">
-                        <span>🃏</span> BlackJack <span class="text-[9px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full uppercase tracking-widest font-mono">Roguelite</span>
-                    </h2>
-                    <button onclick="toggleRulesAccordion()" class="text-xs bg-white/10 hover:bg-white/20 text-slate-300 font-bold px-2.5 py-1 rounded-lg transition border border-white/10">
-                        📜 Aturan & Buff
+                <!-- Casino Hero Card -->
+                <div class="relative overflow-hidden rounded-3xl p-6 border border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-[#0a0a12] to-[#050508] shadow-2xl text-center">
+                    <div class="absolute -top-10 -right-10 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-10 -left-10 w-36 h-36 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-mono-custom font-bold tracking-widest uppercase mb-3">
+                        <span>✨</span> VIP High-Roller Lounge
+                    </div>
+
+                    <h1 class="text-2xl font-black text-white tracking-tight">BLACKJACK <span class="text-amber-400">ROGUELITE</span></h1>
+                    <p class="text-slate-400 text-xs mt-1.5 max-w-xs mx-auto leading-relaxed">
+                        Kuasai meja judi, tumpuk *Win-Streak*, dan manfaatkan Power-Up rahasia untuk mencatatkan namamu di sejarah.
+                    </p>
+
+                    <!-- Large Dopamine Main Button -->
+                    <button onclick="enterCasinoGame()" class="w-full mt-6 py-4 rounded-2xl text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 btn-dopamine">
+                        <span>🃏</span> MAIN SEKARANG <span>➔</span>
+                    </button>
+                </div>
+
+                <!-- Hall of Fame Section (Dalam Lobby) -->
+                <section id="lobbyHallOfFame" class="glass p-5 rounded-3xl border border-white/10 shadow-2xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🏆</span>
+                            <div>
+                                <h3 class="text-xs font-black text-white tracking-widest uppercase">Hall of Fame</h3>
+                                <p class="text-[9px] text-slate-500 font-mono-custom">TOP 5 STREAK TERTINGGI</p>
+                            </div>
+                        </div>
+                        <span class="text-[9px] font-mono-custom text-amber-400/80 bg-amber-500/10 px-2 py-1 rounded-lg border border-amber-500/20">LIVE RANKING</span>
+                    </div>
+                    
+                    <div id="leaderboardList" class="space-y-2">
+                        <div class="text-center text-slate-500 text-xs py-6 italic">Memuat papan peringkat...</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- B. GAMEPLAY BOARD UI (HIDDEN BY DEFAULT UNTIL "MAIN SEKARANG") -->
+            <div id="arcadeGameUI" class="hidden space-y-4">
+                
+                <!-- Game Header Bar -->
+                <div class="flex items-center justify-between glass px-4 py-3 rounded-2xl border border-white/10">
+                    <button onclick="exitCasinoGame()" class="text-slate-400 hover:text-white text-xs font-bold flex items-center gap-1 transition active:scale-95">
+                        <span>⬅</span> LOBBY
+                    </button>
+                    <div class="text-xs font-black tracking-wider text-amber-400 flex items-center gap-1.5">
+                        <span>🃏</span> BLACKJACK TABLE
+                    </div>
+                    <button onclick="toggleRulesAccordion()" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2.5 py-1 rounded-lg transition border border-white/10 flex items-center gap-1">
+                        📜 Rules
                     </button>
                 </div>
 
                 <!-- Accordion Rules Game -->
-                <div id="rulesAccordion" class="hidden mb-4 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-slate-300 space-y-2">
-                    <div class="font-bold text-amber-400 border-b border-white/10 pb-1">📜 Cara Bermain:</div>
-                    <p class="text-[10px] text-slate-400 leading-relaxed">Dapatkan nilai kartu mendekati <b>21</b> tanpa melebihi (*BUST*). Gunakan Power-Up untuk memperpanjang Win Streak!</p>
+                <div id="rulesAccordion" class="hidden p-4 rounded-2xl glass border border-amber-500/20 text-xs text-slate-300 space-y-2">
+                    <div class="font-bold text-amber-400 border-b border-white/10 pb-1">📜 Aturan & Buff:</div>
+                    <p class="text-[10px] text-slate-400 leading-relaxed">Dapatkan nilai kartu mendekati <b>21</b> tanpa melebihi (*BUST*). Kumpulkan streak sebanyak mungkin!</p>
                     <div class="grid grid-cols-1 gap-1.5 text-[10px] pt-1">
                         <div class="text-indigo-300">👁️ <b>PEEK:</b> Mengintip kartu tertutup Dealer (3x per sesi).</div>
                         <div class="text-amber-300">⚡ <b>2X DOWN:</b> Ambil 1 kartu & Stand. Menang = Streak x2 (Unlock @17 Resets).</div>
@@ -248,84 +317,83 @@
                     </div>
                 </div>
 
-                <!-- Record Stats Header -->
-                <div class="flex items-center justify-between mb-3 bg-white/5 px-3 py-2 rounded-xl border border-white/5">
-                    <div class="flex flex-col">
-                        <span class="text-[9px] font-mono text-slate-400 uppercase tracking-wider">Current Record</span>
-                        <span class="text-[9px] text-slate-500 font-mono">Total Resets: <b id="totalResetsText" class="text-amber-400">0</b>/17</span>
-                    </div>
-                    <div class="text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-bold">
-                        Streak: <span id="currentStreak">0</span> 🔥
-                    </div>
-                </div>
-
-                <!-- Panel Power-Up Active -->
-                <div class="grid grid-cols-3 gap-2 mb-1">
-                    <button onclick="usePeek()" id="btnPeek" class="py-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl text-[10px] font-black hover:bg-indigo-500/30 transition disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center gap-1" disabled>
-                        👁️ PEEK (<span id="peekCount">3</span>)
-                    </button>
-                    <button onclick="toggleDoubleDown()" id="btnDoubleDown" class="py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition" disabled>
-                        🔒 2X DOWN
-                    </button>
-                    <button onclick="toggleShield()" id="btnShieldToggle" class="py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition">
-                        🛡️ SHIELD: <span id="shieldStatus" class="font-bold">OFF</span> (<span id="shieldCount">1</span>)
-                    </button>
-                </div>
-                <div class="text-[9px] text-amber-400/80 font-mono text-center mb-3 italic">
-                    ⚠️ 2X DOWN mengambil 1 kartu & langsung mengakhiri ronde.
-                </div>
-
-                <!-- Playing Board Area -->
-                <div class="space-y-4 bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <div>
-                        <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                            <span class="font-bold tracking-wider flex items-center gap-1">DEALER <span id="dealerStatusText" class="text-[9px] font-normal text-amber-400"></span></span>
-                            <span id="dealerScore" class="font-mono text-slate-200 font-bold">0</span>
+                <!-- Casino Felt Gaming Table -->
+                <div id="blackjackCard" class="casino-card-bg p-5 rounded-3xl shadow-2xl relative space-y-4">
+                    
+                    <!-- Top Status Bar: Record & Streak -->
+                    <div class="flex items-center justify-between bg-black/40 px-3.5 py-2.5 rounded-xl border border-white/10">
+                        <div class="flex flex-col">
+                            <span class="text-[9px] font-mono-custom text-slate-400 uppercase tracking-wider">Session Record</span>
+                            <span class="text-[9px] text-slate-500 font-mono-custom">Resets: <b id="totalResetsText" class="text-amber-400">0</b>/17</span>
                         </div>
-                        <div id="dealerCards" class="flex gap-2 min-h-[64px] items-center overflow-x-auto scrollbar-hide py-1"></div>
-                    </div>
-
-                    <div class="border-b border-white/10 my-2"></div>
-
-                    <div>
-                        <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
-                            <span class="font-bold tracking-wider">KAMU</span>
-                            <span id="playerScore" class="font-mono text-slate-200 font-bold">0</span>
+                        <div class="text-[11px] font-mono-custom bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                            STREAK: <span id="currentStreak" class="text-sm">0</span> 🔥
                         </div>
-                        <div id="playerCards" class="flex gap-2 min-h-[64px] items-center overflow-x-auto scrollbar-hide py-1"></div>
                     </div>
-                </div>
 
-                <div id="gameStatus" class="text-center text-xs font-black my-3 min-h-[20px] text-emerald-400 uppercase tracking-wider"></div>
+                    <!-- Power-Up Buff Action Panel -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="usePeek()" id="btnPeek" class="py-2.5 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl text-[10px] font-black hover:bg-indigo-500/30 transition disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center gap-1 shadow-sm" disabled>
+                            👁️ PEEK (<span id="peekCount">3</span>)
+                        </button>
+                        <button onclick="toggleDoubleDown()" id="btnDoubleDown" class="py-2.5 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition" disabled>
+                            🔒 2X DOWN
+                        </button>
+                        <button onclick="toggleShield()" id="btnShieldToggle" class="py-2.5 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition">
+                            🛡️ SHIELD: <span id="shieldStatus" class="font-bold">OFF</span> (<span id="shieldCount">1</span>)
+                        </button>
+                    </div>
 
-                <div class="grid grid-cols-2 gap-2" id="gameControls">
-                    <button onclick="hit()" id="btnHit" class="py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none" disabled>HIT 🃏</button>
-                    <button onclick="stand()" id="btnStand" class="py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none" disabled>STAND ✋</button>
+                    <!-- Dealers & Players Felt Board Area -->
+                    <div class="space-y-3 bg-black/50 p-4 rounded-2xl border border-white/10">
+                        <!-- Dealer Hand -->
+                        <div>
+                            <div class="flex justify-between items-center text-[11px] text-slate-400 mb-2">
+                                <span class="font-bold tracking-wider flex items-center gap-1.5 text-slate-300">
+                                    <span>🎩</span> DEALER <span id="dealerStatusText" class="text-[9px] font-normal text-amber-400 font-mono-custom"></span>
+                                </span>
+                                <span id="dealerScore" class="font-mono-custom text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">0</span>
+                            </div>
+                            <div id="dealerCards" class="flex gap-2 min-h-[70px] items-center overflow-x-auto scrollbar-hide py-1"></div>
+                        </div>
+
+                        <div class="border-b border-white/10 my-2"></div>
+
+                        <!-- Player Hand -->
+                        <div>
+                            <div class="flex justify-between items-center text-[11px] text-slate-400 mb-2">
+                                <span class="font-bold tracking-wider flex items-center gap-1.5 text-slate-300">
+                                    <span>👤</span> KAMU
+                                </span>
+                                <span id="playerScore" class="font-mono-custom text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">0</span>
+                            </div>
+                            <div id="playerCards" class="flex gap-2 min-h-[70px] items-center overflow-x-auto scrollbar-hide py-1"></div>
+                        </div>
+                    </div>
+
+                    <!-- Game Status Toast Banner -->
+                    <div id="gameStatus" class="text-center text-xs font-black my-2 min-h-[20px] text-emerald-400 uppercase tracking-widest font-mono-custom"></div>
+
+                    <!-- Main Gameplay Action Controls -->
+                    <div class="grid grid-cols-2 gap-2.5" id="gameControls">
+                        <button onclick="hit()" id="btnHit" class="py-3.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow-lg" disabled>HIT 🃏</button>
+                        <button onclick="stand()" id="btnStand" class="py-3.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow-lg" disabled>STAND ✋</button>
+                    </div>
+
+                    <!-- Start / Deal Button -->
+                    <button onclick="startNewGame()" id="btnStart" class="w-full py-3.5 btn-dopamine text-white text-xs font-black rounded-xl tracking-wider uppercase">
+                        DEAL / BAGIKAN KARTU 🎰
+                    </button>
                 </div>
-                <button onclick="startNewGame()" id="btnStart" class="w-full mt-2 py-3 bg-emerald-500 text-black text-xs font-black rounded-xl hover:bg-emerald-400 active:scale-[0.98] transition shadow-lg tracking-wider">MAIN SEKARANG 🎰</button>
             </div>
 
-            <!-- Hall of Fame Section -->
-            <section class="glass p-5 rounded-3xl border border-white/10 shadow-2xl">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="text-base">🏆</span>
-                        <h3 class="text-xs font-black text-white tracking-widest uppercase">Blackjack Hall of Fame</h3>
-                    </div>
-                    <span class="text-[9px] text-slate-500 font-mono">TOP 5 STREAKS</span>
-                </div>
-                
-                <div id="leaderboardList" class="space-y-2">
-                    <div class="text-center text-slate-500 text-xs py-4 italic">Memuat papan peringkat...</div>
-                </div>
-            </section>
         </div>
 
     </main>
 
-    <!-- Modal Form Pengakuan (Bottom Sheet) -->
+    <!-- Modal Form Pengakuan -->
     <div id="confessionModal" class="modal-base hidden-modal fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="glass w-full max-w-md p-6 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0a]">
+        <div class="glass w-full max-w-md p-6 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0d]">
             <button onclick="toggleModal(false)" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
@@ -337,7 +405,7 @@
                 
                 <div class="relative">
                     <textarea id="confession" rows="4" maxlength="300" placeholder="Tulis pengakuanmu di sini..." oninput="updateCharCount()" class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition resize-none"></textarea>
-                    <div id="charCount" class="absolute bottom-3 right-3 text-[10px] text-slate-500 font-mono">0/300</div>
+                    <div id="charCount" class="absolute bottom-3 right-3 text-[10px] text-slate-500 font-mono-custom">0/300</div>
                 </div>
                 
                 <button type="submit" id="submitBtn" class="w-full py-3 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg">SUBMIT PENGAKUAN</button>
@@ -347,14 +415,14 @@
 
     <!-- Modal Highscore Submission -->
     <div id="scoreSubmitModal" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-6 rounded-3xl border border-amber-500/30 shadow-2xl text-center bg-[#0a0a0a] relative casino-glow">
+        <div class="glass w-full max-w-xs p-6 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative casino-glow">
             <button onclick="closeScoreModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
             <div class="text-4xl mb-2 animate-bounce">👑</div>
             <h3 class="text-base font-black text-amber-400 mb-1 uppercase tracking-wider">Streak Terhenti!</h3>
-            <p class="text-slate-400 text-xs mb-4">Kamu berhasil mencapai <span id="finalStreak" class="text-emerald-400 font-bold text-sm">0</span> win streak.</p>
+            <p class="text-slate-400 text-xs mb-4">Kamu berhasil mencapai <span id="finalStreak" class="text-emerald-400 font-bold text-sm font-mono-custom">0</span> win streak.</p>
 
             <form id="scoreForm" onsubmit="submitHighScore(event)" class="space-y-3">
                 <label class="flex items-center justify-between p-2.5 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition text-left">
@@ -467,7 +535,7 @@
         // --- SYSTEM SWITCHER MODE (LANDING vs FEEDS vs ARCADE) DENGAN ANIMASI ---
         function triggerPageAnimation(targetEl) {
             targetEl.classList.remove('page-transition');
-            void targetEl.offsetWidth; // Force Reflow untuk reset animasi
+            void targetEl.offsetWidth; 
             targetEl.classList.add('page-transition');
         }
 
@@ -506,12 +574,39 @@
                 appNavbar.classList.remove('hidden');
                 fab.classList.add('hidden');
                 
+                // Pastikan selalu ke Lobby dulu saat masuk tab Arcade
+                exitCasinoGame();
+
                 tabArcade.className = "px-3.5 py-1.5 rounded-full text-white bg-white/10 transition-all flex items-center gap-1.5";
                 tabFeeds.className = "px-3.5 py-1.5 rounded-full text-slate-400 hover:text-white transition-all flex items-center gap-1.5";
                 
                 triggerPageAnimation(viewArcade);
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* --- CONTROL CASINO GAME vs LOBBY STATE --- */
+        function enterCasinoGame() {
+            const lobby = document.getElementById('arcadeLobby');
+            const gameUI = document.getElementById('arcadeGameUI');
+
+            lobby.classList.add('hidden');
+            gameUI.classList.remove('hidden');
+            triggerPageAnimation(gameUI);
+
+            if (!isGameActive && playerHand.length === 0) {
+                startNewGame();
+            }
+        }
+
+        function exitCasinoGame() {
+            const lobby = document.getElementById('arcadeLobby');
+            const gameUI = document.getElementById('arcadeGameUI');
+
+            gameUI.classList.add('hidden');
+            lobby.classList.remove('hidden');
+            triggerPageAnimation(lobby);
+            fetchLeaderboard();
         }
 
         function toggleModal(open) {
@@ -552,7 +647,7 @@
             return `${days}hr yang lalu`;
         }
 
-        // --- SLIDER ENGINE (HOME BANNER) ---
+        // --- SLIDER ENGINE ---
         let currentSlide = 0;
         const totalSlides = 3;
         const slider = document.getElementById('slider');
@@ -579,7 +674,7 @@
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
-        // --- APP LOGIC FEEDS (VERTICAL SCROLL ALL) ---
+        // --- APP LOGIC FEEDS ---
         let posts = [];
         const form = document.getElementById('confessionForm');
         const feed = document.getElementById('feed');
@@ -708,7 +803,6 @@
                 return;
             }
 
-            // Render SELURUH postingan ke bawah (Scroll Vertical)
             posts.forEach(post => {
                 const hasUpvoted = localStorage.getItem(`upvoted_${post.id}`) === 'true';
 
@@ -720,7 +814,7 @@
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-white text-[11px] uppercase tracking-wider">@${escapeHtml(post.alias)}</span>
-                            <span class="text-[9px] text-slate-500 font-mono">• ${timeAgo(post.timestamp)}</span>
+                            <span class="text-[9px] text-slate-500 font-mono-custom">• ${timeAgo(post.timestamp)}</span>
                         </div>
                         <button onclick="handleUpvote('${post.id}')" id="btn-${post.id}" class="flex items-center gap-1.5 text-[10px] transition active:scale-90 hover:text-white ${hasUpvoted ? 'upvoted' : 'text-slate-400'}">
                             <span class="heart">▲</span> <span id="count-${post.id}">${post.upvotes}</span>
@@ -857,24 +951,24 @@
             if (hidden) {
                 if (isPeeked) {
                     return `
-                    <div class="card-animate w-11 h-16 bg-indigo-900/90 border-2 border-indigo-400 rounded-xl flex flex-col justify-between p-1.5 shadow-xl relative overflow-hidden select-none">
+                    <div class="card-animate w-12 h-16 bg-indigo-950 border-2 border-indigo-400 rounded-xl flex flex-col justify-between p-1.5 shadow-2xl relative overflow-hidden select-none">
                         <span class="text-[10px] font-black leading-none ${colorClass}">${card.value}</span>
                         <span class="text-[10px] ${colorClass} self-start leading-none">${card.suit}</span>
                         <div class="absolute inset-0 bg-indigo-500/20 backdrop-blur-[1px] flex items-center justify-center">
-                            <span class="text-[9px] font-mono font-bold text-indigo-200 uppercase bg-indigo-950/80 px-1 rounded">PEEK</span>
+                            <span class="text-[9px] font-mono-custom font-bold text-indigo-200 uppercase bg-indigo-950/90 px-1 rounded">PEEK</span>
                         </div>
                     </div>`;
                 }
 
                 return `
-                <div class="card-animate w-11 h-16 bg-gradient-to-br from-slate-800 to-slate-950 border border-slate-700/80 rounded-xl flex flex-col items-center justify-center font-bold text-slate-500 shadow-xl relative select-none">
-                    <span class="text-xs text-amber-500/70">🂠</span>
-                    <span class="text-[10px] text-slate-400 font-mono">?</span>
+                <div class="card-animate w-12 h-16 bg-gradient-to-br from-slate-800 to-slate-950 border border-slate-700 rounded-xl flex flex-col items-center justify-center font-bold text-slate-500 shadow-2xl relative select-none">
+                    <span class="text-xs text-amber-500/80">🂠</span>
+                    <span class="text-[9px] text-slate-400 font-mono-custom">VIP</span>
                 </div>`;
             }
 
             return `
-            <div class="card-animate w-11 h-16 bg-white rounded-xl flex flex-col justify-between p-1.5 shadow-xl relative overflow-hidden select-none">
+            <div class="card-animate w-12 h-16 bg-white rounded-xl flex flex-col justify-between p-1.5 shadow-2xl relative overflow-hidden select-none">
                 <span class="text-[11px] font-black leading-none ${colorClass}">${card.value}</span>
                 <span class="text-xs ${colorClass} self-start leading-none">${card.suit}</span>
                 <span class="absolute -bottom-1 -right-1 text-xl opacity-10 font-bold ${colorClass}">${card.suit}</span>
@@ -891,12 +985,12 @@
             const btnDoubleDown = document.getElementById('btnDoubleDown');
 
             if (totalResets < UNLOCK_RESET_THRESHOLD) {
-                btnDoubleDown.className = "py-2 bg-slate-800/40 border border-white/5 text-slate-500 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition opacity-40 pointer-events-none";
+                btnDoubleDown.className = "py-2.5 bg-slate-800/40 border border-white/5 text-slate-500 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition opacity-40 pointer-events-none";
                 btnDoubleDown.innerHTML = `🔒 2X DOWN`;
                 btnDoubleDown.disabled = true;
             } else {
                 btnDoubleDown.disabled = !isGameActive || playerHand.length !== 2 || isDealerDrawing;
-                btnDoubleDown.className = "py-2 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition shadow-[0_0_10px_rgba(245,158,11,0.2)]";
+                btnDoubleDown.className = "py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition shadow-[0_0_10px_rgba(245,158,11,0.2)]";
                 btnDoubleDown.innerHTML = `⚡ 2X DOWN`;
             }
 
@@ -904,10 +998,10 @@
             const shieldStatus = document.getElementById('shieldStatus');
             
             if (sessionBuffs.isShieldActive) {
-                btnShieldToggle.className = "py-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition shadow-[0_0_10px_rgba(16,185,129,0.3)]";
+                btnShieldToggle.className = "py-2.5 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition shadow-[0_0_10px_rgba(16,185,129,0.3)]";
                 shieldStatus.textContent = "ON";
             } else {
-                btnShieldToggle.className = "py-2 bg-slate-800/40 border border-white/5 text-slate-500 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition opacity-60";
+                btnShieldToggle.className = "py-2.5 bg-slate-800/40 border border-white/5 text-slate-500 rounded-xl text-[10px] font-black flex items-center justify-center gap-1 transition opacity-60";
                 shieldStatus.textContent = "OFF";
             }
 
@@ -1014,7 +1108,7 @@
                     isResetCoolingDown = false;
                     btnStart.disabled = false;
                     btnStart.classList.remove('opacity-50');
-                    btnStart.textContent = isGameActive ? "RESET GAME" : "MAIN SEKARANG 🎰";
+                    btnStart.textContent = "DEAL / BAGIKAN KARTU 🎰";
                 }
             }, 1000);
 
@@ -1112,10 +1206,6 @@
             document.getElementById('btnHit').disabled = true;
             document.getElementById('btnStand').disabled = true;
             document.getElementById('gameStatus').textContent = message;
-            
-            if (!isResetCoolingDown) {
-                document.getElementById('btnStart').textContent = "MAIN LAGI 🎰";
-            }
 
             if (result === 'win') {
                 playWinSound();
@@ -1242,12 +1332,12 @@
                     const isFirst = index === 0;
                     const medals = ['👑', '🥈', '🥉', '4.', '5.'];
                     return `
-                        <div class="flex items-center justify-between p-3 rounded-xl border text-xs transition-all ${isFirst ? 'gold-rank shadow-lg' : 'bg-white/5 border-white/5'}">
+                        <div class="flex items-center justify-between p-3.5 rounded-2xl border text-xs transition-all ${isFirst ? 'gold-rank' : 'bg-white/5 border-white/5'}">
                             <div class="flex items-center gap-3">
-                                <span class="font-bold text-sm ${index === 0 ? 'text-amber-400' : 'text-slate-400 font-mono'}">${medals[index]}</span>
-                                <span class="font-bold uppercase tracking-wider ${isFirst ? 'text-amber-200' : 'text-white'}">${escapeHtml(item.name)} ${isFirst ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono ml-1">KING</span>' : ''}</span>
+                                <span class="font-bold text-sm ${index === 0 ? 'text-amber-400' : 'text-slate-400 font-mono-custom'}">${medals[index]}</span>
+                                <span class="font-bold uppercase tracking-wider ${isFirst ? 'text-amber-200' : 'text-white'}">${escapeHtml(item.name)} ${isFirst ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono-custom ml-1">KING</span>' : ''}</span>
                             </div>
-                            <div class="font-mono font-black ${isFirst ? 'text-amber-400' : 'text-emerald-400'}">
+                            <div class="font-mono-custom font-black ${isFirst ? 'text-amber-400' : 'text-emerald-400'}">
                                 ${item.streak} <span class="text-[10px] text-slate-500 font-normal">STREAK</span>
                             </div>
                         </div>
