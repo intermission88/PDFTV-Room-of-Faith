@@ -28,6 +28,23 @@
             box-shadow: 0 10px 30px -10px rgba(255, 255, 255, 0.1);
         }
 
+        /* --- ANIMASI TRANSISI ANTAR HALAMAN (HOME / FEEDS / GAME) --- */
+        @keyframes pageIn {
+            0% {
+                opacity: 0;
+                transform: translateY(16px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .page-transition {
+            animation: pageIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            will-change: opacity, transform;
+        }
+
         /* --- ANIMASI KARTU BLACKJACK --- */
         @keyframes cardDeal {
             0% { transform: translateY(-40px) scale(0.6) rotate(-10deg); opacity: 0; }
@@ -119,48 +136,16 @@
     <main class="px-4 pb-12 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
         
         <!-- ================= MODE 0: LANDING PAGE SPLASH ================= -->
-        <div id="viewLanding" class="space-y-6 py-10 my-auto text-center animate-fade-in">
-            <header class="space-y-2">
-                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-8 w-auto mx-auto mb-3">
+        <div id="viewLanding" class="space-y-5 py-8 my-auto text-center">
+            <header class="space-y-1.5">
+                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-8 w-auto mx-auto mb-2">
                 <h1 class="text-2xl font-black text-white tracking-tight">Selamat Datang</h1>
                 <p class="text-slate-400 text-xs italic max-w-xs mx-auto">"If every moment mattered, would it still be like this?"</p>
                 <p class="text-slate-600 text-[9px] uppercase tracking-widest font-bold">- zaldnielsen</p>
             </header>
 
-            <div class="grid grid-cols-1 gap-4 pt-4">
-                <!-- Card Option 1: Feeds -->
-                <div onclick="switchMode('feeds')" class="landing-card glass p-5 rounded-3xl border border-white/10 cursor-pointer text-left relative overflow-hidden group">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-2xl">💬</span>
-                        <span class="text-[10px] font-mono font-bold text-slate-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full group-hover:border-white/30 transition">MASUK FEEDS ➔</span>
-                    </div>
-                    <h2 class="text-base font-black text-white tracking-wide">Room of Faith</h2>
-                    <p class="text-slate-400 text-xs mt-1">Ruang anonim tempat berbagi cerita, pengakuan, dan membaca curhatan sesama.</p>
-                </div>
-
-                <!-- Card Option 2: Arcade -->
-                <div onclick="switchMode('arcade')" class="landing-card glass p-5 rounded-3xl border border-amber-500/20 cursor-pointer text-left relative overflow-hidden group bg-gradient-to-br from-amber-500/5 to-transparent">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-2xl">🎰</span>
-                        <span class="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full group-hover:border-amber-500/40 transition">MAIN GAME ➔</span>
-                    </div>
-                    <h2 class="text-base font-black text-amber-400 tracking-wide">Blackjack Roguelite</h2>
-                    <p class="text-slate-400 text-xs mt-1">Uji keberuntungan dan strategi, kumpulkan win-streak, serta catat namamu di Hall of Fame.</p>
-                </div>
-            </div>
-
-            <p class="text-[10px] text-slate-600 font-mono pt-4">© PDFTV Experience. All rights reserved.</p>
-        </div>
-
-        <!-- ================= MODE 1: FEEDS (ROOM OF FAITH) ================= -->
-        <div id="viewFeeds" class="hidden space-y-5 pt-20">
-            <section class="text-center py-1">
-                <h1 class="text-xl font-black tracking-tight text-white">Room of Faith</h1>
-                <p class="text-slate-400 text-[10px] italic">"Ruang Dengat Anonim"</p>
-            </section>
-
-            <!-- Banner Slider Compact -->
-            <section class="relative w-full overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group">
+            <!-- Banner Slider dipindah ke Home -->
+            <section class="relative w-full overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group my-2">
                 <div id="slider" class="flex transition-transform duration-500 ease-out w-full">
                     <div class="min-w-full aspect-[21/9] relative">
                         <img src="assets/slider01_roster.webp" alt="Slider Image 1" class="w-full h-full object-cover">
@@ -187,6 +172,43 @@
                 </div>
             </section>
 
+            <div class="grid grid-cols-1 gap-3 pt-2">
+                <!-- Card Option 1: Feeds -->
+                <div onclick="switchMode('feeds')" class="landing-card glass p-4 rounded-2xl border border-white/10 cursor-pointer text-left relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xl">💬</span>
+                        <span class="text-[10px] font-mono font-bold text-slate-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full group-hover:border-white/30 transition">MASUK FEEDS ➔</span>
+                    </div>
+                    <h2 class="text-sm font-black text-white tracking-wide">Room of Faith</h2>
+                    <p class="text-slate-400 text-[11px] mt-0.5">Ruang anonim tempat berbagi cerita, pengakuan, dan membaca curhatan sesama.</p>
+                </div>
+
+                <!-- Card Option 2: Arcade -->
+                <div onclick="switchMode('arcade')" class="landing-card glass p-4 rounded-2xl border border-amber-500/20 cursor-pointer text-left relative overflow-hidden group bg-gradient-to-br from-amber-500/5 to-transparent">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xl">🎰</span>
+                        <span class="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full group-hover:border-amber-500/40 transition">MAIN GAME ➔</span>
+                    </div>
+                    <h2 class="text-sm font-black text-amber-400 tracking-wide">Blackjack Roguelite</h2>
+                    <p class="text-slate-400 text-[11px] mt-0.5">Uji keberuntungan dan strategi, kumpulkan win-streak, serta catat namamu di Hall of Fame.</p>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-slate-600 font-mono pt-2">© PDFTV Experience. All rights reserved.</p>
+        </div>
+
+        <!-- ================= MODE 1: FEEDS (ROOM OF FAITH - SCROLL VERTICAL) ================= -->
+        <div id="viewFeeds" class="hidden space-y-4 pt-20">
+            <section class="text-center py-1 flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-black tracking-tight text-white text-left">Room of Faith</h1>
+                    <p class="text-slate-400 text-[10px] italic text-left">"Ruang Dengar Anonim"</p>
+                </div>
+                <div id="totalPostsCount" class="text-[10px] font-mono text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
+                    0 Pengakuan
+                </div>
+            </section>
+
             <!-- Filter Controls -->
             <div class="flex items-center justify-between gap-2">
                 <select id="sortSelect" onchange="sortFeed()" class="bg-black/50 border border-white/10 text-white text-[10px] p-2.5 rounded-xl focus:outline-none uppercase tracking-widest w-full cursor-pointer">
@@ -195,27 +217,10 @@
                     <option value="upvotes">Upvote Terbanyak</option>
                     <option value="comments">Komentar Terbanyak</option>
                 </select>
-                <div id="cardCounter" class="text-[10px] font-mono text-slate-400 bg-white/5 border border-white/5 px-3 py-2.5 rounded-xl shrink-0">
-                    0 / 0
-                </div>
             </div>
 
-            <!-- Swipe Feeds Deck -->
-            <div id="swipeContainer" class="relative w-full select-none touch-pan-y">
-                <div id="feed" class="w-full transition-all duration-200 ease-out"></div>
-            </div>
-            
-            <div class="flex items-center justify-between mt-2 px-1">
-                <button onclick="prevCard()" class="p-2.5 glass rounded-xl border border-white/10 text-white/70 hover:text-white transition active:scale-90 flex items-center gap-1.5 text-[10px] font-mono">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    Sebelumnya
-                </button>
-                <p class="text-[9px] text-slate-500 font-mono tracking-widest uppercase text-center hidden sm:block">‹ Geser / Tombol ›</p>
-                <button onclick="nextCard('right')" class="p-2.5 glass rounded-xl border border-white/10 text-white/70 hover:text-white transition active:scale-90 flex items-center gap-1.5 text-[10px] font-mono">
-                    Selanjutnya
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
-            </div>
+            <!-- Scroll Feed Container (Display Semua Postingan) -->
+            <div id="feed" class="space-y-4 w-full"></div>
         </div>
 
         <!-- ================= MODE 2: ARCADE (BLACKJACK & LEADERBOARD) ================= -->
@@ -459,7 +464,13 @@
         const TABLE_NAME = 'PDFTV Room of Faith';
         const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
 
-        // --- SYSTEM SWITCHER MODE (LANDING vs FEEDS vs ARCADE) ---
+        // --- SYSTEM SWITCHER MODE (LANDING vs FEEDS vs ARCADE) DENGAN ANIMASI ---
+        function triggerPageAnimation(targetEl) {
+            targetEl.classList.remove('page-transition');
+            void targetEl.offsetWidth; // Force Reflow untuk reset animasi
+            targetEl.classList.add('page-transition');
+        }
+
         function switchMode(mode) {
             const viewLanding = document.getElementById('viewLanding');
             const viewFeeds = document.getElementById('viewFeeds');
@@ -475,6 +486,8 @@
                 viewArcade.classList.add('hidden');
                 appNavbar.classList.add('hidden');
                 fab.classList.add('hidden');
+                
+                triggerPageAnimation(viewLanding);
             } else if (mode === 'feeds') {
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.remove('hidden');
@@ -484,6 +497,8 @@
                 
                 tabFeeds.className = "px-3.5 py-1.5 rounded-full text-white bg-white/10 transition-all flex items-center gap-1.5";
                 tabArcade.className = "px-3.5 py-1.5 rounded-full text-slate-400 hover:text-white transition-all flex items-center gap-1.5";
+                
+                triggerPageAnimation(viewFeeds);
             } else if (mode === 'arcade') {
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.add('hidden');
@@ -493,7 +508,10 @@
                 
                 tabArcade.className = "px-3.5 py-1.5 rounded-full text-white bg-white/10 transition-all flex items-center gap-1.5";
                 tabFeeds.className = "px-3.5 py-1.5 rounded-full text-slate-400 hover:text-white transition-all flex items-center gap-1.5";
+                
+                triggerPageAnimation(viewArcade);
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function toggleModal(open) {
@@ -534,7 +552,7 @@
             return `${days}hr yang lalu`;
         }
 
-        // --- SLIDER ENGINE ---
+        // --- SLIDER ENGINE (HOME BANNER) ---
         let currentSlide = 0;
         const totalSlides = 3;
         const slider = document.getElementById('slider');
@@ -561,9 +579,8 @@
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
-        // --- APP LOGIC FEEDS ---
+        // --- APP LOGIC FEEDS (VERTICAL SCROLL ALL) ---
         let posts = [];
-        let currentIndex = 0;
         const form = document.getElementById('confessionForm');
         const feed = document.getElementById('feed');
         const submitBtn = document.getElementById('submitBtn');
@@ -646,8 +663,6 @@
                 updateCharCount();
                 toggleModal(false); 
                 await fetchPosts();
-                currentIndex = 0; 
-                renderFeed();
                 showToast("✨ Pengakuan berhasil dikirim!");
             } catch (error) {
                 console.error('Error:', error);
@@ -678,86 +693,48 @@
             if (sortBy === 'upvotes') posts.sort((a, b) => b.upvotes - a.upvotes);
             if (sortBy === 'comments') posts.sort((a, b) => b.comments.length - a.comments.length);
             
-            currentIndex = 0; 
             renderFeed();
-        }
-
-        function nextCard(direction = 'left') {
-            if (posts.length === 0) return;
-            feed.style.transform = direction === 'left' ? 'translateX(-30px)' : 'translateX(30px)';
-            feed.style.opacity = '0';
-
-            setTimeout(() => {
-                currentIndex = (currentIndex + 1) % posts.length;
-                renderFeed();
-                feed.style.transform = direction === 'left' ? 'translateX(-30px)' : 'translateX(30px)';
-                setTimeout(() => { feed.style.transform = 'translateX(0)'; feed.style.opacity = '1'; }, 50);
-            }, 150);
-        }
-
-        function prevCard() {
-            if (posts.length === 0) return;
-            feed.style.transform = 'translateX(30px)';
-            feed.style.opacity = '0';
-
-            setTimeout(() => {
-                currentIndex = (currentIndex - 1 + posts.length) % posts.length;
-                renderFeed();
-                feed.style.transform = 'translateX(-30px)';
-                setTimeout(() => { feed.style.transform = 'translateX(0)'; feed.style.opacity = '1'; }, 50);
-            }, 150);
-        }
-
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const swipeContainer = document.getElementById('swipeContainer');
-        swipeContainer.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-        swipeContainer.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipeGesture(); }, {passive: true});
-
-        function handleSwipeGesture() {
-            const threshold = 40; 
-            if (touchEndX < touchStartX - threshold) nextCard('left');
-            else if (touchEndX > touchStartX + threshold) prevCard();
         }
 
         function renderFeed() {
             feed.innerHTML = '';
-            const cardCounterEl = document.getElementById('cardCounter');
-            cardCounterEl.textContent = posts.length > 0 ? `${currentIndex + 1} / ${posts.length}` : `0 / 0`;
+            document.getElementById('totalPostsCount').textContent = `${posts.length} Pengakuan`;
 
             if (posts.length === 0) {
                 feed.innerHTML = `
-                    <div class="text-center py-10 glass rounded-2xl border border-white/5">
+                    <div class="text-center py-12 glass rounded-2xl border border-white/5">
                         <p class="text-slate-400 text-xs italic">Belum ada pengakuan sama sekali.</p>
                     </div>`;
                 return;
             }
 
-            const post = posts[currentIndex];
-            const hasUpvoted = localStorage.getItem(`upvoted_${post.id}`) === 'true';
+            // Render SELURUH postingan ke bawah (Scroll Vertical)
+            posts.forEach(post => {
+                const hasUpvoted = localStorage.getItem(`upvoted_${post.id}`) === 'true';
 
-            const div = document.createElement('div');
-            div.id = `post-card-${post.id}`;
-            div.className = 'glass p-5 rounded-2xl border border-white/10 transition-all duration-300 shadow-xl';
-            
-            div.innerHTML = `
-                <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold text-white text-[11px] uppercase tracking-wider">@${escapeHtml(post.alias)}</span>
-                        <span class="text-[9px] text-slate-500 font-mono">• ${timeAgo(post.timestamp)}</span>
+                const div = document.createElement('div');
+                div.id = `post-card-${post.id}`;
+                div.className = 'glass p-5 rounded-2xl border border-white/10 transition-all duration-300 shadow-xl space-y-3';
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white text-[11px] uppercase tracking-wider">@${escapeHtml(post.alias)}</span>
+                            <span class="text-[9px] text-slate-500 font-mono">• ${timeAgo(post.timestamp)}</span>
+                        </div>
+                        <button onclick="handleUpvote('${post.id}')" id="btn-${post.id}" class="flex items-center gap-1.5 text-[10px] transition active:scale-90 hover:text-white ${hasUpvoted ? 'upvoted' : 'text-slate-400'}">
+                            <span class="heart">▲</span> <span id="count-${post.id}">${post.upvotes}</span>
+                        </button>
                     </div>
-                    <button onclick="handleUpvote('${post.id}')" id="btn-${post.id}" class="flex items-center gap-1.5 text-[10px] transition active:scale-90 hover:text-white ${hasUpvoted ? 'upvoted' : 'text-slate-400'}">
-                        <span class="heart">▲</span> <span id="count-${post.id}">${post.upvotes}</span>
-                    </button>
-                </div>
-                <p class="text-slate-200 text-sm mb-5 leading-relaxed break-words">${escapeHtml(post.text)}</p>
-                <div class="space-y-3">
-                    <div id="replies-${post.id}" class="replyList space-y-2 text-[11px] max-h-32 overflow-y-auto scrollbar-hide">
-                        ${post.comments.length > 0 ? post.comments.map(c => `<div class="text-slate-400 pl-3 border-l border-white/10 italic break-words">${escapeHtml(c)}</div>`).join('') : '<div class="text-slate-500 text-[10px] italic">Belum ada balasan.</div>'}
-                    </div>
-                    <input type="text" placeholder="Balas..." onkeydown="handleReply(event, '${post.id}')" class="w-full bg-black/40 border border-white/10 text-[11px] p-3 rounded-lg text-slate-200 focus:outline-none focus:border-white/20 transition">
-                </div>`;
-            feed.appendChild(div);
+                    <p class="text-slate-200 text-sm leading-relaxed break-words">${escapeHtml(post.text)}</p>
+                    <div class="space-y-3 pt-2 border-t border-white/5">
+                        <div id="replies-${post.id}" class="replyList space-y-2 text-[11px] max-h-36 overflow-y-auto scrollbar-hide">
+                            ${post.comments.length > 0 ? post.comments.map(c => `<div class="text-slate-400 pl-3 border-l border-white/10 italic break-words">${escapeHtml(c)}</div>`).join('') : '<div class="text-slate-500 text-[10px] italic">Belum ada balasan.</div>'}
+                        </div>
+                        <input type="text" placeholder="Balas..." onkeydown="handleReply(event, '${post.id}')" class="w-full bg-black/40 border border-white/10 text-[11px] p-2.5 rounded-xl text-slate-200 focus:outline-none focus:border-white/20 transition">
+                    </div>`;
+                feed.appendChild(div);
+            });
         }
 
         function handleUpvote(id) {
