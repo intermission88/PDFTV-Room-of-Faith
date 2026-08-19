@@ -59,29 +59,6 @@
             will-change: opacity, transform;
         }
 
-        /* --- ANIMASI TYPING EFFECT --- */
-        .typing-container {
-            display: inline-block;
-        }
-        .typing-text {
-            display: inline-block;
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 2px solid rgba(255, 255, 255, 0.75);
-            width: 0;
-            animation: typing 4s steps(52, end) forwards, blink 0.75s step-end infinite;
-        }
-
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-
-        @keyframes blink {
-            from, to { border-color: transparent; }
-            50% { border-color: rgba(255, 255, 255, 0.75); }
-        }
-
         /* --- KARTU BLACKJACK CLASSY --- */
         @keyframes cardDeal {
             0% { transform: translateY(-30px) scale(0.7) rotate(-8deg); opacity: 0; }
@@ -136,7 +113,6 @@
             100% { opacity: 0; transform: translateY(-130px) scale(1.6) rotate(360deg); }
         }
 
-        /* High-Roller Play Button Glow */
         .btn-dopamine {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             box-shadow: 0 0 25px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -151,55 +127,46 @@
         }
     </style>
 </head>
-<body class="scrollbar-hide min-h-screen flex flex-col justify-between">
+<body class="scrollbar-hide min-h-screen flex flex-col justify-between pb-24">
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-5 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none border border-white/20">
         ✨ Notifikasi
     </div>
 
-    <!-- NAVBAR (SEAMLESS HEADER FOR ALL MODES) -->
-    <nav id="appNavbar" class="fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all">
-        <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
-            <!-- Left Logo -->
+    <!-- TOP HEADER (CENTERED LOGO) -->
+    <nav class="fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all py-3">
+        <div class="max-w-md mx-auto px-4 flex justify-center items-center">
             <button onclick="switchMode('landing')" class="flex items-center active:scale-95 transition">
-                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-6 w-auto">
+                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-6 w-auto mx-auto">
             </button>
-            
-            <!-- Unified Navigation Tabs (HOME, FEEDS, ARCADE) -->
-            <div class="flex bg-white/5 p-1 rounded-full border border-white/10 text-[10px] font-bold tracking-wider uppercase">
-                <button id="tabHome" onclick="switchMode('landing')" class="px-3 py-1.5 rounded-full text-white bg-white/10 transition-all">
-                    HOME
-                </button>
-                <button id="tabFeeds" onclick="switchMode('feeds')" class="px-3 py-1.5 rounded-full text-slate-400 hover:text-white transition-all">
-                    FEEDS
-                </button>
-                <button id="tabArcade" onclick="switchMode('arcade')" class="px-3 py-1.5 rounded-full text-slate-400 hover:text-white transition-all">
-                    ARCADE
-                </button>
-            </div>
         </div>
     </nav>
 
-    <!-- FLOATING ACTION BUTTON (FEEDS) -->
-    <div id="fabConfession" class="hidden fixed bottom-6 right-6 z-30 transition-transform duration-300">
-        <button onclick="toggleModal(true)" class="flex items-center gap-2 bg-white text-black px-4 py-3 rounded-full shadow-2xl hover:bg-slate-200 active:scale-95 transition-all font-black text-xs">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-            <span class="inline tracking-wide uppercase">Tulis Pengakuan</span>
-        </button>
+    <!-- BOTTOM NAVBAR (HOME, FEEDS, ARCADE) -->
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-4">
+        <div class="glass p-1.5 rounded-full border border-white/10 flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
+            <button id="tabHome" onclick="switchMode('landing')" class="flex-1 py-2 rounded-full text-white bg-white/10 transition-all text-center">
+                HOME
+            </button>
+            <button id="tabFeeds" onclick="handleFeedsClick()" class="flex-1 py-2 rounded-full text-slate-400 hover:text-white transition-all text-center">
+                FEEDS
+            </button>
+            <button id="tabArcade" onclick="switchMode('arcade')" class="flex-1 py-2 rounded-full text-slate-400 hover:text-white transition-all text-center">
+                ARCADE
+            </button>
+        </div>
     </div>
 
     <!-- MAIN CONTAINER -->
     <main class="px-4 pb-12 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
         
         <!-- ================= MODE 0: LANDING PAGE ================= -->
-        <div id="viewLanding" class="space-y-5 pt-20 my-auto text-center">
+        <div id="viewLanding" class="space-y-5 pt-16 my-auto text-center">
             <header class="space-y-2 py-2">
-                <div class="typing-container max-w-full">
-                    <p class="typing-text text-base sm:text-lg font-semibold text-white italic tracking-tight">
-                        "If every moment mattered, would it still be like this?"
-                    </p>
-                </div>
+                <p class="text-base sm:text-lg font-semibold text-white italic tracking-tight leading-snug">
+                    "If every moment mattered,<br>would it still be like this?"
+                </p>
                 <p class="text-slate-500 text-[10px] uppercase tracking-widest font-bold font-mono-custom block">- zaldnielsen</p>
             </header>
 
@@ -231,7 +198,7 @@
             </section>
 
             <div class="grid grid-cols-1 gap-3 pt-2">
-                <div onclick="switchMode('feeds')" class="landing-card glass p-4 rounded-2xl border border-white/10 cursor-pointer text-left relative overflow-hidden group">
+                <div onclick="handleFeedsClick()" class="landing-card glass p-4 rounded-2xl border border-white/10 cursor-pointer text-left relative overflow-hidden group">
                     <div class="flex items-center justify-between mb-1">
                         <span class="text-xl">💬</span>
                         <span class="text-[10px] font-mono-custom font-bold text-slate-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full group-hover:border-white/30 transition">MASUK FEEDS ➔</span>
@@ -254,18 +221,26 @@
         </div>
 
         <!-- ================= MODE 1: FEEDS ================= -->
-        <div id="viewFeeds" class="hidden space-y-4 pt-20">
-            <section class="text-center py-1 flex items-center justify-between">
-                <div>
-                    <h1 class="text-xl font-black tracking-tight text-white text-left">Room of Faith</h1>
-                    <p class="text-slate-400 text-[10px] italic text-left">"Ruang Dengar Anonim"</p>
+        <div id="viewFeeds" class="hidden space-y-4 pt-16">
+            <section class="py-1 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl font-black tracking-tight text-white text-left">Room of Faith</h1>
+                        <p class="text-slate-400 text-[10px] italic text-left">"Ruang Dengar Anonim"</p>
+                    </div>
+                    <div id="totalPostsCount" class="text-[10px] font-mono-custom text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
+                        0 Pengakuan
+                    </div>
                 </div>
-                <div id="totalPostsCount" class="text-[10px] font-mono-custom text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
-                    0 Pengakuan
-                </div>
+
+                <!-- Tombol Static Tulis Pengakuan (Di bagian atas Room of Faith) -->
+                <button onclick="toggleModal(true)" class="w-full flex items-center justify-center gap-2 bg-white text-black py-3 rounded-2xl shadow-xl hover:bg-slate-200 active:scale-95 transition-all font-black text-xs uppercase tracking-wider">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Tulis Pengakuan</span>
+                </button>
             </section>
 
-            <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center justify-between gap-2 pt-1">
                 <select id="sortSelect" onchange="sortFeed()" class="bg-black/50 border border-white/10 text-white text-[10px] p-2.5 rounded-xl focus:outline-none uppercase tracking-widest w-full cursor-pointer">
                     <option value="newest">Terbaru</option>
                     <option value="oldest">Terlama</option>
@@ -277,13 +252,11 @@
             <div id="feed" class="space-y-4 w-full"></div>
         </div>
 
-        <!-- ================= MODE 2: ARCADE (OVERHAULED CLASSY CASINO UI) ================= -->
-        <div id="viewArcade" class="hidden space-y-5 pt-20">
+        <!-- ================= MODE 2: ARCADE ================= -->
+        <div id="viewArcade" class="hidden space-y-5 pt-16">
 
-            <!-- A. ARCADE LOBBY VIEW (DEFAULT FIRST SHOW) -->
+            <!-- A. ARCADE LOBBY VIEW -->
             <div id="arcadeLobby" class="space-y-5">
-                
-                <!-- Casino Hero Card -->
                 <div class="relative overflow-hidden rounded-3xl p-6 border border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-[#0a0a12] to-[#050508] shadow-2xl text-center">
                     <div class="absolute -top-10 -right-10 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="absolute -bottom-10 -left-10 w-36 h-36 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -297,13 +270,11 @@
                         Kuasai meja judi, tumpuk *Win-Streak*, dan manfaatkan Power-Up rahasia untuk mencatatkan namamu di sejarah.
                     </p>
 
-                    <!-- Large Dopamine Main Button -->
                     <button onclick="enterCasinoGame()" class="w-full mt-6 py-4 rounded-2xl text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 btn-dopamine">
                         <span>🃏</span> MAIN SEKARANG <span>➔</span>
                     </button>
                 </div>
 
-                <!-- Hall of Fame Section (Dalam Lobby) -->
                 <section id="lobbyHallOfFame" class="glass p-5 rounded-3xl border border-white/10 shadow-2xl">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-2">
@@ -322,10 +293,8 @@
                 </section>
             </div>
 
-            <!-- B. GAMEPLAY BOARD UI (HIDDEN BY DEFAULT UNTIL "MAIN SEKARANG") -->
+            <!-- B. GAMEPLAY BOARD UI -->
             <div id="arcadeGameUI" class="hidden space-y-4">
-                
-                <!-- Game Header Bar -->
                 <div class="flex items-center justify-between glass px-4 py-3 rounded-2xl border border-white/10">
                     <button onclick="exitCasinoGame()" class="text-slate-400 hover:text-white text-xs font-bold flex items-center gap-1 transition active:scale-95">
                         <span>⬅</span> LOBBY
@@ -338,7 +307,6 @@
                     </button>
                 </div>
 
-                <!-- Accordion Rules Game -->
                 <div id="rulesAccordion" class="hidden p-4 rounded-2xl glass border border-amber-500/20 text-xs text-slate-300 space-y-2">
                     <div class="font-bold text-amber-400 border-b border-white/10 pb-1">📜 Aturan & Buff:</div>
                     <p class="text-[10px] text-slate-400 leading-relaxed">Dapatkan nilai kartu mendekati <b>21</b> tanpa melebihi (*BUST*). Kumpulkan streak sebanyak mungkin!</p>
@@ -349,10 +317,7 @@
                     </div>
                 </div>
 
-                <!-- Casino Felt Gaming Table -->
                 <div id="blackjackCard" class="casino-card-bg p-5 rounded-3xl shadow-2xl relative space-y-4">
-                    
-                    <!-- Top Status Bar: Record & Streak -->
                     <div class="flex items-center justify-between bg-black/40 px-3.5 py-2.5 rounded-xl border border-white/10">
                         <div class="flex flex-col">
                             <span class="text-[9px] font-mono-custom text-slate-400 uppercase tracking-wider">Session Record</span>
@@ -363,7 +328,6 @@
                         </div>
                     </div>
 
-                    <!-- Power-Up Buff Action Panel -->
                     <div class="grid grid-cols-3 gap-2">
                         <button onclick="usePeek()" id="btnPeek" class="py-2.5 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl text-[10px] font-black hover:bg-indigo-500/30 transition disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center gap-1 shadow-sm" disabled>
                             👁️ PEEK (<span id="peekCount">3</span>)
@@ -376,9 +340,7 @@
                         </button>
                     </div>
 
-                    <!-- Dealers & Players Felt Board Area -->
                     <div class="space-y-3 bg-black/50 p-4 rounded-2xl border border-white/10">
-                        <!-- Dealer Hand -->
                         <div>
                             <div class="flex justify-between items-center text-[11px] text-slate-400 mb-2">
                                 <span class="font-bold tracking-wider flex items-center gap-1.5 text-slate-300">
@@ -391,7 +353,6 @@
 
                         <div class="border-b border-white/10 my-2"></div>
 
-                        <!-- Player Hand -->
                         <div>
                             <div class="flex justify-between items-center text-[11px] text-slate-400 mb-2">
                                 <span class="font-bold tracking-wider flex items-center gap-1.5 text-slate-300">
@@ -403,16 +364,13 @@
                         </div>
                     </div>
 
-                    <!-- Game Status Toast Banner -->
                     <div id="gameStatus" class="text-center text-xs font-black my-2 min-h-[20px] text-emerald-400 uppercase tracking-widest font-mono-custom"></div>
 
-                    <!-- Main Gameplay Action Controls -->
                     <div class="grid grid-cols-2 gap-2.5" id="gameControls">
                         <button onclick="hit()" id="btnHit" class="py-3.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow-lg" disabled>HIT 🃏</button>
                         <button onclick="stand()" id="btnStand" class="py-3.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow-lg" disabled>STAND ✋</button>
                     </div>
 
-                    <!-- Start / Deal Button -->
                     <button onclick="startNewGame()" id="btnStart" class="w-full py-3.5 btn-dopamine text-white text-xs font-black rounded-xl tracking-wider uppercase">
                         DEAL / BAGIKAN KARTU 🎰
                     </button>
@@ -469,6 +427,26 @@
                 <button type="submit" id="btnSubmitScore" class="w-full py-3 bg-amber-500 text-black text-xs font-black rounded-xl hover:bg-amber-400 active:scale-[0.98] transition">SIMPAN REKOR 🏆</button>
                 <button type="button" onclick="closeScoreModal()" class="w-full py-2 bg-transparent text-slate-400 hover:text-white text-xs transition">Batal / Tutup</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Peringatan Age Verification (18+) -->
+    <div id="ageWarningModal" class="modal-base hidden-modal fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass w-full max-w-xs p-6 rounded-3xl border border-red-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
+            <div class="text-4xl mb-2">🔞</div>
+            <h3 class="text-base font-black text-red-400 mb-1 uppercase tracking-wider">Peringatan Konten 18+</h3>
+            <p class="text-slate-300 text-xs mb-5 leading-relaxed">
+                Halaman **Feeds** mungkin berisi konten dewasa, emosional, atau sensitif. Apakah kamu berusia 18 tahun atau lebih?
+            </p>
+
+            <div class="space-y-2">
+                <button onclick="confirmAge(true)" class="w-full py-3 bg-red-600 hover:bg-red-500 text-white text-xs font-black rounded-xl active:scale-[0.98] transition shadow-lg uppercase tracking-wider">
+                    Ya, Saya 18+
+                </button>
+                <button onclick="confirmAge(false)" class="w-full py-2.5 bg-white/5 hover:bg-white/10 text-slate-400 text-xs font-bold rounded-xl transition">
+                    Kembali
+                </button>
+            </div>
         </div>
     </div>
 
@@ -564,7 +542,39 @@
         const TABLE_NAME = 'PDFTV Room of Faith';
         const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
 
-        // --- SYSTEM SWITCHER MODE (LANDING vs FEEDS vs ARCADE) DENGAN ANIMASI ---
+        // --- SYSTEM VERIFIKASI 18+ ---
+        function handleFeedsClick() {
+            const is18PlusConfirmed = localStorage.getItem('is_18_plus_confirmed') === 'true';
+            if (is18PlusConfirmed) {
+                switchMode('feeds');
+            } else {
+                showAgeWarningModal(true);
+            }
+        }
+
+        function showAgeWarningModal(show) {
+            const modal = document.getElementById('ageWarningModal');
+            if (show) {
+                modal.classList.remove('hidden-modal');
+                modal.classList.add('show-modal');
+            } else {
+                modal.classList.remove('show-modal');
+                modal.classList.add('hidden-modal');
+            }
+        }
+
+        function confirmAge(is18Plus) {
+            if (is18Plus) {
+                localStorage.setItem('is_18_plus_confirmed', 'true');
+                showAgeWarningModal(false);
+                switchMode('feeds');
+            } else {
+                showAgeWarningModal(false);
+                showToast("⚠️ Akses ditolak. Khusus 18+.");
+            }
+        }
+
+        // --- SYSTEM SWITCHER MODE ---
         function triggerPageAnimation(targetEl) {
             targetEl.classList.remove('page-transition');
             void targetEl.offsetWidth; 
@@ -578,16 +588,14 @@
             const tabHome = document.getElementById('tabHome');
             const tabFeeds = document.getElementById('tabFeeds');
             const tabArcade = document.getElementById('tabArcade');
-            const fab = document.getElementById('fabConfession');
 
-            const activeClass = "px-3 py-1.5 rounded-full text-white bg-white/10 transition-all";
-            const inactiveClass = "px-3 py-1.5 rounded-full text-slate-400 hover:text-white transition-all";
+            const activeClass = "flex-1 py-2 rounded-full text-white bg-white/10 transition-all text-center";
+            const inactiveClass = "flex-1 py-2 rounded-full text-slate-400 hover:text-white transition-all text-center";
 
             if (mode === 'landing') {
                 viewLanding.classList.remove('hidden');
                 viewFeeds.classList.add('hidden');
                 viewArcade.classList.add('hidden');
-                fab.classList.add('hidden');
                 
                 tabHome.className = activeClass;
                 tabFeeds.className = inactiveClass;
@@ -598,7 +606,6 @@
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.remove('hidden');
                 viewArcade.classList.add('hidden');
-                fab.classList.remove('hidden');
                 
                 tabHome.className = inactiveClass;
                 tabFeeds.className = activeClass;
@@ -609,9 +616,7 @@
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.add('hidden');
                 viewArcade.classList.remove('hidden');
-                fab.classList.add('hidden');
                 
-                // Pastikan selalu ke Lobby dulu saat masuk tab Arcade
                 exitCasinoGame();
 
                 tabHome.className = inactiveClass;
@@ -900,9 +905,7 @@
             }
         }
 
-        // ===================================================
-        // --- LOGIKA BLACKJACK ROGUELITE GAME & ANIMASI ---
-        // ===================================================
+        // --- BLACKJACK LOGIC ---
         let deck = [];
         let playerHand = [];
         let dealerHand = [];
