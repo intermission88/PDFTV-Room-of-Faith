@@ -145,7 +145,7 @@
         ✨ Notifikasi
     </div>
 
-    <!-- TOP HEADER (LOGO LEFT, ADMIN RIGHT) -->
+    <!-- TOP HEADER -->
     <nav class="fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all py-3">
         <div class="max-w-md mx-auto px-4 flex justify-between items-center">
             <button onclick="switchMode('landing')" class="flex items-center active:scale-95 transition">
@@ -159,7 +159,7 @@
         </div>
     </nav>
 
-    <!-- BOTTOM NAVBAR (HOME, FEEDS, ARCADE) -->
+    <!-- BOTTOM NAVBAR -->
     <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-4">
         <div class="glass p-1.5 rounded-full border border-white/10 flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
             <button id="tabHome" onclick="switchMode('landing')" class="flex-1 py-2 rounded-full text-white bg-white/10 transition-all text-center">
@@ -233,7 +233,6 @@
                 </div>
             </div>
 
-            <!-- FOOTER DENGAN IKON INSTAGRAM DI ATAS COPYRIGHT -->
             <div class="pt-4 flex flex-col items-center justify-center gap-2">
                 <a href="https://instagram.com/pdftv_life" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-white transition-colors duration-200 p-1" aria-label="Instagram">
                     <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -259,7 +258,6 @@
                     </div>
                 </div>
 
-                <!-- Tombol Static Tulis Pengakuan -->
                 <button onclick="toggleModal(true)" class="w-full flex items-center justify-center gap-2 bg-white text-black py-3 rounded-2xl shadow-xl hover:bg-slate-200 active:scale-95 transition-all font-black text-xs uppercase tracking-wider">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     <span>Tulis Pengakuan</span>
@@ -318,10 +316,10 @@
                         </div>
                     </div>
 
-                    <!-- Countdown Reset Banner -->
-                    <div id="resetCountdownBanner" class="hidden mb-3 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-center">
+                    <!-- Countdown Reset Banner (PUBLIK & LIVE) -->
+                    <div id="resetCountdownBanner" class="hidden mb-3 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-center animate-pulse">
                         <div class="text-[10px] text-red-400 font-mono-custom font-bold uppercase tracking-wider">
-                            ⚠️ Leaderboard Agan Direset Dalam:
+                            ⚠️ Leaderboard Direset Publik Dalam:
                         </div>
                         <div id="countdownTimer" class="text-base font-black text-white font-mono-custom mt-0.5">
                             30:00
@@ -515,6 +513,14 @@
 
     <!-- SCRIPT ENGINE LOGIC -->
     <script>
+        // --- KONFIGURASI SUPABASE ---
+        const SUPABASE_URL = 'https://fhpyvnbsreoaiaeqfkvk.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const TABLE_NAME = 'PDFTV Room of Faith';
+        const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
+        const CONFIG_TABLE = 'PDFTV System Config';
+
         // --- ADMIN SYSTEM & STATE ---
         let isAdminLoggedIn = false;
         let resetCountdownTimer = null;
@@ -670,13 +676,6 @@
             card.classList.add('win-pulse');
         }
 
-        // --- KONFIGURASI SUPABASE ---
-        const SUPABASE_URL = 'https://fhpyvnbsreoaiaeqfkvk.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const TABLE_NAME = 'PDFTV Room of Faith';
-        const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
-
         // --- SYSTEM VERIFIKASI 18+ ---
         function handleFeedsClick() {
             const is18PlusConfirmed = localStorage.getItem('is_18_plus_confirmed') === 'true';
@@ -747,6 +746,7 @@
                 tabArcade.className = inactiveClass;
                 
                 triggerPageAnimation(viewFeeds);
+                fetchPosts();
             } else if (mode === 'arcade') {
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.add('hidden');
@@ -759,11 +759,11 @@
                 tabArcade.className = activeClass;
                 
                 triggerPageAnimation(viewArcade);
+                checkResetCountdown();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        /* --- CONTROL CASINO GAME vs LOBBY STATE --- */
         function enterCasinoGame() {
             const lobby = document.getElementById('arcadeLobby');
             const gameUI = document.getElementById('arcadeGameUI');
@@ -852,7 +852,7 @@
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
-        // --- APP LOGIC FEEDS ---
+        // --- APP LOGIC FEEDS (LIVE & PUBLIC PINNED) ---
         let posts = [];
         const form = document.getElementById('confessionForm');
         const feed = document.getElementById('feed');
@@ -879,8 +879,6 @@
                 const { data, error } = await supabaseClient.from(TABLE_NAME).select('*');
                 if (error) throw error;
 
-                const pinnedPosts = JSON.parse(localStorage.getItem('pinned_posts') || '[]');
-                
                 posts = (data || []).map((row) => {
                     let parsedComments = [];
                     if (row.comments) {
@@ -897,7 +895,7 @@
                         upvotes: Number(row.upvotes) || 0,
                         comments: Array.isArray(parsedComments) ? parsedComments : [],
                         timestamp: parsedTime,
-                        isPinned: pinnedPosts.includes(String(row.id))
+                        isPinned: Boolean(row.is_pinned)
                     };
                 });
 
@@ -929,7 +927,8 @@
                     alias: alias,
                     confession: text,
                     upvotes: 0,
-                    comments: JSON.stringify([])
+                    comments: JSON.stringify([]),
+                    is_pinned: false
                 };
 
                 const { error } = await supabaseClient.from(TABLE_NAME).insert([payload]);
@@ -954,7 +953,11 @@
             try {
                 const { error } = await supabaseClient
                     .from(TABLE_NAME)
-                    .update({ upvotes: post.upvotes, comments: JSON.stringify(post.comments) })
+                    .update({ 
+                        upvotes: post.upvotes, 
+                        comments: JSON.stringify(post.comments),
+                        is_pinned: post.isPinned 
+                    })
                     .eq('id', post.id);
                 if (error) throw error;
             } catch (error) {
@@ -969,29 +972,33 @@
             if (sortBy === 'upvotes') posts.sort((a, b) => b.upvotes - a.upvotes);
             if (sortBy === 'comments') posts.sort((a, b) => b.comments.length - a.comments.length);
 
-            // Re-order agar Pinned posts selalu paling atas
+            // Re-order agar Pinned posts publik selalu berada paling atas
             posts.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
             
             renderFeed();
         }
 
-        function togglePinPost(id) {
-            let pinnedPosts = JSON.parse(localStorage.getItem('pinned_posts') || '[]');
+        async function togglePinPost(id) {
+            if (!isAdminLoggedIn) return;
             const post = posts.find(p => p.id === id);
             if (!post) return;
 
-            if (post.isPinned) {
-                pinnedPosts = pinnedPosts.filter(pId => pId !== id);
-                post.isPinned = false;
-                showToast("📌 Post unpinned.");
-            } else {
-                pinnedPosts.push(id);
-                post.isPinned = true;
-                showToast("📌 Post pinned ke atas.");
-            }
+            post.isPinned = !post.isPinned;
 
-            localStorage.setItem('pinned_posts', JSON.stringify(pinnedPosts));
-            sortFeed();
+            try {
+                const { error } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .update({ is_pinned: post.isPinned })
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showToast(post.isPinned ? "📌 Post berhasil di-PIN (Publik)!" : "📌 Post berhasil di-UNPIN!");
+                sortFeed();
+            } catch (err) {
+                console.error("Gagal mengubah status pin:", err);
+                alert("Gagal mengupdate pin ke database.");
+            }
         }
 
         function renderFeed() {
@@ -1011,18 +1018,18 @@
 
                 const div = document.createElement('div');
                 div.id = `post-card-${post.id}`;
-                div.className = `glass p-5 rounded-2xl border transition-all duration-300 shadow-xl space-y-3 ${post.isPinned ? 'border-amber-500/40 bg-amber-500/5' : 'border-white/10'}`;
+                div.className = `glass p-5 rounded-2xl border transition-all duration-300 shadow-xl space-y-3 ${post.isPinned ? 'border-amber-500/50 bg-amber-500/10' : 'border-white/10'}`;
                 
                 div.innerHTML = `
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                            ${post.isPinned ? '<span class="text-xs">📌</span>' : ''}
+                            ${post.isPinned ? '<span class="text-[10px] font-mono-custom font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full flex items-center gap-1">📌 PINNED</span>' : ''}
                             <span class="font-bold text-white text-[11px] uppercase tracking-wider">@${escapeHtml(post.alias)}</span>
                             <span class="text-[9px] text-slate-500 font-mono-custom">• ${timeAgo(post.timestamp)}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             ${isAdminLoggedIn ? `
-                                <button onclick="togglePinPost('${post.id}')" class="text-[9px] font-mono-custom font-bold px-2 py-0.5 rounded border ${post.isPinned ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'}">
+                                <button onclick="togglePinPost('${post.id}')" class="text-[9px] font-mono-custom font-bold px-2 py-0.5 rounded border ${post.isPinned ? 'bg-amber-500/30 text-amber-200 border-amber-500/50' : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'}">
                                     ${post.isPinned ? 'UNPIN' : 'PIN'}
                                 </button>
                             ` : ''}
@@ -1073,46 +1080,70 @@
             }
         }
 
-        // --- RESET LEADERBOARD WITH COUNTDOWN ---
-        function confirmResetLeaderboard() {
+        // --- PUBLIC & LIVE RESET COUNTDOWN LEADERBOARD ---
+        async function confirmResetLeaderboard() {
             if (!isAdminLoggedIn) return;
-            const sure = confirm("🚨 APAKAH ANDA YAKIN INGIN MERESET LEADERBOARD?\n\nPapan peringkat akan dibersihkan dari Supabase setelah hitung mundur 30 menit selesai.");
+            const sure = confirm("🚨 AKSI PUBLIK: HITUNG MUNDUR RESET LEADERBOARD (30 MENIT)?\n\nSeluruh pemain publik akan melihat banner hitung mundur dan leaderboard akan dibersihkan dari Supabase setelah 30 menit.");
             if (sure) {
                 const targetTime = Date.now() + 30 * 60 * 1000;
-                localStorage.setItem('leaderboard_reset_target', targetTime.toString());
-                checkResetCountdown();
-                showToast("⏱️ Hitung mundur reset leaderboard dimulai (30 Menit).");
+                
+                try {
+                    const { error } = await supabaseClient
+                        .from(CONFIG_TABLE)
+                        .upsert([{ key: 'reset_target_time', value: targetTime.toString() }]);
+
+                    if (error) throw error;
+
+                    showToast("⏱️ Hitung mundur reset publik 30 menit dimulai!");
+                    checkResetCountdown();
+                } catch (err) {
+                    console.error("Gagal mengatur waktu reset:", err);
+                    alert("Gagal memulai hitung mundur reset.");
+                }
             }
         }
 
-        function checkResetCountdown() {
-            const targetTimeStr = localStorage.getItem('leaderboard_reset_target');
+        async function checkResetCountdown() {
             const banner = document.getElementById('resetCountdownBanner');
             const timerEl = document.getElementById('countdownTimer');
 
-            if (!targetTimeStr) {
-                if (banner) banner.classList.add('hidden');
-                if (resetCountdownTimer) clearInterval(resetCountdownTimer);
-                return;
-            }
+            try {
+                const { data, error } = await supabaseClient
+                    .from(CONFIG_TABLE)
+                    .select('value')
+                    .eq('key', 'reset_target_time')
+                    .single();
 
-            if (banner) banner.classList.remove('hidden');
-
-            if (resetCountdownTimer) clearInterval(resetCountdownTimer);
-
-            resetCountdownTimer = setInterval(() => {
-                const remaining = Number(targetTimeStr) - Date.now();
-                if (remaining <= 0) {
-                    clearInterval(resetCountdownTimer);
-                    localStorage.removeItem('leaderboard_reset_target');
+                if (error || !data || !data.value) {
                     if (banner) banner.classList.add('hidden');
-                    executeLeaderboardReset();
-                } else {
-                    const mins = Math.floor(remaining / 60000);
-                    const secs = Math.floor((remaining % 60000) / 1000);
-                    if (timerEl) timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    if (resetCountdownTimer) clearInterval(resetCountdownTimer);
+                    return;
                 }
-            }, 1000);
+
+                const targetTime = Number(data.value);
+                if (banner) banner.classList.remove('hidden');
+
+                if (resetCountdownTimer) clearInterval(resetCountdownTimer);
+
+                resetCountdownTimer = setInterval(async () => {
+                    const remaining = targetTime - Date.now();
+                    if (remaining <= 0) {
+                        clearInterval(resetCountdownTimer);
+                        if (banner) banner.classList.add('hidden');
+                        
+                        // Hapus config timer di DB
+                        await supabaseClient.from(CONFIG_TABLE).delete().eq('key', 'reset_target_time');
+                        executeLeaderboardReset();
+                    } else {
+                        const mins = Math.floor(remaining / 60000);
+                        const secs = Math.floor((remaining % 60000) / 1000);
+                        if (timerEl) timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    }
+                }, 1000);
+
+            } catch (err) {
+                console.error("Gagal memeriksa timer reset:", err);
+            }
         }
 
         async function executeLeaderboardReset() {
@@ -1120,15 +1151,14 @@
                 const { error } = await supabaseClient
                     .from(LEADERBOARD_TABLE)
                     .delete()
-                    .neq('streak', -1); // Hapus semua baris
+                    .neq('streak', -1); 
 
                 if (error) throw error;
 
-                showToast("🧹 Leaderboard berhasil dibersihkan dari Supabase!");
+                showToast("🧹 Leaderboard publik resmi dibersihkan!");
                 fetchLeaderboard();
             } catch (err) {
                 console.error("Gagal mereset leaderboard:", err);
-                showToast("❌ Gagal mereset leaderboard.");
             }
         }
 
