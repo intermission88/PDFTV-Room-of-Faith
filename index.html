@@ -584,29 +584,37 @@
         </div>
     </div>
 
-    <!-- Modal Highscore Submission -->
+    <!-- Modal Highscore Submission (Revamped: Clean & Minimalist UI/UX) -->
     <div id="scoreSubmitModal" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
-            <button onclick="closeScoreModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative space-y-3">
+            
+            <div class="w-10 h-10 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg shadow">
+                👑
+            </div>
 
-            <div class="text-3xl mb-1 animate-bounce">👑</div>
-            <h3 class="text-sm font-black text-amber-400 mb-0.5 uppercase tracking-wider">Streak Terhenti!</h3>
-            <p class="text-slate-400 text-[11px] mb-3">Kamu berhasil mencapai <span id="finalStreak" class="text-emerald-400 font-bold text-xs font-mono-custom">0</span> win streak.</p>
+            <div>
+                <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider">Streak Terhenti!</h3>
+                <p class="text-slate-400 text-[11px] mt-0.5">Kamu meraih <span id="finalStreak" class="text-emerald-400 font-bold font-mono-custom">0</span> Win-Streak.</p>
+            </div>
+
+            <!-- Pesan Minimum Score -->
+            <div id="minScoreWarning" class="hidden text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/20 py-2 px-3 rounded-xl">
+                ⚠️ Minimal <b>10 streak</b> untuk mencatat rekor ke Leaderboard.
+            </div>
 
             <form id="scoreForm" onsubmit="submitHighScore(event)" class="space-y-2.5">
-                <label class="flex items-center justify-between p-2 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition text-left">
-                    <span class="text-[11px] text-slate-300 font-medium">Catat ke Leaderboard?</span>
-                    <input type="checkbox" id="saveToLeaderboard" onchange="toggleNameInput(this.checked)" checked class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
-                </label>
-
-                <div id="nameInputContainer">
-                    <input type="text" id="playerName" maxlength="12" placeholder="Nama / Alias..." required class="w-full bg-white/5 border border-white/10 text-white text-xs p-2.5 rounded-xl text-center focus:outline-none focus:border-amber-500 transition">
+                <div id="nameInputContainer" class="space-y-1">
+                    <input type="text" id="playerName" maxlength="12" placeholder="Masukkan Nama / Alias..." required class="w-full bg-white/5 border border-white/10 text-white text-xs p-3 rounded-xl text-center focus:outline-none focus:border-amber-500 transition font-mono-custom tracking-wide">
                 </div>
 
-                <button type="submit" id="btnSubmitScore" class="w-full py-2.5 bg-amber-500 text-black text-xs font-black rounded-xl hover:bg-amber-400 active:scale-[0.98] transition">SIMPAN REKOR 🏆</button>
-                <button type="button" onclick="closeScoreModal()" class="w-full py-1.5 bg-transparent text-slate-400 hover:text-white text-[10px] transition">Batal / Tutup</button>
+                <div class="space-y-1.5 pt-1">
+                    <button type="submit" id="btnSubmitScore" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-black rounded-xl active:scale-[0.98] transition shadow uppercase tracking-wider">
+                        SIMPAN REKOR 🏆
+                    </button>
+                    <button type="button" onclick="closeScoreModal()" class="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] font-bold rounded-xl transition">
+                        Tutup
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -1606,7 +1614,6 @@
             triggerHaptic('heavy');
             isDriansMercyActive = true;
             
-            // Menggunakan Drian's Mercy akan mereset hitungan totalResets kembali ke 0
             totalResets = 0;
             document.getElementById('totalResetsText').textContent = totalResets;
 
@@ -1852,36 +1859,42 @@
         }
 
         function showScoreModal(finalStreak) {
-            if (finalStreak <= 0) return;
             playModalSound();
             document.getElementById('finalStreak').textContent = finalStreak;
+            
             const modal = document.getElementById('scoreSubmitModal');
+            const nameContainer = document.getElementById('nameInputContainer');
+            const submitBtn = document.getElementById('btnSubmitScore');
+            const warningEl = document.getElementById('minScoreWarning');
+            const nameInput = document.getElementById('playerName');
+
+            // Cek apakah mencapai minimal 10
+            if (finalStreak < 10) {
+                warningEl.classList.remove('hidden');
+                nameContainer.classList.add('hidden');
+                submitBtn.classList.add('hidden');
+                nameInput.required = false;
+            } else {
+                warningEl.classList.add('hidden');
+                nameContainer.classList.remove('hidden');
+                submitBtn.classList.remove('hidden');
+                nameInput.required = true;
+                nameInput.value = '';
+            }
+
             modal.classList.remove('hidden-modal');
             modal.classList.add('show-modal');
         }
 
-        function toggleNameInput(checked) {
-            playClickSound();
-            triggerHaptic('light');
-            const container = document.getElementById('nameInputContainer');
-            const input = document.getElementById('playerName');
-            if (checked) {
-                container.classList.remove('hidden');
-                input.required = true;
-            } else {
-                container.classList.add('hidden');
-                input.required = false;
-            }
-        }
-
         async function submitHighScore(e) {
             e.preventDefault();
+            if (streakToSubmit < 10) return; // Proteksi extra
+
             playWinSound();
             triggerHaptic('heavy');
-            const saveToLB = document.getElementById('saveToLeaderboard').checked;
             const nameInput = document.getElementById('playerName').value.trim();
 
-            if (saveToLB && nameInput) {
+            if (nameInput) {
                 try {
                     const payload = {
                         player_name: nameInput,
