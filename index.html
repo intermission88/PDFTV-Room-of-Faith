@@ -34,15 +34,15 @@
 
         /* EPIC BOSS BATTLE ARENA */
         .boss-card-bg {
-            background: radial-gradient(circle at top, rgba(225, 29, 72, 0.3) 0%, rgba(15, 5, 8, 0.98) 100%) !important;
-            border: 1px solid rgba(225, 29, 72, 0.8) !important;
-            box-shadow: 0 0 45px rgba(225, 29, 72, 0.5) !important;
-            animation: bossPulse 1.5s infinite alternate;
+            background: radial-gradient(circle at top, rgba(225, 29, 72, 0.35) 0%, rgba(15, 5, 8, 0.98) 100%) !important;
+            border: 1px solid rgba(225, 29, 72, 0.9) !important;
+            box-shadow: 0 0 55px rgba(225, 29, 72, 0.6) !important;
+            animation: bossPulse 1.2s infinite alternate;
         }
 
         @keyframes bossPulse {
-            0% { border-color: rgba(225, 29, 72, 0.5); box-shadow: 0 0 25px rgba(225, 29, 72, 0.3); }
-            100% { border-color: rgba(255, 0, 0, 1); box-shadow: 0 0 50px rgba(255, 0, 0, 0.7); }
+            0% { border-color: rgba(225, 29, 72, 0.6); box-shadow: 0 0 30px rgba(225, 29, 72, 0.4); }
+            100% { border-color: rgba(255, 0, 0, 1); box-shadow: 0 0 65px rgba(255, 0, 0, 0.8); }
         }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -112,7 +112,6 @@
             100% { opacity: 0; transform: translateY(-150px) scale(1.8) rotate(360deg); }
         }
 
-        /* GACHA JACKPOT ANIMATION */
         @keyframes slotGlow {
             0%, 100% { border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
             50% { border-color: rgba(236, 72, 153, 1); box-shadow: 0 0 30px rgba(236, 72, 153, 0.8); }
@@ -259,7 +258,7 @@
         <!-- MODE 2: ARCADE -->
         <div id="viewArcade" class="hidden space-y-3 pt-14">
 
-            <!-- ADMIN CHEAT PANEL (TRIGGERED UPON ADMIN ACCESS) -->
+            <!-- ADMIN CHEAT PANEL -->
             <div id="adminCheatPanel" class="hidden glass p-3.5 rounded-2xl border border-red-500/50 bg-red-950/20 space-y-2 text-xs font-mono-custom shadow-2xl">
                 <div class="flex items-center justify-between border-b border-red-500/30 pb-1.5">
                     <span class="font-black text-red-400 flex items-center gap-1">
@@ -356,14 +355,14 @@
                     </div>
                 </div>
 
-                <!-- BOSS BANNER ALERT -->
-                <div id="bossAlertBanner" class="hidden p-2.5 rounded-xl bg-gradient-to-r from-red-900/80 via-rose-900/80 to-red-950/80 border border-red-500/50 text-center shadow-lg space-y-0.5">
-                    <div class="text-[10px] font-black text-red-300 uppercase tracking-widest font-mono-custom flex items-center justify-center gap-1">
-                        <span>⚔️</span> BOSS BATTLE (NO CONSUMABLES) <span>⚔️</span>
+                <!-- BOSS BANNER ALERT (REFINED & MORE IMMERSIVE) -->
+                <div id="bossAlertBanner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-red-950 via-rose-900 to-red-950 border-2 border-red-500 text-center shadow-[0_0_30px_rgba(239,68,68,0.4)] space-y-1">
+                    <div class="text-[11px] font-black text-white uppercase tracking-widest font-mono-custom flex items-center justify-center gap-1.5 animate-pulse">
+                        <span>⚔️</span> BOSS FIGHT ACTIVE <span>⚔️</span>
                     </div>
-                    <div id="bossNameTitle" class="text-xs font-black text-amber-400 tracking-wider">THE BOSS</div>
-                    <div id="bossPerkDescription" class="text-[9px] text-slate-300 italic">Perk: Efek khusus bos aktif!</div>
-                    <div id="bossHeartsContainer" class="flex justify-center gap-1 pt-0.5 text-xs">
+                    <div id="bossNameTitle" class="text-sm font-black text-amber-400 tracking-wider">THE BOSS</div>
+                    <div id="bossPerkDescription" class="text-[9px] text-rose-200 font-medium">Perk: Efek khusus bos aktif!</div>
+                    <div id="bossHeartsContainer" class="flex justify-center gap-1 pt-1 text-sm">
                         ❤️❤️❤️
                     </div>
                 </div>
@@ -519,26 +518,15 @@
         </div>
     </div>
 
-    <!-- MODAL PEMILIHAN PASIF (3 OPSI) -->
+    <!-- MODAL PEMILIHAN PASIF (DYNAMIC: HILANG JIKA DIPILIH, +5 WIN STREAK / +3 AEGIS KETIKA HABIS) -->
     <div id="passiveChoiceModal" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
             <div class="text-3xl mb-1">🎁</div>
             <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider">PILIH 1 PASIF BOSS</h3>
-            <p class="text-slate-400 text-[10px] mb-3">Selamat! Kamu mengalahkan Boss. Pilih 1 pasif permanen untuk run ini:</p>
+            <p id="passiveModalSubtitle" class="text-slate-400 text-[10px] mb-3">Pilih 1 pasif permanen untuk run ini:</p>
 
-            <div class="space-y-2">
-                <button onclick="selectPassive('golden_boot')" class="w-full p-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-left rounded-xl transition group">
-                    <div class="text-xs font-bold text-yellow-300 font-mono-custom">👢 Golden Boot</div>
-                    <div class="text-[9px] text-slate-400 mt-0.5">+2 Bonus Win-Streak otomatis setiap kali menang.</div>
-                </button>
-                <button onclick="selectPassive('heartbreaker')" class="w-full p-2.5 bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 text-left rounded-xl transition group">
-                    <div class="text-xs font-bold text-purple-300 font-mono-custom">💔 Heartbreaker</div>
-                    <div class="text-[9px] text-slate-400 mt-0.5">Hasil Seri (Draw) langsung dianggap sebagai Menang!</div>
-                </button>
-                <button onclick="selectPassive('lifesteal')" class="w-full p-2.5 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition group">
-                    <div class="text-xs font-bold text-rose-300 font-mono-custom">🩸 Lifesteal</div>
-                    <div class="text-[9px] text-slate-400 mt-0.5">Menang dengan angka tepat 21 memberikan +1 Aegis Shield.</div>
-                </button>
+            <div id="passiveButtonsContainer" class="space-y-2">
+                <!-- Di-render dinamis via JS agar pasif yg sudah dipilih hilang -->
             </div>
         </div>
     </div>
@@ -584,9 +572,9 @@
         </div>
     </div>
 
-    <!-- Modal Highscore Submission (Revamped: Clean & Minimalist UI/UX) -->
+    <!-- Modal Highscore Submission (Dilengkapi END-GAME STATISTICS) -->
     <div id="scoreSubmitModal" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative space-y-3">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative space-y-3 max-h-[90vh] overflow-y-auto scrollbar-hide">
             
             <div class="w-10 h-10 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg shadow">
                 👑
@@ -595,6 +583,22 @@
             <div>
                 <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider">Streak Terhenti!</h3>
                 <p class="text-slate-400 text-[11px] mt-0.5">Kamu meraih <span id="finalStreak" class="text-emerald-400 font-bold font-mono-custom">0</span> Win-Streak.</p>
+            </div>
+
+            <!-- END-GAME STATISTICS BOX (Pariwisata Statistik Game) -->
+            <div class="bg-black/60 p-3 rounded-2xl border border-white/10 text-left space-y-1.5 font-mono-custom text-[10px]">
+                <div class="text-amber-400 font-black uppercase text-[10px] border-b border-white/10 pb-1 flex justify-between items-center">
+                    <span>📊 End-Game Statistics</span>
+                    <span class="text-[8px] text-slate-400 font-normal">Ready to Share</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1 text-slate-300 pt-0.5">
+                    <div>🛡️ Aegis Used: <b id="statEndAegis" class="text-emerald-400">0</b></div>
+                    <div>⚡ Mercy Used: <b id="statEndMercy" class="text-amber-400">0</b></div>
+                    <div>🔮 Crystal Used: <b id="statEndCrystal" class="text-indigo-400">0</b></div>
+                    <div>👁️ Revelio Used: <b id="statEndRevelio" class="text-rose-400">0</b></div>
+                    <div>💣 Buster Used: <b id="statEndBuster" class="text-red-400">0</b></div>
+                    <div>🔥 Max Streak: <b id="statEndMaxStreak" class="text-amber-300">0</b></div>
+                </div>
             </div>
 
             <!-- Pesan Minimum Score -->
@@ -712,7 +716,7 @@
             }
         }
 
-        // --- CHEAT FUNCTIONS FOR TESTING ---
+        // --- CHEAT FUNCTIONS ---
         function cheatToggleUnlimitedConsumables() {
             playAdminSound();
             cheatUnlimitedConsumables = !cheatUnlimitedConsumables;
@@ -731,6 +735,7 @@
         function cheatAddStreak(amt) {
             playWinSound();
             streak += amt;
+            if (streak > maxStreakAchieved) maxStreakAchieved = streak;
             updateUIStats();
             showToast(`🔥 Cheat: +${amt} Streak Added!`);
         }
@@ -794,7 +799,7 @@
         }
         typeWriter();
 
-        // --- COMPLETE ADVANCED AUDIO ENGINE (WEB AUDIO API) ---
+        // --- AUDIO ENGINE (WEB AUDIO API) ---
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
@@ -1221,7 +1226,6 @@
         let shieldCount = 1;
         let isShieldActive = true;
         let isDriansMercyActive = false;
-        
         let totalResets = 0;
 
         let holyCrystalCount = 1;
@@ -1229,6 +1233,18 @@
         let busterCount = 1;
         let isDealerRevealed = false; 
 
+        // STATISTIK END-GAME TRACKER
+        let statsTracker = {
+            aegisUsed: 0,
+            mercyUsed: 0,
+            crystalUsed: 0,
+            revelioUsed: 0,
+            busterUsed: 0
+        };
+        let maxStreakAchieved = 0;
+
+        // STATE PASIF BOSS (Dinamis: Hilang kalau sudah dipilih, opsi bonus jika 3-3 nya habis)
+        let availablePassives = ['golden_boot', 'heartbreaker', 'lifesteal'];
         let activePassives = {
             golden_boot: false,
             heartbreaker: false,
@@ -1247,13 +1263,13 @@
             {
                 name: "SAMARITAN",
                 avatar: "🥷",
-                perkDesc: "Kartu ke-2 Player disembunyikan (Blind Hold).",
+                perkDesc: "Kartu ke-2 Player disembunyikan.",
                 perkType: "blind_hold"
             },
             {
                 name: "SUNARTO",
                 avatar: "👑",
-                perkDesc: "Tombol Stand dikunci jika poin kamu di bawah 20!",
+                perkDesc: "Tombol Stand dikunci jika poin di bawah 20!",
                 perkType: "force_stand_20"
             },
             {
@@ -1362,7 +1378,6 @@
                 document.getElementById('dealerScore').textContent = calculateScore(dealerHand);
             }
 
-            // CEK KUNCI STAND SUNARTO
             const btnStand = document.getElementById('btnStand');
             const pScore = calculateScore(playerHand);
             if (isBossLevel && currentBoss && currentBoss.perkType === 'force_stand_20' && isGameActive) {
@@ -1416,6 +1431,7 @@
             playHolyCrystalSound();
             triggerHaptic('heavy');
             if (!cheatUnlimitedConsumables) holyCrystalCount--;
+            statsTracker.crystalUsed++;
             
             playerHand[playerHand.length - 1] = { suit: '🔮', value: '21' };
             showToast("🔮 HOLY CRYSTAL! Kartu berubah jadi 21!");
@@ -1430,6 +1446,7 @@
             playRevelioSound();
             triggerHaptic('medium');
             if (!cheatUnlimitedConsumables) revelioCount--;
+            statsTracker.revelioUsed++;
             isDealerRevealed = true;
             showToast("👁️ REVELIO! Kartu dealer terungkap!");
             renderCards();
@@ -1442,6 +1459,7 @@
             playBusterSound();
             triggerHaptic('heavy');
             if (!cheatUnlimitedConsumables) busterCount--;
+            statsTracker.busterUsed++;
             
             showToast("💣 BUSTER! Dealer BUST otomatis!");
 
@@ -1487,7 +1505,7 @@
                 
                 document.getElementById('dealerAvatar').textContent = currentBoss.avatar;
                 document.getElementById('dealerTitleText').textContent = currentBoss.name;
-                tableTitle.innerHTML = `<span class="text-red-400 font-bold">⚔️ BOSS BATTLE (${4 - bossHP}/3 RONDE)</span>`;
+                tableTitle.innerHTML = `<span class="text-red-400 font-bold">⚔️ BOSS BATTLE (${4 - bossHP}/3)</span>`;
             } else {
                 cardUI.classList.remove('boss-card-bg');
                 bossAlert.classList.add('hidden');
@@ -1613,6 +1631,7 @@
             playMercySound();
             triggerHaptic('heavy');
             isDriansMercyActive = true;
+            statsTracker.mercyUsed++;
             
             totalResets = 0;
             document.getElementById('totalResetsText').textContent = totalResets;
@@ -1621,9 +1640,57 @@
             if (isGameActive) stand();
         }
 
+        // --- SISTEM PEMILIHAN PASIF BOSS (DINAMIS & TERSARING) ---
         function triggerPassiveChoiceModal() {
             playModalSound();
             const modal = document.getElementById('passiveChoiceModal');
+            const container = document.getElementById('passiveButtonsContainer');
+            const subtitle = document.getElementById('passiveModalSubtitle');
+            
+            container.innerHTML = '';
+
+            if (availablePassives.length > 0) {
+                subtitle.textContent = "Selamat! Pilih 1 pasif permanen untuk run ini:";
+                
+                if (availablePassives.includes('golden_boot')) {
+                    container.innerHTML += `
+                        <button onclick="selectPassive('golden_boot')" class="w-full p-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-left rounded-xl transition group">
+                            <div class="text-xs font-bold text-yellow-300 font-mono-custom">👢 Golden Boot</div>
+                            <div class="text-[9px] text-slate-400 mt-0.5">+2 Bonus Win-Streak otomatis setiap kali menang.</div>
+                        </button>
+                    `;
+                }
+                if (availablePassives.includes('heartbreaker')) {
+                    container.innerHTML += `
+                        <button onclick="selectPassive('heartbreaker')" class="w-full p-2.5 bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 text-left rounded-xl transition group">
+                            <div class="text-xs font-bold text-purple-300 font-mono-custom">💔 Heartbreaker</div>
+                            <div class="text-[9px] text-slate-400 mt-0.5">Hasil Seri (Draw) langsung dianggap sebagai Menang!</div>
+                        </button>
+                    `;
+                }
+                if (availablePassives.includes('lifesteal')) {
+                    container.innerHTML += `
+                        <button onclick="selectPassive('lifesteal')" class="w-full p-2.5 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition group">
+                            <div class="text-xs font-bold text-rose-300 font-mono-custom">🩸 Lifesteal</div>
+                            <div class="text-[9px] text-slate-400 mt-0.5">Menang dengan angka tepat 21 memberikan +1 Aegis Shield.</div>
+                        </button>
+                    `;
+                }
+            } else {
+                // JIKA SEMUA 3 PASIF SUDAH TERPAKAI, MUNCULKAN PILIHAN +5 WIN STREAK ATAU +3 AEGIS
+                subtitle.textContent = "Semua pasif utama sudah aktif! Pilih bonus reward ultimate:";
+                container.innerHTML = `
+                    <button onclick="selectUltimateBonus('streak')" class="w-full p-3 bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-left rounded-xl transition group">
+                        <div class="text-xs font-bold text-amber-300 font-mono-custom">🔥 +5 Win Streak</div>
+                        <div class="text-[9px] text-slate-400 mt-0.5">Tambahan instan 5 Win-Streak ke total saat ini.</div>
+                    </button>
+                    <button onclick="selectUltimateBonus('aegis')" class="w-full p-3 bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-left rounded-xl transition group">
+                        <div class="text-xs font-bold text-emerald-300 font-mono-custom">🛡️ +3 Aegis Shields</div>
+                        <div class="text-[9px] text-slate-400 mt-0.5">Tambahan 3 kuota pelindung kekalahan beruntun.</div>
+                    </button>
+                `;
+            }
+
             modal.classList.remove('hidden-modal');
             modal.classList.add('show-modal');
         }
@@ -1631,15 +1698,40 @@
         function selectPassive(type) {
             playWinSound();
             triggerHaptic('heavy');
+            
             if (type === 'golden_boot') activePassives.golden_boot = true;
             if (type === 'heartbreaker') activePassives.heartbreaker = true;
             if (type === 'lifesteal') activePassives.lifesteal = true;
+
+            // Hapus dari available passives agar tidak muncul lagi
+            availablePassives = availablePassives.filter(p => p !== type);
 
             const modal = document.getElementById('passiveChoiceModal');
             modal.classList.remove('show-modal');
             modal.classList.add('hidden-modal');
 
             showToast("✨ Pasif Baru Diaktifkan!");
+            updateUIStats();
+        }
+
+        function selectUltimateBonus(bonusType) {
+            playWinSound();
+            triggerHaptic('heavy');
+
+            if (bonusType === 'streak') {
+                streak += 5;
+                if (streak > maxStreakAchieved) maxStreakAchieved = streak;
+                showToast("🔥 +5 Win Streak Berhasil Ditambahkan!");
+            } else if (bonusType === 'aegis') {
+                shieldCount += 3;
+                isShieldActive = true;
+                statsTracker.aegisUsed += 0; // Hanya sebagai info tambah kuota
+                showToast("🛡️ +3 Aegis Shields Berhasil Ditambahkan!");
+            }
+
+            const modal = document.getElementById('passiveChoiceModal');
+            modal.classList.remove('show-modal');
+            modal.classList.add('hidden-modal');
             updateUIStats();
         }
 
@@ -1738,6 +1830,7 @@
                 if (isDriansMercyActive) addedStreak *= 2;
 
                 streak += addedStreak;
+                if (streak > maxStreakAchieved) maxStreakAchieved = streak;
                 wins++;
 
                 if (activePassives.lifesteal && calculateScore(playerHand) === 21) {
@@ -1784,6 +1877,7 @@
 
                 if (isShieldActive && shieldCount > 0) {
                     shieldCount--;
+                    statsTracker.aegisUsed++;
                     showToast("🛡️ SHIELD DIGUNAKAN! Streak Aman!");
                     if (shieldCount === 0) isShieldActive = false;
                 } else {
@@ -1791,12 +1885,15 @@
                     document.getElementById('totalResetsText').textContent = totalResets;
 
                     streakToSubmit = streak;
+                    if (streakToSubmit > maxStreakAchieved) maxStreakAchieved = streakToSubmit;
+
                     streak = 0;
                     bossHP = 3;
                     isBossLevel = false;
                     currentBoss = null;
-                    resetSessionBuffs();
+                    
                     showScoreModal(streakToSubmit);
+                    resetSessionBuffs();
                 }
             } else {
                 draws++;
@@ -1817,6 +1914,7 @@
                 busterCount = 1;
             }
             activePassives = { golden_boot: false, heartbreaker: false, lifesteal: false };
+            availablePassives = ['golden_boot', 'heartbreaker', 'lifesteal'];
             
             bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;
             bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;
@@ -1862,13 +1960,20 @@
             playModalSound();
             document.getElementById('finalStreak').textContent = finalStreak;
             
+            // ISI DATA END-GAME STATISTICS
+            document.getElementById('statEndAegis').textContent = statsTracker.aegisUsed;
+            document.getElementById('statEndMercy').textContent = statsTracker.mercyUsed;
+            document.getElementById('statEndCrystal').textContent = statsTracker.crystalUsed;
+            document.getElementById('statEndRevelio').textContent = statsTracker.revelioUsed;
+            document.getElementById('statEndBuster').textContent = statsTracker.busterUsed;
+            document.getElementById('statEndMaxStreak').textContent = maxStreakAchieved;
+
             const modal = document.getElementById('scoreSubmitModal');
             const nameContainer = document.getElementById('nameInputContainer');
             const submitBtn = document.getElementById('btnSubmitScore');
             const warningEl = document.getElementById('minScoreWarning');
             const nameInput = document.getElementById('playerName');
 
-            // Cek apakah mencapai minimal 10
             if (finalStreak < 10) {
                 warningEl.classList.remove('hidden');
                 nameContainer.classList.add('hidden');
@@ -1888,7 +1993,7 @@
 
         async function submitHighScore(e) {
             e.preventDefault();
-            if (streakToSubmit < 10) return; // Proteksi extra
+            if (streakToSubmit < 10) return;
 
             playWinSound();
             triggerHaptic('heavy');
