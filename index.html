@@ -41,7 +41,6 @@
         }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .upvoted { color: #ffffff !important; }
         #toast { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; }
         
         .modal-base { transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -108,12 +107,6 @@
         }
         .win-pulse { animation: winPulse 0.8s ease-out; }
 
-        .casino-glow { animation: goldGlow 2s infinite ease-in-out; }
-        @keyframes goldGlow {
-            0%, 100% { border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 0 15px rgba(245, 158, 11, 0.15); }
-            50% { border-color: rgba(245, 158, 11, 0.8); box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); }
-        }
-
         .coin-particle {
             position: fixed;
             pointer-events: none;
@@ -140,21 +133,21 @@
         }
     </style>
 </head>
-<body class="scrollbar-hide min-h-screen flex flex-col justify-between pb-24">
+<body class="scrollbar-hide min-h-screen flex flex-col justify-between pb-20">
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-5 py-3 rounded-full shadow-2xl opacity-0 pointer-events-none border border-white/20">
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl opacity-0 pointer-events-none border border-white/20 whitespace-nowrap">
         ✨ Notifikasi
     </div>
 
     <!-- TOP HEADER -->
-    <nav class="fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all py-3">
+    <nav class="fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all py-2.5">
         <div class="max-w-md mx-auto px-4 flex justify-between items-center">
             <button onclick="switchMode('landing')" class="flex items-center active:scale-95 transition">
-                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-6 w-auto">
+                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-5 w-auto">
             </button>
             <div id="adminHeaderContainer">
-                <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
+                <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 py-1 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
                     🔒 Admin
                 </button>
             </div>
@@ -162,33 +155,33 @@
     </nav>
 
     <!-- BOTTOM NAVBAR -->
-    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-4">
-        <div class="glass p-1.5 rounded-full border border-white/10 flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
-            <button id="tabHome" onclick="switchMode('landing')" class="flex-1 py-2 rounded-full text-white bg-white/10 transition-all text-center">
+    <div class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-4">
+        <div class="glass p-1 rounded-full border border-white/10 flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
+            <button id="tabHome" onclick="switchMode('landing')" class="flex-1 py-1.5 rounded-full text-white bg-white/10 transition-all text-center">
                 HOME
             </button>
-            <button id="tabFeeds" onclick="handleFeedsClick()" class="flex-1 py-2 rounded-full text-slate-400 hover:text-white transition-all text-center">
+            <button id="tabFeeds" onclick="handleFeedsClick()" class="flex-1 py-1.5 rounded-full text-slate-400 hover:text-white transition-all text-center">
                 FEEDS
             </button>
-            <button id="tabArcade" onclick="switchMode('arcade')" class="flex-1 py-2 rounded-full text-slate-400 hover:text-white transition-all text-center">
+            <button id="tabArcade" onclick="switchMode('arcade')" class="flex-1 py-1.5 rounded-full text-slate-400 hover:text-white transition-all text-center">
                 ARCADE
             </button>
         </div>
     </div>
 
-    <!-- MAIN CONTAINER -->
-    <main class="px-4 pb-12 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
+    <!-- MAIN CONTAINER (OPTIMIZED FOR IPHONE 15 PRO) -->
+    <main class="px-3 pb-8 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
         
         <!-- ================= MODE 0: LANDING PAGE ================= -->
-        <div id="viewLanding" class="space-y-5 pt-16 my-auto text-center">
-            <header class="space-y-2 py-2">
-                <p class="text-base sm:text-lg font-black text-white uppercase tracking-tight leading-snug min-h-[56px] flex items-center justify-center">
+        <div id="viewLanding" class="space-y-4 pt-14 my-auto text-center">
+            <header class="space-y-1 py-1">
+                <p class="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-snug min-h-[48px] flex items-center justify-center">
                     <span id="typewriterText" class="typewriter-cursor"></span>
                 </p>
-                <p class="text-slate-500 text-[10px] uppercase tracking-widest font-bold font-mono-custom block">- ZALDNIELSEN</p>
+                <p class="text-slate-500 text-[9px] uppercase tracking-widest font-bold font-mono-custom block">- ZALDNIELSEN</p>
             </header>
 
-            <section class="relative w-full overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group my-2">
+            <section class="relative w-full overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group my-1">
                 <div id="slider" class="flex transition-transform duration-500 ease-out w-full">
                     <div class="min-w-full aspect-[21/9] relative">
                         <img src="assets/slider01_roster.webp" alt="Slider Image 1" class="w-full h-full object-cover">
@@ -201,11 +194,11 @@
                     </div>
                 </div>
 
-                <button onclick="prevSlide()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white/70 p-1.5 rounded-full backdrop-blur-sm transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                <button onclick="prevSlide()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white/70 p-1 rounded-full backdrop-blur-sm transition">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
-                <button onclick="nextSlide()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white/70 p-1.5 rounded-full backdrop-blur-sm transition">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <button onclick="nextSlide()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white/70 p-1 rounded-full backdrop-blur-sm transition">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </button>
 
                 <div class="absolute bottom-2 right-3 flex gap-1 z-10">
@@ -215,50 +208,50 @@
                 </div>
             </section>
 
-            <div class="grid grid-cols-1 gap-3 pt-2">
-                <div onclick="handleFeedsClick()" class="landing-card glass p-4 rounded-2xl border border-white/10 cursor-pointer text-left relative overflow-hidden group">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xl">💬</span>
-                        <span class="text-[10px] font-mono-custom font-bold text-slate-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full group-hover:border-white/30 transition">MASUK FEEDS ➔</span>
+            <div class="grid grid-cols-1 gap-2.5 pt-1">
+                <div onclick="handleFeedsClick()" class="landing-card glass p-3.5 rounded-2xl border border-white/10 cursor-pointer text-left relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-0.5">
+                        <span class="text-lg">💬</span>
+                        <span class="text-[9px] font-mono-custom font-bold text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full group-hover:border-white/30 transition">MASUK FEEDS ➔</span>
                     </div>
-                    <h2 class="text-sm font-black text-white tracking-wide">Room of Faith</h2>
-                    <p class="text-slate-400 text-[11px] mt-0.5">Ruang anonim tempat berbagi cerita, pengakuan, dan membaca curhatan sesama.</p>
+                    <h2 class="text-xs font-black text-white tracking-wide">Room of Faith</h2>
+                    <p class="text-slate-400 text-[10px] mt-0.5">Ruang anonim tempat berbagi cerita, pengakuan, dan membaca curhatan sesama.</p>
                 </div>
 
-                <div onclick="switchMode('arcade')" class="landing-card glass p-4 rounded-2xl border border-amber-500/20 cursor-pointer text-left relative overflow-hidden group bg-gradient-to-br from-amber-500/5 to-transparent">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xl">🎰</span>
-                        <span class="text-[10px] font-mono-custom font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full group-hover:border-amber-500/40 transition">MAIN GAME ➔</span>
+                <div onclick="switchMode('arcade')" class="landing-card glass p-3.5 rounded-2xl border border-amber-500/20 cursor-pointer text-left relative overflow-hidden group bg-gradient-to-br from-amber-500/5 to-transparent">
+                    <div class="flex items-center justify-between mb-0.5">
+                        <span class="text-lg">🎰</span>
+                        <span class="text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full group-hover:border-amber-500/40 transition">MAIN GAME ➔</span>
                     </div>
-                    <h2 class="text-sm font-black text-amber-400 tracking-wide">Blackjack Roguelite</h2>
-                    <p class="text-slate-400 text-[11px] mt-0.5">Uji keberuntungan dan strategi, kumpulkan win-streak, serta catat namamu di Hall of Fame.</p>
+                    <h2 class="text-xs font-black text-amber-400 tracking-wide">Blackjack Roguelite</h2>
+                    <p class="text-slate-400 text-[10px] mt-0.5">Uji keberuntungan dan strategi, kumpulkan win-streak, serta catat namamu di Hall of Fame.</p>
                 </div>
             </div>
 
-            <div class="pt-4 flex flex-col items-center justify-center gap-2">
+            <div class="pt-2 flex flex-col items-center justify-center gap-1">
                 <a href="https://instagram.com/pdftv_life" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-white transition-colors duration-200 p-1" aria-label="Instagram">
-                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
                 </a>
-                <p class="text-[10px] text-slate-600 font-mono-custom">
+                <p class="text-[9px] text-slate-600 font-mono-custom">
                     © PDFTV Experience. All rights reserved.
                 </p>
             </div>
         </div>
 
         <!-- ================= MODE 1: FEEDS (UNDER MAINTENANCE) ================= -->
-        <div id="viewFeeds" class="hidden pt-20 pb-10 flex flex-col items-center justify-center text-center">
-            <div class="glass p-8 rounded-3xl border border-amber-500/30 max-w-sm w-full space-y-4 shadow-2xl relative overflow-hidden">
-                <div class="text-5xl animate-bounce">🚧</div>
+        <div id="viewFeeds" class="hidden pt-16 pb-8 flex flex-col items-center justify-center text-center">
+            <div class="glass p-6 rounded-3xl border border-amber-500/30 max-w-xs w-full space-y-3 shadow-2xl relative overflow-hidden">
+                <div class="text-4xl animate-bounce">🚧</div>
                 <div>
-                    <h2 class="text-xl font-black text-amber-400 tracking-wider font-mono-custom uppercase">UNDER MAINTENANCE</h2>
-                    <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                    <h2 class="text-lg font-black text-amber-400 tracking-wider font-mono-custom uppercase">UNDER MAINTENANCE</h2>
+                    <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
                         Halaman <b>Room of Faith (Feeds)</b> sedang dalam pemeliharaan sistem. Kami akan segera kembali!
                     </p>
                 </div>
-                <div class="pt-2">
-                    <button onclick="switchMode('landing')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-mono-custom font-bold text-xs rounded-xl border border-white/10 transition active:scale-95">
+                <div class="pt-1">
+                    <button onclick="switchMode('landing')" class="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white font-mono-custom font-bold text-xs rounded-xl border border-white/10 transition active:scale-95">
                         KEMBALI KE HOME
                     </button>
                 </div>
@@ -266,219 +259,212 @@
         </div>
 
         <!-- ================= MODE 2: ARCADE ================= -->
-        <div id="viewArcade" class="hidden space-y-5 pt-16">
+        <div id="viewArcade" class="hidden space-y-3 pt-14">
 
             <!-- A. ARCADE LOBBY VIEW -->
-            <div id="arcadeLobby" class="space-y-5">
-                <div class="relative overflow-hidden rounded-3xl p-6 border border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-[#0a0a12] to-[#050508] shadow-2xl text-center">
-                    <div class="absolute -top-10 -right-10 w-36 h-36 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="absolute -bottom-10 -left-10 w-36 h-36 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-mono-custom font-bold tracking-widest uppercase mb-3">
+            <div id="arcadeLobby" class="space-y-4">
+                <div class="relative overflow-hidden rounded-3xl p-5 border border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-[#0a0a12] to-[#050508] shadow-2xl text-center">
+                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-mono-custom font-bold tracking-widest uppercase mb-2">
                         <span>✨</span> VIP High-Roller Lounge
                     </div>
 
-                    <h1 class="text-2xl font-black text-white tracking-tight">BLACKJACK <span class="text-amber-400">ROGUELITE</span></h1>
-                    <p class="text-slate-400 text-xs mt-1.5 max-w-xs mx-auto leading-relaxed">
+                    <h1 class="text-xl font-black text-white tracking-tight">BLACKJACK <span class="text-amber-400">ROGUELITE</span></h1>
+                    <p class="text-slate-400 text-[11px] mt-1 max-w-xs mx-auto leading-relaxed">
                         Kuasai meja judi, tumpuk *Win-Streak*, dan manfaatkan Power-Up rahasia untuk mencatatkan namamu di sejarah.
                     </p>
 
-                    <button onclick="enterCasinoGame()" class="w-full mt-6 py-4 rounded-2xl text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 btn-dopamine">
+                    <button onclick="enterCasinoGame()" class="w-full mt-4 py-3.5 rounded-2xl text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 btn-dopamine">
                         <span>🃏</span> MAIN SEKARANG <span>➔</span>
                     </button>
                 </div>
 
-                <section id="lobbyHallOfFame" class="glass p-5 rounded-3xl border border-white/10 shadow-2xl">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg">🏆</span>
+                <section id="lobbyHallOfFame" class="glass p-4 rounded-3xl border border-white/10 shadow-2xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-base">🏆</span>
                             <div>
-                                <h3 class="text-xs font-black text-white tracking-widest uppercase">Hall of Fame</h3>
-                                <p class="text-[9px] text-slate-500 font-mono-custom">TOP 5 STREAK TERTINGGI</p>
+                                <h3 class="text-[11px] font-black text-white tracking-widest uppercase">Hall of Fame</h3>
+                                <p class="text-[8px] text-slate-500 font-mono-custom">TOP 5 STREAK TERTINGGI</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button id="adminResetLeaderboardBtn" onclick="confirmResetLeaderboard()" class="hidden text-[9px] font-mono-custom font-bold bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-1 rounded-lg hover:bg-red-500/30 transition">
+                        <div class="flex items-center gap-1.5">
+                            <button id="adminResetLeaderboardBtn" onclick="confirmResetLeaderboard()" class="hidden text-[8px] font-mono-custom font-bold bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-lg hover:bg-red-500/30 transition">
                                 🔄 RESET
                             </button>
-                            <span class="text-[9px] font-mono-custom text-amber-400/80 bg-amber-500/10 px-2 py-1 rounded-lg border border-amber-500/20">LIVE RANKING</span>
-                        </div>
-                    </div>
-
-                    <div id="resetCountdownBanner" class="hidden mb-3 p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-center animate-pulse">
-                        <div class="text-[10px] text-red-400 font-mono-custom font-bold uppercase tracking-wider">
-                            ⚠️ Leaderboard Direset Publik Dalam:
-                        </div>
-                        <div id="countdownTimer" class="text-base font-black text-white font-mono-custom mt-0.5">
-                            30:00
+                            <span class="text-[8px] font-mono-custom text-amber-400/80 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">LIVE RANKING</span>
                         </div>
                     </div>
                     
-                    <div id="leaderboardList" class="space-y-2">
-                        <div class="text-center text-slate-500 text-xs py-6 italic">Memuat papan peringkat...</div>
+                    <div id="leaderboardList" class="space-y-1.5">
+                        <div class="text-center text-slate-500 text-[11px] py-4 italic">Memuat papan peringkat...</div>
                     </div>
                 </section>
             </div>
 
-            <!-- B. GAMEPLAY BOARD UI -->
-            <div id="arcadeGameUI" class="hidden space-y-4">
-                <div class="flex items-center justify-between glass px-4 py-3 rounded-2xl border border-white/10">
-                    <button onclick="exitCasinoGame()" class="text-slate-400 hover:text-white text-xs font-bold flex items-center gap-1 transition active:scale-95">
+            <!-- B. GAMEPLAY BOARD UI (OPTIMIZED FOR IPHONE 15 PRO) -->
+            <div id="arcadeGameUI" class="hidden space-y-2.5">
+                
+                <!-- TOP GAME HEADER -->
+                <div class="flex items-center justify-between glass px-3 py-2 rounded-xl border border-white/10">
+                    <button onclick="exitCasinoGame()" class="text-slate-400 hover:text-white text-[11px] font-bold flex items-center gap-1 transition active:scale-95">
                         <span>⬅</span> LOBBY
                     </button>
-                    <div id="tableHeaderTitle" class="text-xs font-black tracking-wider text-amber-400 flex items-center gap-1.5">
+                    <div id="tableHeaderTitle" class="text-[11px] font-black tracking-wider text-amber-400 flex items-center gap-1">
                         <span>🃏</span> BLACKJACK TABLE
                     </div>
-                    <button onclick="toggleRulesAccordion()" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2.5 py-1 rounded-lg transition border border-white/10 flex items-center gap-1">
+                    <button onclick="toggleRulesAccordion()" class="text-[9px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2 py-0.5 rounded-lg transition border border-white/10 flex items-center gap-1">
                         📜 Rules
                     </button>
                 </div>
 
-                <div id="rulesAccordion" class="hidden p-4 rounded-2xl glass border border-amber-500/20 text-xs text-slate-300 space-y-2">
-                    <div class="font-bold text-amber-400 border-b border-white/10 pb-1">📜 Aturan, Buff & Consumables:</div>
-                    <p class="text-[10px] text-slate-400 leading-relaxed">Dapatkan nilai kartu mendekati <b>21</b> tanpa melebihi (*BUST*). Kumpulkan streak sebanyak mungkin!</p>
-                    <div class="grid grid-cols-1 gap-1.5 text-[10px] pt-1">
-                        <div class="text-indigo-300">🔮 <b>HOLY CRYSTAL:</b> Mengubah kartu terakhir otomatis bernilai 21 (Auto Win jika tak BUST).</div>
-                        <div class="text-rose-300">👁️ <b>REVELIO:</b> Membuka/mereveal kartu rahasia dealer secara instan.</div>
-                        <div class="text-red-400">💣 <b>BUSTER:</b> Memaksa dealer otomatis BUST secara instan!</div>
-                        <div class="text-amber-300">⚡ <b>DRIAN'S MERCY:</b> Power-Up IMBA! Ambil 1 kartu & Stand. Menang = Streak x2 (Unlock @17 Resets).</div>
+                <!-- RULES ACCORDION -->
+                <div id="rulesAccordion" class="hidden p-3 rounded-2xl glass border border-amber-500/20 text-[10px] text-slate-300 space-y-1.5">
+                    <div class="font-bold text-amber-400 border-b border-white/10 pb-0.5">📜 Aturan, Buff & Consumables:</div>
+                    <p class="text-[9px] text-slate-400 leading-relaxed">Dapatkan nilai kartu mendekati <b>21</b> tanpa melebihi (*BUST*). Kumpulkan streak sebanyak mungkin!</p>
+                    <div class="grid grid-cols-1 gap-1 text-[9px] pt-0.5">
+                        <div class="text-indigo-300">🔮 <b>HOLY CRYSTAL:</b> Mengubah kartu terakhir otomatis bernilai 21.</div>
+                        <div class="text-rose-300">👁️ <b>REVELIO:</b> Membuka kartu rahasia dealer secara instan.</div>
+                        <div class="text-red-400">💣 <b>BUSTER:</b> Memaksa dealer otomatis BUST!</div>
+                        <div class="text-amber-300">⚡ <b>DRIAN'S MERCY:</b> Ambil 1 kartu & Stand. Win = Streak x2 (Unlock @17 Resets).</div>
                         <div class="text-emerald-300">🛡️ <b>SHIELD:</b> Mencegah streak habis saat kalah. +1 Shield tiap 3-Win Streak.</div>
                     </div>
                 </div>
 
                 <!-- BOSS BANNER ALERT -->
-                <div id="bossAlertBanner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-red-900/80 via-rose-900/80 to-red-950/80 border border-red-500/50 text-center shadow-lg space-y-1">
-                    <div class="text-xs font-black text-red-300 uppercase tracking-widest font-mono-custom flex items-center justify-center gap-1.5">
+                <div id="bossAlertBanner" class="hidden p-2.5 rounded-xl bg-gradient-to-r from-red-900/80 via-rose-900/80 to-red-950/80 border border-red-500/50 text-center shadow-lg space-y-0.5">
+                    <div class="text-[10px] font-black text-red-300 uppercase tracking-widest font-mono-custom flex items-center justify-center gap-1">
                         <span>⚔️</span> BOSS BATTLE (NO CONSUMABLES) <span>⚔️</span>
                     </div>
-                    <div id="bossNameTitle" class="text-sm font-black text-amber-400 tracking-wider">THE BOSS</div>
-                    <div id="bossPerkDescription" class="text-[10px] text-slate-300 italic">Perk: Efek khusus bos aktif!</div>
-                    <!-- 3 HEARTS UI -->
-                    <div id="bossHeartsContainer" class="flex justify-center gap-1.5 pt-1 text-sm">
+                    <div id="bossNameTitle" class="text-xs font-black text-amber-400 tracking-wider">THE BOSS</div>
+                    <div id="bossPerkDescription" class="text-[9px] text-slate-300 italic">Perk: Efek khusus bos aktif!</div>
+                    <div id="bossHeartsContainer" class="flex justify-center gap-1 pt-0.5 text-xs">
                         ❤️❤️❤️
                     </div>
                 </div>
 
-                <div id="blackjackCard" class="casino-card-bg p-5 rounded-3xl shadow-2xl relative space-y-4">
-                    <!-- SESSION RECORD & STATS -->
-                    <div class="bg-black/40 p-3 rounded-xl border border-white/10 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <div class="flex flex-col">
-                                <span class="text-[9px] font-mono-custom text-slate-400 uppercase tracking-wider">Session Record</span>
-                                <span class="text-[9px] text-slate-500 font-mono-custom">Resets: <b id="totalResetsText" class="text-amber-400">0</b>/17</span>
+                <!-- MAIN CARD CASINO CONTAINER -->
+                <div id="blackjackCard" class="casino-card-bg p-3.5 rounded-2xl shadow-2xl relative space-y-2.5">
+                    
+                    <!-- COMPACT STATS HEADER (SESSION, STREAK & WINRATE) -->
+                    <div class="bg-black/50 p-2 rounded-xl border border-white/10 space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] text-slate-400 font-mono-custom uppercase">RESETS: <b id="totalResetsText" class="text-amber-400 text-xs">0</b>/17</span>
                             </div>
-                            <div class="text-[11px] font-mono-custom bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                                STREAK: <span id="currentStreak" class="text-sm">0</span> 🔥
+                            <div class="font-mono-custom bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-black text-[11px] shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                                STREAK: <span id="currentStreak" class="text-xs">0</span> 🔥
                             </div>
                         </div>
 
-                        <!-- STATS WINRATE UI -->
-                        <div class="grid grid-cols-3 gap-2 text-center pt-2 border-t border-white/5 font-mono-custom">
-                            <div class="bg-white/5 p-1.5 rounded-lg border border-white/5">
-                                <div class="text-[8px] text-slate-400 uppercase">W - L - D</div>
-                                <div id="statWLD" class="text-[10px] font-bold text-white">0-0-0</div>
+                        <!-- MINI STATS BAR -->
+                        <div class="grid grid-cols-3 gap-1.5 text-center font-mono-custom pt-1 border-t border-white/5">
+                            <div class="bg-white/5 py-1 px-1 rounded-lg border border-white/5">
+                                <div class="text-[7px] text-slate-400 uppercase">W - L - D</div>
+                                <div id="statWLD" class="text-[9px] font-bold text-white">0-0-0</div>
                             </div>
-                            <div class="bg-white/5 p-1.5 rounded-lg border border-white/5">
-                                <div class="text-[8px] text-slate-400 uppercase">Total Game</div>
-                                <div id="statTotal" class="text-[10px] font-bold text-slate-300">0</div>
+                            <div class="bg-white/5 py-1 px-1 rounded-lg border border-white/5">
+                                <div class="text-[7px] text-slate-400 uppercase">Total</div>
+                                <div id="statTotal" class="text-[9px] font-bold text-slate-300">0</div>
                             </div>
-                            <div class="bg-white/5 p-1.5 rounded-lg border border-white/5">
-                                <div class="text-[8px] text-slate-400 uppercase">Winrate</div>
-                                <div id="statWinrate" class="text-[10px] font-bold text-emerald-400">0%</div>
+                            <div class="bg-white/5 py-1 px-1 rounded-lg border border-white/5">
+                                <div class="text-[7px] text-slate-400 uppercase">Winrate</div>
+                                <div id="statWinrate" class="text-[9px] font-bold text-emerald-400">0%</div>
                             </div>
                         </div>
 
                         <!-- BADGE PASIF AKTIF -->
-                        <div id="activePassivesContainer" class="hidden pt-1 flex flex-wrap gap-1 justify-center">
-                            <span id="badgeGoldenBoot" class="hidden text-[8px] font-bold font-mono-custom bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2 py-0.5 rounded-full">👢 Golden Boot (+2 Streak)</span>
-                            <span id="badgeHeartbreaker" class="hidden text-[8px] font-bold font-mono-custom bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full">💔 Heartbreaker (Seri=Menang)</span>
-                            <span id="badgeLifesteal" class="hidden text-[8px] font-bold font-mono-custom bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full">🩸 Lifesteal (21=Shield)</span>
+                        <div id="activePassivesContainer" class="hidden pt-0.5 flex flex-wrap gap-1 justify-center">
+                            <span id="badgeGoldenBoot" class="hidden text-[8px] font-bold font-mono-custom bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2 py-0.5 rounded-full">👢 Golden Boot (+2)</span>
+                            <span id="badgeHeartbreaker" class="hidden text-[8px] font-bold font-mono-custom bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full">💔 Heartbreaker</span>
+                            <span id="badgeLifesteal" class="hidden text-[8px] font-bold font-mono-custom bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full">🩸 Lifesteal</span>
                         </div>
                     </div>
 
-                    <!-- INDEPENDENT CONSUMABLES UI CONTAINER (3 CONSUMABLES) -->
-                    <div class="bg-indigo-950/40 p-3 rounded-2xl border border-indigo-500/30 space-y-2">
-                        <div class="flex justify-between items-center text-[10px] font-bold tracking-wider text-indigo-300 uppercase">
+                    <!-- CONSUMABLES CONTAINER -->
+                    <div class="bg-indigo-950/40 p-2 rounded-xl border border-indigo-500/30 space-y-1">
+                        <div class="flex justify-between items-center text-[9px] font-bold tracking-wider text-indigo-300 uppercase">
                             <span>🧪 Consumables</span>
-                            <span id="consumablesLockedTag" class="hidden font-mono-custom text-[9px] text-red-400 font-bold">LOCKED IN BOSS BATTLE</span>
+                            <span id="consumablesLockedTag" class="hidden font-mono-custom text-[8px] text-red-400 font-bold">LOCKED IN BOSS BATTLE</span>
                         </div>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <button onclick="useHolyCrystal()" id="btnHolyCrystal" class="py-2 px-1 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-400/40 text-[9px] font-bold rounded-xl transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center shadow">
+                            <button onclick="useHolyCrystal()" id="btnHolyCrystal" class="py-1.5 px-1 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center">
                                 <span>🔮 Crystal</span>
-                                <span id="countHolyCrystal" class="font-mono-custom bg-indigo-500/30 px-1 py-0.5 rounded text-[8px] mt-0.5">1</span>
+                                <span id="countHolyCrystal" class="font-mono-custom bg-indigo-500/30 px-1 rounded text-[7px] mt-0.5">1</span>
                             </button>
-                            <button onclick="useRevelio()" id="btnRevelio" class="py-2 px-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 border border-rose-400/40 text-[9px] font-bold rounded-xl transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center shadow">
+                            <button onclick="useRevelio()" id="btnRevelio" class="py-1.5 px-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 border border-rose-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center">
                                 <span>👁️ Revelio</span>
-                                <span id="countRevelio" class="font-mono-custom bg-rose-500/30 px-1 py-0.5 rounded text-[8px] mt-0.5">1</span>
+                                <span id="countRevelio" class="font-mono-custom bg-rose-500/30 px-1 rounded text-[7px] mt-0.5">1</span>
                             </button>
-                            <button onclick="useBuster()" id="btnBuster" class="py-2 px-1 bg-red-600/30 hover:bg-red-600/50 text-red-200 border border-red-400/40 text-[9px] font-bold rounded-xl transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center shadow">
+                            <button onclick="useBuster()" id="btnBuster" class="py-1.5 px-1 bg-red-600/30 hover:bg-red-600/50 text-red-200 border border-red-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center">
                                 <span>💣 Buster</span>
-                                <span id="countBuster" class="font-mono-custom bg-red-500/30 px-1 py-0.5 rounded text-[8px] mt-0.5">1</span>
+                                <span id="countBuster" class="font-mono-custom bg-red-500/30 px-1 rounded text-[7px] mt-0.5">1</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- SEPARATE IMBA POWER-UP SLOT: DRIAN'S MERCY -->
-                    <div class="w-full">
-                        <button onclick="toggleDriansMercy()" id="btnDriansMercy" class="w-full py-3 rounded-2xl text-[11px] font-black uppercase tracking-wider text-amber-100 flex items-center justify-center gap-2 border border-amber-400/40 shadow-lg disabled:opacity-40 disabled:pointer-events-none disabled:shadow-none" disabled>
-                            <span>⚡</span> DRIAN'S MERCY <span>(2X STREAK)</span>
-                        </button>
-                    </div>
+                    <!-- DRIAN'S MERCY POWER-UP -->
+                    <button onclick="toggleDriansMercy()" id="btnDriansMercy" class="w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-wider text-amber-100 flex items-center justify-center gap-1.5 border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 disabled:pointer-events-none" disabled>
+                        <span>⚡</span> DRIAN'S MERCY <span>(2X STREAK)</span>
+                    </button>
 
-                    <!-- CARD PLAYING TABLE AREA -->
-                    <div class="space-y-3 bg-black/50 p-4 rounded-2xl border border-white/10">
+                    <!-- PLAYING TABLE AREA -->
+                    <div class="space-y-2 bg-black/60 p-3 rounded-xl border border-white/10">
+                        <!-- DEALER SECTION -->
                         <div>
-                            <div class="flex justify-between items-center text-[11px] text-slate-400 mb-2">
-                                <span class="font-bold tracking-wider flex items-center gap-1.5 text-slate-300">
-                                    <span id="dealerAvatar">🎩</span> <span id="dealerTitleText">DEALER</span> <span id="dealerStatusText" class="text-[9px] font-normal text-amber-400 font-mono-custom"></span>
+                            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
+                                <span class="font-bold tracking-wider flex items-center gap-1 text-slate-300">
+                                    <span id="dealerAvatar">🎩</span> <span id="dealerTitleText">DEALER</span>
                                 </span>
-                                <span id="dealerScore" class="font-mono-custom text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">0</span>
+                                <span id="dealerScore" class="font-mono-custom text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20 text-[10px]">0</span>
                             </div>
-                            <div id="dealerCards" class="flex gap-2 min-h-[70px] items-center overflow-x-auto scrollbar-hide py-1"></div>
+                            <div id="dealerCards" class="flex gap-1.5 min-h-[58px] items-center overflow-x-auto scrollbar-hide py-0.5"></div>
                         </div>
 
-                        <div class="border-b border-white/10 my-2"></div>
+                        <div class="border-b border-white/10 my-1"></div>
 
+                        <!-- PLAYER SECTION -->
                         <div>
-                            <div class="flex justify-between items-center text-[11px] text-slate-400 mb-2">
-                                <span class="font-bold tracking-wider flex items-center gap-1.5 text-slate-300">
+                            <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
+                                <span class="font-bold tracking-wider flex items-center gap-1 text-slate-300">
                                     <span>👤</span> KAMU
                                 </span>
-                                <span id="playerScore" class="font-mono-custom text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">0</span>
+                                <span id="playerScore" class="font-mono-custom text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20 text-[10px]">0</span>
                             </div>
-                            <div id="playerCards" class="flex gap-2 min-h-[70px] items-center overflow-x-auto scrollbar-hide py-1"></div>
+                            <div id="playerCards" class="flex gap-1.5 min-h-[58px] items-center overflow-x-auto scrollbar-hide py-0.5"></div>
                         </div>
                     </div>
 
-                    <!-- REVAMPED SHIELD UI -->
-                    <div class="bg-slate-900/80 p-3 rounded-2xl border border-emerald-500/20 flex items-center justify-between gap-3 shadow-inner">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-sm">
+                    <!-- SHIELD BAR -->
+                    <div class="bg-slate-900/80 p-2 rounded-xl border border-emerald-500/20 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs">
                                 🛡️
                             </div>
                             <div>
-                                <div class="text-[10px] font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                                <div class="text-[9px] font-bold text-white uppercase flex items-center gap-1">
                                     Aegis Shield
-                                    <span id="shieldBadge" class="text-[8px] px-1.5 py-0.2 rounded font-mono-custom bg-slate-800 text-slate-400 border border-slate-700">OFF</span>
+                                    <span id="shieldBadge" class="text-[7px] px-1 rounded font-mono-custom bg-slate-800 text-slate-400 border border-slate-700">OFF</span>
                                 </div>
-                                <div class="text-[9px] text-slate-400">Proteksi Kehilangan Streak</div>
+                                <div class="text-[8px] text-slate-400">Proteksi Loss Streak</div>
                             </div>
                         </div>
 
-                        <button onclick="toggleShield()" id="btnShieldToggle" class="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-all flex items-center gap-1.5 active:scale-95">
+                        <button onclick="toggleShield()" id="btnShieldToggle" class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border transition-all flex items-center gap-1 active:scale-95">
                             <span>KUOTA:</span>
-                            <span id="shieldCount" class="font-mono-custom text-xs font-bold text-emerald-400">1</span>
+                            <span id="shieldCount" class="font-mono-custom text-[10px] font-bold text-emerald-400">1</span>
                         </button>
                     </div>
 
-                    <div id="gameStatus" class="text-center text-xs font-black my-2 min-h-[20px] text-emerald-400 uppercase tracking-widest font-mono-custom"></div>
+                    <!-- GAME STATUS MSG -->
+                    <div id="gameStatus" class="text-center text-[10px] font-black my-1 min-h-[16px] text-emerald-400 uppercase tracking-widest font-mono-custom"></div>
 
-                    <div class="grid grid-cols-2 gap-2.5" id="gameControls">
-                        <button onclick="hit()" id="btnHit" class="py-3.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow-lg" disabled>HIT 🃏</button>
-                        <button onclick="stand()" id="btnStand" class="py-3.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow-lg" disabled>STAND ✋</button>
+                    <!-- ACTION BUTTONS -->
+                    <div class="grid grid-cols-2 gap-2" id="gameControls">
+                        <button onclick="hit()" id="btnHit" class="py-2.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow" disabled>HIT 🃏</button>
+                        <button onclick="stand()" id="btnStand" class="py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow" disabled>STAND ✋</button>
                     </div>
 
-                    <button onclick="startNewGame()" id="btnStart" class="w-full py-3.5 btn-dopamine text-white text-xs font-black rounded-xl tracking-wider uppercase">
+                    <button onclick="startNewGame()" id="btnStart" class="w-full py-3 btn-dopamine text-white text-xs font-black rounded-xl tracking-wider uppercase">
                         DEAL / BAGIKAN KARTU 🎰
                     </button>
                 </div>
@@ -490,74 +476,68 @@
 
     <!-- Modal Admin Login -->
     <div id="adminModal" class="modal-base hidden-modal fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-6 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0d]">
-            <button onclick="toggleAdminModal(false)" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0d]">
+            <button onclick="toggleAdminModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
-            <div class="text-center mb-4">
-                <span class="text-3xl">🔑</span>
-                <h2 class="text-base font-black text-white mt-1">Akses Admin</h2>
-                <p class="text-[10px] text-slate-400">Masukkan kata sandi admin untuk melanjutkan.</p>
+            <div class="text-center mb-3">
+                <span class="text-2xl">🔑</span>
+                <h2 class="text-sm font-black text-white mt-1">Akses Admin</h2>
+                <p class="text-[9px] text-slate-400">Masukkan kata sandi admin untuk melanjutkan.</p>
             </div>
 
-            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="space-y-3">
-                <input type="password" id="adminPasswordInput" placeholder="Password Admin..." class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition text-center font-mono-custom">
-                <button type="submit" class="w-full py-3 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg uppercase tracking-wider">
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="space-y-2.5">
+                <input type="password" id="adminPasswordInput" placeholder="Password Admin..." class="w-full bg-white/5 border border-white/10 text-white text-xs p-2.5 rounded-xl focus:outline-none focus:border-white transition text-center font-mono-custom">
+                <button type="submit" class="w-full py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow uppercase tracking-wider">
                     MASUK ADMIN
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL PEMILIHAN PASIF (SETELAH MENGALAHKAN BOSS) -->
+    <!-- MODAL PEMILIHAN PASIF (3 OPSI SETELAH MENGALAHKAN BOSS) -->
     <div id="passiveChoiceModal" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
             <div class="text-3xl mb-1">🎁</div>
-            <h3 class="text-base font-black text-amber-400 uppercase tracking-wider">PILIH PASIF BOSS</h3>
-            <p class="text-slate-400 text-[10px] mb-4">Kamu berhasil melumpuhkan Boss sepenuhnya! Pilih 1 pasif permanen baru:</p>
+            <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider">PILIH 1 PASIF BOSS</h3>
+            <p class="text-slate-400 text-[10px] mb-3">Selamat! Kamu mengalahkan Boss. Pilih 1 pasif permanen untuk run ini:</p>
 
-            <div class="space-y-2.5">
-                <button onclick="selectPassive('golden_boot')" class="w-full p-3 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-left rounded-2xl transition group">
+            <div class="space-y-2">
+                <button onclick="selectPassive('golden_boot')" class="w-full p-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-left rounded-xl transition group">
                     <div class="text-xs font-bold text-yellow-300 font-mono-custom">👢 Golden Boot</div>
-                    <div class="text-[9px] text-slate-400 mt-0.5">Mendapatkan bonus +2 Streak otomatis setiap kemenangan.</div>
+                    <div class="text-[9px] text-slate-400 mt-0.5">+2 Bonus Win-Streak otomatis setiap kali menang.</div>
                 </button>
-                <button onclick="selectPassive('heartbreaker')" class="w-full p-3 bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 text-left rounded-2xl transition group">
+                <button onclick="selectPassive('heartbreaker')" class="w-full p-2.5 bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 text-left rounded-xl transition group">
                     <div class="text-xs font-bold text-purple-300 font-mono-custom">💔 Heartbreaker</div>
-                    <div class="text-[9px] text-slate-400 mt-0.5">Hasil Seri (Draw) langsung dianggap sebagai kemenangan!</div>
+                    <div class="text-[9px] text-slate-400 mt-0.5">Hasil Seri (Draw) langsung dianggap sebagai Menang!</div>
                 </button>
-                <button onclick="selectPassive('lifesteal')" class="w-full p-3 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-2xl transition group">
+                <button onclick="selectPassive('lifesteal')" class="w-full p-2.5 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition group">
                     <div class="text-xs font-bold text-rose-300 font-mono-custom">🩸 Lifesteal</div>
-                    <div class="text-[9px] text-slate-400 mt-0.5">Menang tepat nilai 21 memberikan +1 Aegis Shield gratis.</div>
+                    <div class="text-[9px] text-slate-400 mt-0.5">Menang dengan angka tepat 21 memberikan +1 Aegis Shield.</div>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL REWARD CONSUMABLE SETELAH MENANG BOSS BATTLE (PILIH 1) -->
+    <!-- MODAL REWARD CONSUMABLE SETELAH BOSS BATTLE -->
     <div id="bossRewardModal" class="modal-base hidden-modal fixed inset-0 z-[66] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-indigo-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
             <div class="text-3xl mb-1">📦</div>
-            <h3 class="text-base font-black text-indigo-400 uppercase tracking-wider">BOSS REWARD</h3>
-            <p class="text-slate-400 text-[10px] mb-4">Pilih 1 consumable bonus dari kemenangan ronde ini:</p>
+            <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider">BOSS REWARD</h3>
+            <p class="text-slate-400 text-[10px] mb-3">Pilih 1 consumable bonus tambahan:</p>
 
             <div class="space-y-2">
-                <button onclick="chooseBossReward('crystal')" class="w-full p-2.5 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 text-left rounded-xl transition flex items-center justify-between">
-                    <div>
-                        <div class="text-xs font-bold text-indigo-300 font-mono-custom">🔮 Holy Crystal</div>
-                    </div>
+                <button onclick="chooseBossReward('crystal')" class="w-full p-2 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 text-left rounded-xl transition flex items-center justify-between">
+                    <span class="text-xs font-bold text-indigo-300 font-mono-custom">🔮 Holy Crystal</span>
                     <span class="text-xs font-bold bg-indigo-500/20 px-2 py-0.5 rounded text-indigo-300">+1</span>
                 </button>
-                <button onclick="chooseBossReward('revelio')" class="w-full p-2.5 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition flex items-center justify-between">
-                    <div>
-                        <div class="text-xs font-bold text-rose-300 font-mono-custom">👁️ Revelio</div>
-                    </div>
+                <button onclick="chooseBossReward('revelio')" class="w-full p-2 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition flex items-center justify-between">
+                    <span class="text-xs font-bold text-rose-300 font-mono-custom">👁️ Revelio</span>
                     <span class="text-xs font-bold bg-rose-500/20 px-2 py-0.5 rounded text-rose-300">+1</span>
                 </button>
-                <button onclick="chooseBossReward('buster')" class="w-full p-2.5 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-left rounded-xl transition flex items-center justify-between">
-                    <div>
-                        <div class="text-xs font-bold text-red-300 font-mono-custom">💣 Buster</div>
-                    </div>
+                <button onclick="chooseBossReward('buster')" class="w-full p-2 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-left rounded-xl transition flex items-center justify-between">
+                    <span class="text-xs font-bold text-red-300 font-mono-custom">💣 Buster</span>
                     <span class="text-xs font-bold bg-red-500/20 px-2 py-0.5 rounded text-red-300">+1</span>
                 </button>
             </div>
@@ -568,14 +548,14 @@
     <div id="dealerEncounterModal" class="modal-base hidden-modal fixed inset-0 z-[66] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-indigo-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
             <div class="text-3xl mb-1">🎰</div>
-            <h3 class="text-base font-black text-indigo-400 uppercase tracking-wider">GACHA CONSUMABLE ROLL</h3>
-            <p class="text-slate-400 text-[10px] mb-4">Putar gacha roll untuk mendapatkan 1 consumable gratis!</p>
+            <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider">GACHA CONSUMABLE ROLL</h3>
+            <p class="text-slate-400 text-[10px] mb-3">Putar gacha roll untuk mendapatkan 1 consumable gratis!</p>
 
-            <div id="gachaRollBox" class="p-4 bg-indigo-950/50 border border-indigo-500/30 rounded-2xl mb-4 text-sm font-mono-custom font-bold text-indigo-200">
+            <div id="gachaRollBox" class="p-3 bg-indigo-950/50 border border-indigo-500/30 rounded-xl mb-3 text-xs font-mono-custom font-bold text-indigo-200">
                 Tekan tombol di bawah untuk roll!
             </div>
 
-            <button id="btnSpinGacha" onclick="executeGachaRoll()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl uppercase tracking-wider transition shadow-lg">
+            <button id="btnSpinGacha" onclick="executeGachaRoll()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl uppercase tracking-wider transition shadow">
                 🎲 ROLL SEKARANG
             </button>
         </div>
@@ -583,27 +563,27 @@
 
     <!-- Modal Highscore Submission -->
     <div id="scoreSubmitModal" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-6 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative casino-glow">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
             <button onclick="closeScoreModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
-            <div class="text-4xl mb-2 animate-bounce">👑</div>
-            <h3 class="text-base font-black text-amber-400 mb-1 uppercase tracking-wider">Streak Terhenti!</h3>
-            <p class="text-slate-400 text-xs mb-4">Kamu berhasil mencapai <span id="finalStreak" class="text-emerald-400 font-bold text-sm font-mono-custom">0</span> win streak.</p>
+            <div class="text-3xl mb-1 animate-bounce">👑</div>
+            <h3 class="text-sm font-black text-amber-400 mb-0.5 uppercase tracking-wider">Streak Terhenti!</h3>
+            <p class="text-slate-400 text-[11px] mb-3">Kamu berhasil mencapai <span id="finalStreak" class="text-emerald-400 font-bold text-xs font-mono-custom">0</span> win streak.</p>
 
-            <form id="scoreForm" onsubmit="submitHighScore(event)" class="space-y-3">
-                <label class="flex items-center justify-between p-2.5 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition text-left">
-                    <span class="text-xs text-slate-300 font-medium">Catat ke Leaderboard?</span>
+            <form id="scoreForm" onsubmit="submitHighScore(event)" class="space-y-2.5">
+                <label class="flex items-center justify-between p-2 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition text-left">
+                    <span class="text-[11px] text-slate-300 font-medium">Catat ke Leaderboard?</span>
                     <input type="checkbox" id="saveToLeaderboard" onchange="toggleNameInput(this.checked)" checked class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
                 </label>
 
                 <div id="nameInputContainer">
-                    <input type="text" id="playerName" maxlength="12" placeholder="Nama / Alias..." required class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl text-center focus:outline-none focus:border-amber-500 transition">
+                    <input type="text" id="playerName" maxlength="12" placeholder="Nama / Alias..." required class="w-full bg-white/5 border border-white/10 text-white text-xs p-2.5 rounded-xl text-center focus:outline-none focus:border-amber-500 transition">
                 </div>
 
-                <button type="submit" id="btnSubmitScore" class="w-full py-3 bg-amber-500 text-black text-xs font-black rounded-xl hover:bg-amber-400 active:scale-[0.98] transition">SIMPAN REKOR 🏆</button>
-                <button type="button" onclick="closeScoreModal()" class="w-full py-2 bg-transparent text-slate-400 hover:text-white text-xs transition">Batal / Tutup</button>
+                <button type="submit" id="btnSubmitScore" class="w-full py-2.5 bg-amber-500 text-black text-xs font-black rounded-xl hover:bg-amber-400 active:scale-[0.98] transition">SIMPAN REKOR 🏆</button>
+                <button type="button" onclick="closeScoreModal()" class="w-full py-1.5 bg-transparent text-slate-400 hover:text-white text-[10px] transition">Batal / Tutup</button>
             </form>
         </div>
     </div>
@@ -614,9 +594,7 @@
         const SUPABASE_URL = 'https://fhpyvnbsreoaiaeqfkvk.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const TABLE_NAME = 'PDFTV Room of Faith';
         const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
-        const CONFIG_TABLE = 'PDFTV System Config';
 
         // --- ADMIN SYSTEM & STATE ---
         let isAdminLoggedIn = false;
@@ -659,15 +637,15 @@
 
             if (isAdminLoggedIn) {
                 adminContainer.innerHTML = `
-                    <div class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-xl">
-                        <span class="text-[9px] font-mono-custom font-bold text-emerald-400 uppercase">ADMIN</span>
+                    <div class="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-xl">
+                        <span class="text-[8px] font-mono-custom font-bold text-emerald-400 uppercase">ADMIN</span>
                         <button onclick="handleAdminLogout()" class="text-slate-400 hover:text-white text-xs font-bold ml-1">✕</button>
                     </div>
                 `;
                 if (adminResetBtn) adminResetBtn.classList.remove('hidden');
             } else {
                 adminContainer.innerHTML = `
-                    <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1.5 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
+                    <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 py-1 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
                         🔒 Admin
                     </button>
                 `;
@@ -746,12 +724,12 @@
 
         function spawnCoins() {
             const emojis = ['🪙', '💰', '✨', '🔥'];
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 12; i++) {
                 const coin = document.createElement('div');
                 coin.className = 'coin-particle';
                 coin.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                coin.style.left = (window.innerWidth / 2 + (Math.random() * 200 - 100)) + 'px';
-                coin.style.top = (window.innerHeight / 2 + (Math.random() * 100 - 50)) + 'px';
+                coin.style.left = (window.innerWidth / 2 + (Math.random() * 180 - 90)) + 'px';
+                coin.style.top = (window.innerHeight / 2 + (Math.random() * 80 - 40)) + 'px';
                 document.body.appendChild(coin);
                 setTimeout(() => coin.remove(), 1200);
             }
@@ -771,12 +749,10 @@
             card.classList.add('win-pulse');
         }
 
-        // --- SYSTEM VERIFIKASI MAINTENANCE FEEDS ---
         function handleFeedsClick() {
             switchMode('feeds');
         }
 
-        // --- SYSTEM SWITCHER MODE ---
         function triggerPageAnimation(targetEl) {
             targetEl.classList.remove('page-transition');
             void targetEl.offsetWidth; 
@@ -791,8 +767,8 @@
             const tabFeeds = document.getElementById('tabFeeds');
             const tabArcade = document.getElementById('tabArcade');
 
-            const activeClass = "flex-1 py-2 rounded-full text-white bg-white/10 transition-all text-center";
-            const inactiveClass = "flex-1 py-2 rounded-full text-slate-400 hover:text-white transition-all text-center";
+            const activeClass = "flex-1 py-1.5 rounded-full text-white bg-white/10 transition-all text-center";
+            const inactiveClass = "flex-1 py-1.5 rounded-full text-slate-400 hover:text-white transition-all text-center";
 
             if (mode === 'landing') {
                 viewLanding.classList.remove('hidden');
@@ -875,7 +851,7 @@
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translate(-50%, 0)';
-            }, 3000);
+            }, 2500);
         }
 
         // --- SLIDER ENGINE ---
@@ -905,7 +881,7 @@
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
-        // ================= ARCADE BLACKJACK ENGINE, BOSSES & PASSIF =================
+        // ================= ARCADE GAMEPLAY LOGIC & BOSSES =================
         let deck = [];
         let playerHand = [];
         let dealerHand = [];
@@ -918,30 +894,32 @@
         let shieldCount = 1;
         let isShieldActive = true;
         let isDriansMercyActive = false;
+        
+        // TOTAL RESETS COUNTER
         let totalResets = 0;
 
-        // CONSUMABLES STATE (Mulai 1 tiap item)
+        // CONSUMABLES STATE
         let holyCrystalCount = 1;
         let revelioCount = 1;
         let busterCount = 1;
         let isDealerRevealed = false; 
 
-        // PASSIF PILIHAN USER
+        // PASSIF STATE
         let activePassives = {
             golden_boot: false,
             heartbreaker: false,
             lifesteal: false
         };
 
-        // BOSS SYSTEM STATE & HP (3 HEARTS)
+        // BOSS SYSTEM & HP (3 HEARTS)
         let isBossLevel = false;
         let currentBoss = null;
         let bossHP = 3;
 
-        // TARGET STREAK BOSS
-        let bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;   // 5 - 10
-        let bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;  // 10 - 15
-        let bossStreakTarget3 = Math.floor(Math.random() * 6) + 15;  // 15 - 20
+        // TARGET STREAK BOSS: 5-10, 10-15, 15-20 (RANDOM)
+        let bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;   // 5 s/d 10
+        let bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;  // 10 s/d 15
+        let bossStreakTarget3 = Math.floor(Math.random() * 6) + 15;  // 15 s/d 20
 
         const BOSSES = [
             {
@@ -953,13 +931,13 @@
             {
                 name: "SUNARTO",
                 avatar: "👑",
-                perkDesc: "Player dipaksa tidak bisa Stand jika poin masih di bawah 20.",
+                perkDesc: "Player dipaksa tidak bisa Stand jika poin di bawah 20.",
                 perkType: "force_stand_20"
             },
             {
                 name: "DON SALIERI",
                 avatar: "🗿",
-                perkDesc: "Menambah batas BUST menjadi 30 (Samgong).",
+                perkDesc: "Batas BUST menjadi 30 (Samgong).",
                 perkType: "samgong_burst"
             }
         ];
@@ -1015,16 +993,16 @@
             pCards.innerHTML = playerHand.map((c, idx) => {
                 if (isBossLevel && currentBoss && currentBoss.perkType === 'blind_hold' && idx === 1 && isGameActive) {
                     return `
-                        <div class="card-animate bg-gradient-to-tr from-slate-800 to-slate-900 text-rose-400 font-mono-custom font-bold w-12 h-16 rounded-xl border border-rose-500/40 flex items-center justify-center shadow-md flex-shrink-0 text-lg">
+                        <div class="card-animate bg-gradient-to-tr from-slate-800 to-slate-900 text-rose-400 font-mono-custom font-bold w-10 h-14 rounded-lg border border-rose-500/40 flex items-center justify-center shadow flex-shrink-0 text-base">
                             🔒
                         </div>
                     `;
                 }
                 return `
-                    <div class="card-animate bg-gradient-to-tr from-slate-100 to-white text-black font-mono-custom font-bold w-12 h-16 rounded-xl border border-white flex flex-col justify-between p-1.5 shadow-md flex-shrink-0 text-center ${['♥','♦'].includes(c.suit) ? 'text-red-600' : 'text-slate-900'}">
-                        <div class="text-[10px] text-left leading-none">${c.value}</div>
-                        <div class="text-base leading-none">${c.suit}</div>
-                        <div class="text-[10px] text-right leading-none">${c.value}</div>
+                    <div class="card-animate bg-gradient-to-tr from-slate-100 to-white text-black font-mono-custom font-bold w-10 h-14 rounded-lg border border-white flex flex-col justify-between p-1 shadow flex-shrink-0 text-center ${['♥','♦'].includes(c.suit) ? 'text-red-600' : 'text-slate-900'}">
+                        <div class="text-[9px] text-left leading-none">${c.value}</div>
+                        <div class="text-xs leading-none">${c.suit}</div>
+                        <div class="text-[9px] text-right leading-none">${c.value}</div>
                     </div>
                 `;
             }).join('');
@@ -1032,21 +1010,20 @@
             dCards.innerHTML = dealerHand.map((c, idx) => {
                 if (idx === 1 && isGameActive && !isDealerRevealed) {
                     return `
-                        <div class="card-animate bg-gradient-to-tr from-slate-800 to-slate-900 text-amber-400 font-mono-custom font-bold w-12 h-16 rounded-xl border border-amber-500/30 flex items-center justify-center shadow-md flex-shrink-0 text-lg">
+                        <div class="card-animate bg-gradient-to-tr from-slate-800 to-slate-900 text-amber-400 font-mono-custom font-bold w-10 h-14 rounded-lg border border-amber-500/30 flex items-center justify-center shadow flex-shrink-0 text-base">
                             ❓
                         </div>
                     `;
                 }
                 return `
-                    <div class="card-animate bg-gradient-to-tr from-slate-100 to-white text-black font-mono-custom font-bold w-12 h-16 rounded-xl border border-white flex flex-col justify-between p-1.5 shadow-md flex-shrink-0 text-center ${['♥','♦'].includes(c.suit) ? 'text-red-600' : 'text-slate-900'}">
-                        <div class="text-[10px] text-left leading-none">${c.value}</div>
-                        <div class="text-base leading-none">${c.suit}</div>
-                        <div class="text-[10px] text-right leading-none">${c.value}</div>
+                    <div class="card-animate bg-gradient-to-tr from-slate-100 to-white text-black font-mono-custom font-bold w-10 h-14 rounded-lg border border-white flex flex-col justify-between p-1 shadow flex-shrink-0 text-center ${['♥','♦'].includes(c.suit) ? 'text-red-600' : 'text-slate-900'}">
+                        <div class="text-[9px] text-left leading-none">${c.value}</div>
+                        <div class="text-xs leading-none">${c.suit}</div>
+                        <div class="text-[9px] text-right leading-none">${c.value}</div>
                     </div>
                 `;
             }).join('');
 
-            // PERBAIKAN BUG SAMARITAN: Sembunyikan total poin player jika kartu ke-2 di-blind
             if (isBossLevel && currentBoss && currentBoss.perkType === 'blind_hold' && isGameActive && playerHand.length >= 2) {
                 let firstVal = playerHand[0].value;
                 let visibleScore = ['K','Q','J'].includes(firstVal) ? 10 : (firstVal === 'A' ? 11 : parseInt(firstVal) || 0);
@@ -1090,42 +1067,33 @@
         }
 
         function useHolyCrystal() {
-            if (isBossLevel) {
-                showToast("🚫 Consumables dilarang saat Boss Battle!");
-                return;
-            }
+            if (isBossLevel) return;
             if (!isGameActive || holyCrystalCount <= 0 || playerHand.length === 0) return;
             holyCrystalCount--;
             
             playerHand[playerHand.length - 1] = { suit: '🔮', value: '21' };
-            showToast("🔮 HOLY CRYSTAL DIGUNAKAN! Kartu berubah jadi 21!");
+            showToast("🔮 HOLY CRYSTAL! Kartu berubah jadi 21!");
             playWinSound();
             renderCards();
             stand();
         }
 
         function useRevelio() {
-            if (isBossLevel) {
-                showToast("🚫 Consumables dilarang saat Boss Battle!");
-                return;
-            }
+            if (isBossLevel) return;
             if (!isGameActive || revelioCount <= 0 || isDealerRevealed) return;
             revelioCount--;
             isDealerRevealed = true;
-            showToast("👁️ REVELIO DIGUNAKAN! Kartu dealer terungkap!");
+            showToast("👁️ REVELIO! Kartu dealer terungkap!");
             playCardSound();
             renderCards();
         }
 
         function useBuster() {
-            if (isBossLevel) {
-                showToast("🚫 Consumables dilarang saat Boss Battle!");
-                return;
-            }
+            if (isBossLevel) return;
             if (!isGameActive || busterCount <= 0) return;
             busterCount--;
             
-            showToast("💣 BUSTER DIGUNAKAN! Dealer BUST otomatis!");
+            showToast("💣 BUSTER! Dealer BUST otomatis!");
             playBustSound();
 
             dealerHand.push({ suit: '💥', value: '10' });
@@ -1142,14 +1110,14 @@
             isGameActive = true;
             isDealerRevealed = false;
 
-            // KONDISI MASUK KE BOSS BATTLE BERDASARKAN HEARTS (3 RONDE)
+            // CEK EVENT BOSS BATTLE DENGAN TARGET STREAK ACAK (5-10, 10-15, 15-20)
             if (bossHP < 3 && currentBoss) {
-                isBossLevel = true; // Melanjutkan ronde boss yang belum selesai
-            } else if (streak === bossStreakTarget1 || streak === bossStreakTarget2 || streak === bossStreakTarget3) {
+                isBossLevel = true;
+            } else if (streak > 0 && (streak === bossStreakTarget1 || streak === bossStreakTarget2 || streak === bossStreakTarget3)) {
                 isBossLevel = true;
                 if (!currentBoss || bossHP <= 0) {
                     currentBoss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
-                    bossHP = 3; // Inisialisasi awal 3 Hearts (3 Ronde)
+                    bossHP = 3;
                 }
             } else {
                 isBossLevel = false;
@@ -1220,9 +1188,8 @@
 
             let pScore = calculateScore(playerHand);
 
-            // ATURAN BOSS: SUNARTO (Player dipaksa tidak bisa Stand jika poin < 20)
             if (isBossLevel && currentBoss && currentBoss.perkType === 'force_stand_20' && pScore < 20) {
-                showToast("👑 SUNARTO MEMAKSA: Poin di bawah 20 tidak boleh Stand! Hit!");
+                showToast("👑 SUNARTO: Poin di bawah 20 dilarang Stand! Hit!");
                 return;
             }
 
@@ -1269,18 +1236,18 @@
 
             if (isShieldActive && shieldCount > 0) {
                 badge.textContent = "ON";
-                badge.className = "text-[8px] px-1.5 py-0.2 rounded font-mono-custom bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
-                btn.className = "px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border border-emerald-500/40 bg-emerald-500/20 text-emerald-300 transition-all active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
+                badge.className = "text-[7px] px-1 rounded font-mono-custom bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                btn.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border border-emerald-500/40 bg-emerald-500/20 text-emerald-300 transition-all active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.2)]";
             } else {
                 badge.textContent = "OFF";
-                badge.className = "text-[8px] px-1.5 py-0.2 rounded font-mono-custom bg-slate-800 text-slate-400 border border-slate-700";
-                btn.className = "px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border border-white/10 bg-white/5 text-slate-400 transition-all active:scale-95";
+                badge.className = "text-[7px] px-1 rounded font-mono-custom bg-slate-800 text-slate-400 border border-slate-700";
+                btn.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border border-white/10 bg-white/5 text-slate-400 transition-all active:scale-95";
             }
         }
 
         function toggleDriansMercy() {
             if (totalResets < 17) {
-                showToast("🔒 Membutuhkan 17 Reset untuk Unlock!");
+                showToast(`🔒 Membutuhkan 17 Reset! (Saat ini: ${totalResets})`);
                 return;
             }
             if (!isGameActive) return;
@@ -1305,7 +1272,7 @@
             modal.classList.remove('show-modal');
             modal.classList.add('hidden-modal');
 
-            showToast("✨ Pasif Baru Berhasil Diaktifkan!");
+            showToast("✨ Pasif Baru Diaktifkan!");
             updateUIStats();
         }
 
@@ -1320,7 +1287,7 @@
             if (itemType === 'revelio') revelioCount++;
             if (itemType === 'buster') busterCount++;
 
-            showToast("🎁 Reward Consumable Ditambahkan!");
+            showToast("🎁 Consumable Ditambahkan!");
             const modal = document.getElementById('bossRewardModal');
             modal.classList.remove('show-modal');
             modal.classList.add('hidden-modal');
@@ -1359,7 +1326,7 @@
                         const modal = document.getElementById('dealerEncounterModal');
                         modal.classList.remove('show-modal');
                         modal.classList.add('hidden-modal');
-                    }, 1500);
+                    }, 1200);
                 }
             }, 100);
         }
@@ -1387,19 +1354,23 @@
                 streak += addedStreak;
                 wins++;
 
+                // PASIF LIFESTEAL: Score 21 = Restore Shield
+                if (activePassives.lifesteal && calculateScore(playerHand) === 21) {
+                    shieldCount++;
+                    showToast("🩸 LIFESTEAL: Score 21 Memberikan +1 Aegis Shield!");
+                }
+
                 if (streak % 3 === 0) shieldCount++;
 
-                // SISTEM 3 RONDE BOSS BATTLE (KURANGI 1 HEART TIAP MENANG)
                 if (isBossLevel && currentBoss) {
                     bossHP--;
                     updateBossHeartsUI();
 
                     if (bossHP <= 0) {
-                        // MENGALAHKAN BOSS SEPENUHNYA (3 RONDE MENANG)
                         spawnCoins();
                         playWinSound();
                         triggerScreenShake();
-                        showToast(`🌟 BOSS ${currentBoss.name} DIELIMINASI DALAM 3 RONDE!`);
+                        showToast(`🌟 BOSS ${currentBoss.name} DIELIMINASI!`);
                         
                         isBossLevel = false;
                         currentBoss = null;
@@ -1407,16 +1378,15 @@
                         setTimeout(() => {
                             triggerPassiveChoiceModal();
                             triggerBossRewardModal();
-                        }, 800);
+                        }, 700);
                     } else {
-                        // MASIH ADA SISA RONDE
-                        showToast(`⚔️ Ronde Menang! Sisa HP Boss: ${bossHP} Hearts. Tekan DEAL untuk ronde berikutnya!`);
+                        showToast(`⚔️ Ronde Menang! Sisa HP Boss: ${bossHP} Hearts.`);
                     }
                 } else {
                     if (streak > 0 && streak % 3 === 0) {
                         setTimeout(() => {
                             triggerDealerEncounterModal();
-                        }, 800);
+                        }, 700);
                     }
                 }
 
@@ -1425,15 +1395,18 @@
                 triggerScreenShake();
                 losses++;
 
-                // Jika kalah saat Boss Battle, HP Boss tidak berkurang dan kekalahan berlaku biasa
                 if (isShieldActive && shieldCount > 0) {
                     shieldCount--;
                     showToast("🛡️ SHIELD DIGUNAKAN! Streak Aman!");
                     if (shieldCount === 0) isShieldActive = false;
                 } else {
+                    // RESETS COUNTER INCREMENT
+                    totalResets++;
+                    document.getElementById('totalResetsText').textContent = totalResets;
+
                     streakToSubmit = streak;
                     streak = 0;
-                    bossHP = 3; // Reset boss HP jika streak terhenti
+                    bossHP = 3;
                     isBossLevel = false;
                     currentBoss = null;
                     resetSessionBuffs();
@@ -1456,6 +1429,7 @@
             busterCount = 1;
             activePassives = { golden_boot: false, heartbreaker: false, lifesteal: false };
             
+            // ACAK KEMBALI TARGET STREAK BOSS UNTUK RUN BERIKUTNYA
             bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;
             bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;
             bossStreakTarget3 = Math.floor(Math.random() * 6) + 15;
@@ -1467,6 +1441,7 @@
         function updateUIStats() {
             document.getElementById('currentStreak').textContent = streak;
             document.getElementById('statWLD').textContent = `${wins}-${losses}-${draws}`;
+            document.getElementById('totalResetsText').textContent = totalResets;
 
             let total = wins + losses + draws;
             document.getElementById('statTotal').textContent = total;
@@ -1476,6 +1451,7 @@
 
             updateShieldUI();
 
+            // UNLOCK DRIAN'S MERCY JIKA TOTAL RESETS >= 17
             const btnMercy = document.getElementById('btnDriansMercy');
             btnMercy.disabled = totalResets < 17 || !isGameActive;
 
@@ -1515,7 +1491,6 @@
             }
         }
 
-        // --- MENCEGAH ERROR INSERT LEADERBOARD SUPABASE ---
         async function submitHighScore(e) {
             e.preventDefault();
             const saveToLB = document.getElementById('saveToLeaderboard').checked;
@@ -1528,18 +1503,15 @@
                         streak_count: Number(streakToSubmit)
                     };
 
-                    const { data, error } = await supabaseClient.from(LEADERBOARD_TABLE).insert([payload]).select();
+                    const { error } = await supabaseClient.from(LEADERBOARD_TABLE).insert([payload]);
                     
-                    if (error) {
-                        console.error("Detail Error Supabase Insert:", error);
-                        throw new Error(error.message || "Gagal insert data ke Supabase.");
-                    }
+                    if (error) throw new Error(error.message);
 
                     showToast("🏆 Rekor berhasil dicatat!");
                     await fetchLeaderboard();
                 } catch (err) {
                     console.error('Error submitting score:', err);
-                    alert("Gagal mencatat rekor: " + (err.message || "Pastikan tabel di Supabase sudah sesuai."));
+                    alert("Gagal mencatat rekor: " + (err.message || "Pastikan tabel Supabase sesuai."));
                 }
             }
 
@@ -1547,7 +1519,6 @@
             exitCasinoGame();
         }
 
-        // --- LEADERBOARD & EMPTY STATE ---
         async function fetchLeaderboard() {
             const listEl = document.getElementById('leaderboardList');
             try {
@@ -1561,10 +1532,10 @@
 
                 if (!data || data.length === 0) {
                     listEl.innerHTML = `
-                        <div class="relative overflow-hidden p-6 rounded-2xl border-2 border-dashed border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-black/40 to-transparent text-center space-y-3 group hover:border-amber-500/60 transition-all duration-500 shadow-[0_0_25px_rgba(245,158,11,0.1)]">
-                            <div class="text-3xl animate-bounce">👑</div>
-                            <div class="text-xs font-black text-amber-400 font-mono-custom tracking-wider uppercase">Papan Peringkat Kosong!</div>
-                            <p class="text-[10px] text-slate-400 max-w-xs mx-auto">Jadilah pemain pertama yang mencatatkan rekor *Win-Streak* di Hall of Fame!</p>
+                        <div class="relative overflow-hidden p-4 rounded-2xl border border-dashed border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-black/40 to-transparent text-center space-y-2">
+                            <div class="text-2xl animate-bounce">👑</div>
+                            <div class="text-xs font-black text-amber-400 font-mono-custom uppercase">Papan Peringkat Kosong!</div>
+                            <p class="text-[9px] text-slate-400 max-w-xs mx-auto">Jadilah pemain pertama yang mencatatkan rekor *Win-Streak* di Hall of Fame!</p>
                         </div>
                     `;
                     return;
@@ -1574,23 +1545,19 @@
                     const rankIcons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
                     const isTop1 = index === 0;
                     return `
-                        <div class="flex items-center justify-between p-3 rounded-2xl ${isTop1 ? 'gold-rank' : 'bg-white/5 border border-white/5'} transition-all">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg">${rankIcons[index] || '🎖️'}</span>
-                                <div>
-                                    <div class="text-xs font-black ${isTop1 ? 'text-amber-300' : 'text-white'} font-mono-custom">${escapeHtml(item.player_name)}</div>
-                                </div>
+                        <div class="flex items-center justify-between p-2 rounded-xl ${isTop1 ? 'gold-rank' : 'bg-white/5 border border-white/5'} transition-all">
+                            <div class="flex items-center gap-2">
+                                <span class="text-base">${rankIcons[index] || '🎖️'}</span>
+                                <span class="text-xs font-black ${isTop1 ? 'text-amber-300' : 'text-white'} font-mono-custom">${escapeHtml(item.player_name)}</span>
                             </div>
-                            <div class="text-right">
-                                <span class="text-xs font-black text-emerald-400 font-mono-custom">${item.streak_count} 🔥</span>
-                            </div>
+                            <span class="text-xs font-black text-emerald-400 font-mono-custom">${item.streak_count} 🔥</span>
                         </div>
                     `;
                 }).join('');
 
             } catch (err) {
                 console.error("Gagal load leaderboard:", err);
-                listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-4 italic">Gagal memuat leaderboard dari Supabase.</div>`;
+                listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-3 italic">Gagal memuat leaderboard.</div>`;
             }
         }
 
