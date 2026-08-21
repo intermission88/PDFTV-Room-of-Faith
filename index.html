@@ -247,35 +247,22 @@
             </div>
         </div>
 
-        <!-- ================= MODE 1: FEEDS ================= -->
-        <div id="viewFeeds" class="hidden space-y-4 pt-16">
-            <section class="py-1 space-y-3">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-xl font-black tracking-tight text-white text-left">Room of Faith</h1>
-                        <p class="text-slate-400 text-[10px] italic text-left">"Ruang Dengar Anonim"</p>
-                    </div>
-                    <div id="totalPostsCount" class="text-[10px] font-mono-custom text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
-                        0 Pengakuan
-                    </div>
+        <!-- ================= MODE 1: FEEDS (UNDER MAINTENANCE) ================= -->
+        <div id="viewFeeds" class="hidden pt-20 pb-10 flex flex-col items-center justify-center text-center">
+            <div class="glass p-8 rounded-3xl border border-amber-500/30 max-w-sm w-full space-y-4 shadow-2xl relative overflow-hidden">
+                <div class="text-5xl animate-bounce">🚧</div>
+                <div>
+                    <h2 class="text-xl font-black text-amber-400 tracking-wider font-mono-custom uppercase">UNDER MAINTENANCE</h2>
+                    <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                        Halaman <b>Room of Faith (Feeds)</b> sedang dalam pemeliharaan sistem. Kami akan segera kembali!
+                    </p>
                 </div>
-
-                <button onclick="toggleModal(true)" class="w-full flex items-center justify-center gap-2 bg-white text-black py-3 rounded-2xl shadow-xl hover:bg-slate-200 active:scale-95 transition-all font-black text-xs uppercase tracking-wider">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                    <span>Tulis Pengakuan</span>
-                </button>
-            </section>
-
-            <div class="flex items-center justify-between gap-2 pt-1">
-                <select id="sortSelect" onchange="sortFeed()" class="bg-black/50 border border-white/10 text-white text-[10px] p-2.5 rounded-xl focus:outline-none uppercase tracking-widest w-full cursor-pointer">
-                    <option value="newest">Terbaru</option>
-                    <option value="oldest">Terlama</option>
-                    <option value="upvotes">Upvote Terbanyak</option>
-                    <option value="comments">Komentar Terbanyak</option>
-                </select>
+                <div class="pt-2">
+                    <button onclick="switchMode('landing')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-mono-custom font-bold text-xs rounded-xl border border-white/10 transition active:scale-95">
+                        KEMBALI KE HOME
+                    </button>
+                </div>
             </div>
-
-            <div id="feed" class="space-y-4 w-full"></div>
         </div>
 
         <!-- ================= MODE 2: ARCADE ================= -->
@@ -523,28 +510,6 @@
         </div>
     </div>
 
-    <!-- Modal Form Pengakuan -->
-    <div id="confessionModal" class="modal-base hidden-modal fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="glass w-full max-w-md p-6 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0d]">
-            <button onclick="toggleModal(false)" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-
-            <h2 class="text-base font-black text-white mb-4 tracking-tight">Sampaikan Pengakuan</h2>
-
-            <form id="confessionForm" class="space-y-3">
-                <input type="text" id="alias" placeholder="Alias..." class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition">
-                
-                <div class="relative">
-                    <textarea id="confession" rows="4" maxlength="300" placeholder="Tulis pengakuanmu di sini..." oninput="updateCharCount()" class="w-full bg-white/5 border border-white/10 text-white text-sm p-3 rounded-xl focus:outline-none focus:border-white transition resize-none"></textarea>
-                    <div id="charCount" class="absolute bottom-3 right-3 text-[10px] text-slate-500 font-mono-custom">0/300</div>
-                </div>
-                
-                <button type="submit" id="submitBtn" class="w-full py-3 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow-lg">SUBMIT PENGAKUAN</button>
-            </form>
-        </div>
-    </div>
-
     <!-- MODAL PEMILIHAN PASIF (SETELAH MENGALAHKAN BOSS) -->
     <div id="passiveChoiceModal" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
@@ -643,26 +608,6 @@
         </div>
     </div>
 
-    <!-- Modal Peringatan Age Verification (18+) -->
-    <div id="ageWarningModal" class="modal-base hidden-modal fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-6 rounded-3xl border border-red-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
-            <div class="text-4xl mb-2">🔞</div>
-            <h3 class="text-base font-black text-red-400 mb-1 uppercase tracking-wider">Peringatan Konten 18+</h3>
-            <p class="text-slate-300 text-xs mb-5 leading-relaxed">
-                Halaman **Feeds** mungkin berisi konten dewasa, emosional, atau sensitif. Apakah kamu berusia 18 tahun atau lebih?
-            </p>
-
-            <div class="space-y-2">
-                <button onclick="confirmAge(true)" class="w-full py-3 bg-red-600 hover:bg-red-500 text-white text-xs font-black rounded-xl active:scale-[0.98] transition shadow-lg uppercase tracking-wider">
-                    Ya, Saya 18+
-                </button>
-                <button onclick="confirmAge(false)" class="w-full py-2.5 bg-white/5 hover:bg-white/10 text-slate-400 text-xs font-bold rounded-xl transition">
-                    Kembali
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- SCRIPT ENGINE LOGIC -->
     <script>
         // --- KONFIGURASI SUPABASE ---
@@ -675,7 +620,6 @@
 
         // --- ADMIN SYSTEM & STATE ---
         let isAdminLoggedIn = false;
-        let resetCountdownTimer = null;
 
         function toggleAdminModal(open) {
             const modal = document.getElementById('adminModal');
@@ -729,7 +673,6 @@
                 `;
                 if (adminResetBtn) adminResetBtn.classList.add('hidden');
             }
-            renderFeed();
         }
 
         // --- TYPEWRITER ENGINE ---
@@ -828,36 +771,9 @@
             card.classList.add('win-pulse');
         }
 
-        // --- SYSTEM VERIFIKASI 18+ ---
+        // --- SYSTEM VERIFIKASI MAINTENANCE FEEDS ---
         function handleFeedsClick() {
-            const is18PlusConfirmed = localStorage.getItem('is_18_plus_confirmed') === 'true';
-            if (is18PlusConfirmed) {
-                switchMode('feeds');
-            } else {
-                showAgeWarningModal(true);
-            }
-        }
-
-        function showAgeWarningModal(show) {
-            const modal = document.getElementById('ageWarningModal');
-            if (show) {
-                modal.classList.remove('hidden-modal');
-                modal.classList.add('show-modal');
-            } else {
-                modal.classList.remove('show-modal');
-                modal.classList.add('hidden-modal');
-            }
-        }
-
-        function confirmAge(is18Plus) {
-            if (is18Plus) {
-                localStorage.setItem('is_18_plus_confirmed', 'true');
-                showAgeWarningModal(false);
-                switchMode('feeds');
-            } else {
-                showAgeWarningModal(false);
-                showToast("⚠️ Akses ditolak. Khusus 18+.");
-            }
+            switchMode('feeds');
         }
 
         // --- SYSTEM SWITCHER MODE ---
@@ -898,7 +814,6 @@
                 tabArcade.className = inactiveClass;
                 
                 triggerPageAnimation(viewFeeds);
-                fetchPosts();
             } else if (mode === 'arcade') {
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.add('hidden');
@@ -911,7 +826,7 @@
                 tabArcade.className = activeClass;
                 
                 triggerPageAnimation(viewArcade);
-                checkResetCountdown();
+                fetchLeaderboard();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -939,12 +854,6 @@
             fetchLeaderboard();
         }
 
-        function toggleModal(open) {
-            const modal = document.getElementById('confessionModal');
-            if (open) { modal.classList.remove('hidden-modal'); modal.classList.add('show-modal'); }
-            else { modal.classList.remove('show-modal'); modal.classList.add('hidden-modal'); }
-        }
-
         function toggleRulesAccordion() {
             const rules = document.getElementById('rulesAccordion');
             rules.classList.toggle('hidden');
@@ -958,23 +867,15 @@
             resetSessionBuffs();
         }
 
-        // --- HELPER SECURITY & TIME ---
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        function timeAgo(timestamp) {
-            const now = Date.now();
-            const seconds = Math.floor((now - timestamp) / 1000);
-            if (isNaN(seconds) || seconds < 0) return 'baru saja';
-            if (seconds < 60) return `${seconds}d yang lalu`;
-            const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `${minutes}m yang lalu`;
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `${hours}j yang lalu`;
-            const days = Math.floor(hours / 24);
-            return `${days}hr yang lalu`;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 10px)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 0)';
+            }, 3000);
         }
 
         // --- SLIDER ENGINE ---
@@ -1004,262 +905,6 @@
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
-        // --- APP LOGIC FEEDS ---
-        let posts = [];
-        const form = document.getElementById('confessionForm');
-        const feed = document.getElementById('feed');
-        const submitBtn = document.getElementById('submitBtn');
-        const toast = document.getElementById('toast');
-
-        function showToast(message) {
-            toast.textContent = message;
-            toast.style.opacity = '1';
-            toast.style.transform = 'translate(-50%, 10px)';
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translate(-50%, 0)';
-            }, 3000);
-        }
-
-        function updateCharCount() {
-            const textLength = document.getElementById('confession').value.length;
-            document.getElementById('charCount').textContent = `${textLength}/300`;
-        }
-
-        async function fetchPosts() {
-            try {
-                const { data, error } = await supabaseClient.from(TABLE_NAME).select('*');
-                if (error) throw error;
-
-                posts = (data || []).map((row) => {
-                    let parsedComments = [];
-                    if (row.comments) {
-                        try { parsedComments = typeof row.comments === 'string' ? JSON.parse(row.comments) : row.comments; } 
-                        catch (e) { parsedComments = []; }
-                    }
-                    const rawTime = row.id; 
-                    const parsedTime = isNaN(Number(rawTime)) ? Date.now() : Number(rawTime);
-
-                    return {
-                        id: String(row.id),
-                        alias: row.alias || 'Anonymous',
-                        text: row.confession || '',
-                        upvotes: Number(row.upvotes) || 0,
-                        comments: Array.isArray(parsedComments) ? parsedComments : [],
-                        timestamp: parsedTime,
-                        isPinned: Boolean(row.is_pinned)
-                    };
-                });
-
-                sortFeed();
-            } catch (error) {
-                console.error('Gagal memuat data:', error);
-                feed.innerHTML = `<div class="text-center text-slate-500 text-xs py-10 italic">Gagal memuat pengakuan dari Supabase.</div>`;
-            }
-        }
-
-        fetchPosts();
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const aliasInput = document.getElementById('alias');
-            const confessionInput = document.getElementById('confession');
-            
-            const alias = aliasInput.value.trim() || 'Anonymous';
-            const text = confessionInput.value.trim();
-            if (!text) return;
-
-            submitBtn.textContent = "MENGIRIM...";
-            submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-70');
-
-            try {
-                const payload = {
-                    id: Date.now(),
-                    alias: alias,
-                    confession: text,
-                    upvotes: 0,
-                    comments: JSON.stringify([]),
-                    is_pinned: false
-                };
-
-                const { error } = await supabaseClient.from(TABLE_NAME).insert([payload]);
-                if (error) throw error;
-
-                form.reset();
-                updateCharCount();
-                toggleModal(false); 
-                await fetchPosts();
-                showToast("✨ Pengakuan berhasil dikirim!");
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Gagal mengirim pengakuan.');
-            } finally {
-                submitBtn.textContent = "SUBMIT PENGAKUAN";
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-70');
-            }
-        });
-
-        async function updatePostInSupabase(post) {
-            try {
-                const { error } = await supabaseClient
-                    .from(TABLE_NAME)
-                    .update({ 
-                        upvotes: post.upvotes, 
-                        comments: JSON.stringify(post.comments),
-                        is_pinned: post.isPinned 
-                    })
-                    .eq('id', post.id);
-                if (error) throw error;
-            } catch (error) {
-                console.error('Gagal memperbarui Supabase:', error);
-            }
-        }
-
-        function sortFeed() {
-            const sortBy = document.getElementById('sortSelect').value;
-            if (sortBy === 'newest') posts.sort((a, b) => b.id - a.id);
-            if (sortBy === 'oldest') posts.sort((a, b) => a.id - b.id);
-            if (sortBy === 'upvotes') posts.sort((a, b) => b.upvotes - a.upvotes);
-            if (sortBy === 'comments') posts.sort((a, b) => b.comments.length - a.comments.length);
-
-            posts.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0));
-            renderFeed();
-        }
-
-        function renderFeed() {
-            feed.innerHTML = '';
-            document.getElementById('totalPostsCount').textContent = `${posts.length} Pengakuan`;
-
-            if (posts.length === 0) {
-                feed.innerHTML = `<div class="text-center text-slate-500 text-xs py-10 italic">Belum ada pengakuan. Jadilah yang pertama!</div>`;
-                return;
-            }
-
-            posts.forEach(post => {
-                const postEl = document.createElement('div');
-                postEl.className = `glass p-4 sm:p-5 rounded-2xl border ${post.isPinned ? 'border-amber-500/40 bg-amber-500/5' : 'border-white/10'} space-y-3 relative overflow-hidden transition-all`;
-
-                const isUpvoted = localStorage.getItem(`upvoted_${post.id}`) === 'true';
-
-                let commentsHtml = post.comments.map(c => `
-                    <div class="bg-black/40 p-2.5 rounded-xl border border-white/5 text-[11px] text-slate-300">
-                        <span class="font-bold text-amber-400 font-mono-custom">${escapeHtml(c.alias)}:</span> ${escapeHtml(c.text)}
-                    </div>
-                `).join('');
-
-                postEl.innerHTML = `
-                    ${post.isPinned ? `<div class="text-[9px] font-mono-custom font-bold text-amber-400 uppercase tracking-widest flex items-center gap-1 mb-1">📌 PINNED POST</div>` : ''}
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h3 class="text-xs font-bold text-white tracking-wide font-mono-custom">${escapeHtml(post.alias)}</h3>
-                            <p class="text-[9px] text-slate-500 font-mono-custom">${timeAgo(post.timestamp)}</p>
-                        </div>
-                        ${isAdminLoggedIn ? `
-                            <div class="flex items-center gap-1">
-                                <button onclick="togglePinPost('${post.id}')" class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 font-mono-custom font-bold">
-                                    ${post.isPinned ? 'Unpin' : 'Pin'}
-                                </button>
-                                <button onclick="deletePost('${post.id}')" class="text-[10px] bg-red-500/20 text-red-300 px-2 py-0.5 rounded border border-red-500/30 font-mono-custom font-bold">
-                                    Hapus
-                                </button>
-                            </div>
-                        ` : ''}
-                    </div>
-
-                    <p class="text-slate-200 text-xs sm:text-sm leading-relaxed whitespace-pre-line">${escapeHtml(post.text)}</p>
-
-                    <div class="flex items-center justify-between pt-2 border-t border-white/5 text-[11px]">
-                        <button onclick="handleUpvote('${post.id}')" class="flex items-center gap-1.5 ${isUpvoted ? 'text-amber-400 font-bold' : 'text-slate-400'} hover:text-white transition">
-                            <span>▲</span>
-                            <span class="font-mono-custom">${post.upvotes}</span>
-                        </button>
-
-                        <button onclick="toggleCommentsUI('${post.id}')" class="text-slate-400 hover:text-white transition font-mono-custom flex items-center gap-1">
-                            💬 <span>${post.comments.length}</span>
-                        </button>
-                    </div>
-
-                    <div id="commentsSection_${post.id}" class="hidden space-y-2 pt-3 border-t border-white/5">
-                        <div class="space-y-1.5 max-h-40 overflow-y-auto scrollbar-hide">
-                            ${commentsHtml || '<div class="text-[10px] text-slate-500 italic">Belum ada komentar.</div>'}
-                        </div>
-                        <form onsubmit="handleCommentSubmit(event, '${post.id}')" class="flex gap-2 pt-1">
-                            <input type="text" id="commentAlias_${post.id}" placeholder="Alias..." class="w-1/3 bg-white/5 border border-white/10 text-white text-[11px] p-2 rounded-xl focus:outline-none">
-                            <input type="text" id="commentText_${post.id}" placeholder="Komentar..." required class="flex-1 bg-white/5 border border-white/10 text-white text-[11px] p-2 rounded-xl focus:outline-none">
-                            <button type="submit" class="bg-white text-black font-bold text-[10px] px-3 rounded-xl hover:bg-slate-200 transition">Kirim</button>
-                        </form>
-                    </div>
-                `;
-                feed.appendChild(postEl);
-            });
-        }
-
-        async function handleUpvote(id) {
-            const post = posts.find(p => p.id === id);
-            if (!post) return;
-
-            const isUpvoted = localStorage.getItem(`upvoted_${id}`) === 'true';
-            if (isUpvoted) {
-                post.upvotes = Math.max(0, post.upvotes - 1);
-                localStorage.removeItem(`upvoted_${id}`);
-            } else {
-                post.upvotes += 1;
-                localStorage.setItem(`upvoted_${id}`, 'true');
-            }
-
-            renderFeed();
-            await updatePostInSupabase(post);
-        }
-
-        function toggleCommentsUI(id) {
-            const sec = document.getElementById(`commentsSection_${id}`);
-            if (sec) sec.classList.toggle('hidden');
-        }
-
-        async function handleCommentSubmit(e, id) {
-            e.preventDefault();
-            const post = posts.find(p => p.id === id);
-            if (!post) return;
-
-            const aliasInput = document.getElementById(`commentAlias_${id}`);
-            const textInput = document.getElementById(`commentText_${id}`);
-
-            const alias = aliasInput.value.trim() || 'Anon';
-            const text = textInput.value.trim();
-            if (!text) return;
-
-            post.comments.push({ alias, text, timestamp: Date.now() });
-            renderFeed();
-            document.getElementById(`commentsSection_${id}`).classList.remove('hidden');
-
-            await updatePostInSupabase(post);
-        }
-
-        async function togglePinPost(id) {
-            const post = posts.find(p => p.id === id);
-            if (!post) return;
-            post.isPinned = !post.isPinned;
-            sortFeed();
-            await updatePostInSupabase(post);
-            showToast(post.isPinned ? "📌 Post disematkan!" : "📌 Pin dilepas!");
-        }
-
-        async function deletePost(id) {
-            if (!confirm("Hapus pengakuan ini?")) return;
-            try {
-                const { error } = await supabaseClient.from(TABLE_NAME).delete().eq('id', id);
-                if (error) throw error;
-                posts = posts.filter(p => p.id !== id);
-                renderFeed();
-                showToast("🗑️ Post berhasil dihapus.");
-            } catch (err) {
-                console.error(err);
-                alert("Gagal menghapus post.");
-            }
-        }
-
         // ================= ARCADE BLACKJACK ENGINE, BOSSES & PASSIF =================
         let deck = [];
         let playerHand = [];
@@ -1279,7 +924,7 @@
         let holyCrystalCount = 1;
         let revelioCount = 1;
         let busterCount = 1;
-        let isDealerRevealed = false; // Efek Revelio
+        let isDealerRevealed = false; 
 
         // PASSIF PILIHAN USER
         let activePassives = {
@@ -1401,7 +1046,14 @@
                 `;
             }).join('');
 
-            document.getElementById('playerScore').textContent = calculateScore(playerHand);
+            // PERBAIKAN BUG SAMARITAN: Sembunyikan total poin player jika kartu ke-2 di-blind
+            if (isBossLevel && currentBoss && currentBoss.perkType === 'blind_hold' && isGameActive && playerHand.length >= 2) {
+                let firstVal = playerHand[0].value;
+                let visibleScore = ['K','Q','J'].includes(firstVal) ? 10 : (firstVal === 'A' ? 11 : parseInt(firstVal) || 0);
+                document.getElementById('playerScore').textContent = `${visibleScore} + ?`;
+            } else {
+                document.getElementById('playerScore').textContent = calculateScore(playerHand);
+            }
 
             if (isGameActive && dealerHand.length > 0 && !isDealerRevealed) {
                 let firstVal = dealerHand[0].value;
@@ -1490,12 +1142,14 @@
             isGameActive = true;
             isDealerRevealed = false;
 
-            // DETEKSI BOSS LEVEL BERDASARKAN RENTANG STREAK
-            if (streak === bossStreakTarget1 || streak === bossStreakTarget2 || streak === bossStreakTarget3) {
+            // KONDISI MASUK KE BOSS BATTLE BERDASARKAN HEARTS (3 RONDE)
+            if (bossHP < 3 && currentBoss) {
+                isBossLevel = true; // Melanjutkan ronde boss yang belum selesai
+            } else if (streak === bossStreakTarget1 || streak === bossStreakTarget2 || streak === bossStreakTarget3) {
                 isBossLevel = true;
-                if (!currentBoss) {
+                if (!currentBoss || bossHP <= 0) {
                     currentBoss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
-                    bossHP = 3; // Reset ke 3 Hearts
+                    bossHP = 3; // Inisialisasi awal 3 Hearts (3 Ronde)
                 }
             } else {
                 isBossLevel = false;
@@ -1515,7 +1169,7 @@
                 
                 document.getElementById('dealerAvatar').textContent = currentBoss.avatar;
                 document.getElementById('dealerTitleText').textContent = currentBoss.name;
-                tableTitle.innerHTML = `<span class="text-red-400 font-bold">⚔️ BOSS BATTLE</span>`;
+                tableTitle.innerHTML = `<span class="text-red-400 font-bold">⚔️ BOSS BATTLE (${4 - bossHP}/3 RONDE)</span>`;
             } else {
                 cardUI.classList.remove('boss-card-bg');
                 bossAlert.classList.add('hidden');
@@ -1564,7 +1218,7 @@
         function stand() {
             if (!isGameActive) return;
 
-            let pScore = document.getElementById('playerScore').textContent == '21' ? 21 : calculateScore(playerHand);
+            let pScore = calculateScore(playerHand);
 
             // ATURAN BOSS: SUNARTO (Player dipaksa tidak bisa Stand jika poin < 20)
             if (isBossLevel && currentBoss && currentBoss.perkType === 'force_stand_20' && pScore < 20) {
@@ -1673,7 +1327,6 @@
             updateConsumableUI();
         }
 
-        // GACHA ROLL CONSUMABLE SYSTEM
         function triggerDealerEncounterModal() {
             const modal = document.getElementById('dealerEncounterModal');
             modal.classList.remove('hidden-modal');
@@ -1736,15 +1389,17 @@
 
                 if (streak % 3 === 0) shieldCount++;
 
-                // JIKA DI BOSS BATTLE, KURANGI HP BOSS (1 HEART)
+                // SISTEM 3 RONDE BOSS BATTLE (KURANGI 1 HEART TIAP MENANG)
                 if (isBossLevel && currentBoss) {
                     bossHP--;
                     updateBossHeartsUI();
+
                     if (bossHP <= 0) {
+                        // MENGALAHKAN BOSS SEPENUHNYA (3 RONDE MENANG)
                         spawnCoins();
                         playWinSound();
                         triggerScreenShake();
-                        showToast(`🌟 BOSS ${currentBoss.name} SEPENUHNYA DIELIMINASI!`);
+                        showToast(`🌟 BOSS ${currentBoss.name} DIELIMINASI DALAM 3 RONDE!`);
                         
                         isBossLevel = false;
                         currentBoss = null;
@@ -1754,10 +1409,10 @@
                             triggerBossRewardModal();
                         }, 800);
                     } else {
-                        showToast(`⚔️ Boss terkena hit! Sisa HP: ${bossHP} Hearts`);
+                        // MASIH ADA SISA RONDE
+                        showToast(`⚔️ Ronde Menang! Sisa HP Boss: ${bossHP} Hearts. Tekan DEAL untuk ronde berikutnya!`);
                     }
                 } else {
-                    // RANDOM GACHA ROLL DEALER ENCOUNTER (TIAP 3 STREAK)
                     if (streak > 0 && streak % 3 === 0) {
                         setTimeout(() => {
                             triggerDealerEncounterModal();
@@ -1770,6 +1425,7 @@
                 triggerScreenShake();
                 losses++;
 
+                // Jika kalah saat Boss Battle, HP Boss tidak berkurang dan kekalahan berlaku biasa
                 if (isShieldActive && shieldCount > 0) {
                     shieldCount--;
                     showToast("🛡️ SHIELD DIGUNAKAN! Streak Aman!");
@@ -1777,6 +1433,9 @@
                 } else {
                     streakToSubmit = streak;
                     streak = 0;
+                    bossHP = 3; // Reset boss HP jika streak terhenti
+                    isBossLevel = false;
+                    currentBoss = null;
                     resetSessionBuffs();
                     showScoreModal(streakToSubmit);
                 }
@@ -1864,7 +1523,6 @@
 
             if (saveToLB && nameInput) {
                 try {
-                    // Payload aman dan bersih tanpa konfiks tipe data/kolom otomatis
                     const payload = {
                         player_name: nameInput,
                         streak_count: Number(streakToSubmit)
@@ -1881,7 +1539,7 @@
                     await fetchLeaderboard();
                 } catch (err) {
                     console.error('Error submitting score:', err);
-                    alert("Gagal mencatat rekor: " + (err.message || "Pastikan tabel 'PDFTV Blackjack Leaderboard' di Supabase sudah mengizinkan RLS (INSERT) untuk publik."));
+                    alert("Gagal mencatat rekor: " + (err.message || "Pastikan tabel di Supabase sudah sesuai."));
                 }
             }
 
@@ -1889,7 +1547,7 @@
             exitCasinoGame();
         }
 
-        // --- LEADERBOARD & EFEK KOSONG (EMPTY STATE) TOP 5 ---
+        // --- LEADERBOARD & EMPTY STATE ---
         async function fetchLeaderboard() {
             const listEl = document.getElementById('leaderboardList');
             try {
@@ -1901,131 +1559,45 @@
 
                 if (error) throw error;
 
-                // EFEK ATRAKTIF SAAT TOP 5 MASIH KOSONG
                 if (!data || data.length === 0) {
                     listEl.innerHTML = `
                         <div class="relative overflow-hidden p-6 rounded-2xl border-2 border-dashed border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-black/40 to-transparent text-center space-y-3 group hover:border-amber-500/60 transition-all duration-500 shadow-[0_0_25px_rgba(245,158,11,0.1)]">
-                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 text-2xl animate-bounce shadow-lg">
-                                👑
-                            </div>
-                            <div class="space-y-1">
-                                <h4 class="text-xs font-black text-amber-400 uppercase tracking-widest font-mono-custom">
-                                    TAHTA MASIH KOSONG!
-                                </h4>
-                                <p class="text-[10px] text-slate-400 max-w-[200px] mx-auto leading-relaxed">
-                                    Belum ada Jawara yang mencatatkan Win-Streak. Jadilah yang Pertama!
-                                </p>
-                            </div>
-                            <button onclick="enterCasinoGame()" class="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-bold rounded-xl transition active:scale-95 uppercase tracking-wider">
-                                MAIN & CATAT REKOR ➔
-                            </button>
+                            <div class="text-3xl animate-bounce">👑</div>
+                            <div class="text-xs font-black text-amber-400 font-mono-custom tracking-wider uppercase">Papan Peringkat Kosong!</div>
+                            <p class="text-[10px] text-slate-400 max-w-xs mx-auto">Jadilah pemain pertama yang mencatatkan rekor *Win-Streak* di Hall of Fame!</p>
                         </div>
                     `;
                     return;
                 }
 
                 listEl.innerHTML = data.map((item, index) => {
-                    let rankBadge = `${index + 1}`;
-                    let cardClass = "glass border-white/10";
-                    if (index === 0) {
-                        rankBadge = "🥇 1ST";
-                        cardClass = "gold-rank";
-                    } else if (index === 1) {
-                        rankBadge = "🥈 2ND";
-                    } else if (index === 2) {
-                        rankBadge = "🥉 3RD";
-                    }
-
+                    const rankIcons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+                    const isTop1 = index === 0;
                     return `
-                        <div class="${cardClass} p-3 rounded-2xl flex items-center justify-between transition hover:border-white/20">
+                        <div class="flex items-center justify-between p-3 rounded-2xl ${isTop1 ? 'gold-rank' : 'bg-white/5 border border-white/5'} transition-all">
                             <div class="flex items-center gap-3">
-                                <span class="text-[10px] font-black font-mono-custom px-2 py-1 bg-white/5 rounded-lg border border-white/10 text-amber-400">${rankBadge}</span>
-                                <span class="text-xs font-bold text-white font-mono-custom">${escapeHtml(item.player_name)}</span>
+                                <span class="text-lg">${rankIcons[index] || '🎖️'}</span>
+                                <div>
+                                    <div class="text-xs font-black ${isTop1 ? 'text-amber-300' : 'text-white'} font-mono-custom">${escapeHtml(item.player_name)}</div>
+                                </div>
                             </div>
-                            <div class="text-xs font-black font-mono-custom text-emerald-400 flex items-center gap-1">
-                                <span>${item.streak_count}</span>
-                                <span class="text-[10px]">🔥</span>
+                            <div class="text-right">
+                                <span class="text-xs font-black text-emerald-400 font-mono-custom">${item.streak_count} 🔥</span>
                             </div>
                         </div>
                     `;
                 }).join('');
+
             } catch (err) {
-                console.error('Gagal memuat leaderboard:', err);
-                listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-4 italic">Gagal memuat leaderboard.</div>`;
+                console.error("Gagal load leaderboard:", err);
+                listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-4 italic">Gagal memuat leaderboard dari Supabase.</div>`;
             }
         }
 
-        async function checkResetCountdown() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from(CONFIG_TABLE)
-                    .select('*')
-                    .eq('key', 'reset_timestamp')
-                    .single();
-
-                const banner = document.getElementById('resetCountdownBanner');
-                const timerEl = document.getElementById('countdownTimer');
-
-                if (error || !data || !data.value) {
-                    banner.classList.add('hidden');
-                    return;
-                }
-
-                const resetTime = Number(data.value);
-                const now = Date.now();
-                const diff = resetTime - now;
-
-                if (diff <= 0) {
-                    banner.classList.add('hidden');
-                    if (resetCountdownTimer) clearInterval(resetCountdownTimer);
-                    return;
-                }
-
-                banner.classList.remove('hidden');
-
-                if (resetCountdownTimer) clearInterval(resetCountdownTimer);
-                resetCountdownTimer = setInterval(() => {
-                    const currentDiff = resetTime - Date.now();
-                    if (currentDiff <= 0) {
-                        clearInterval(resetCountdownTimer);
-                        banner.classList.add('hidden');
-                        fetchLeaderboard();
-                        return;
-                    }
-                    const mins = Math.floor(currentDiff / 60000);
-                    const secs = Math.floor((currentDiff % 60000) / 1000);
-                    timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-                }, 1000);
-            } catch (err) {
-                console.error('Error countdown reset:', err);
-            }
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
-
-        async function confirmResetLeaderboard() {
-            if (!isAdminLoggedIn) {
-                alert("Akses hanya untuk Admin!");
-                return;
-            }
-            if (confirm("Apakah Anda yakin ingin mereset seluruh Leaderboard?")) {
-                try {
-                    const { error } = await supabaseClient
-                        .from(LEADERBOARD_TABLE)
-                        .delete()
-                        .neq('id', 0);
-
-                    if (error) throw error;
-
-                    showToast("🔄 Leaderboard berhasil di-reset!");
-                    fetchLeaderboard();
-                } catch (err) {
-                    console.error('Gagal reset leaderboard:', err);
-                    alert("Gagal mereset leaderboard: " + err.message);
-                }
-            }
-        }
-
-        // INITIAL LOAD
-        fetchLeaderboard();
     </script>
 </body>
 </html>
