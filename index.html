@@ -351,7 +351,7 @@
                         <div class="text-indigo-300">🔮 <b>HOLY CRYSTAL:</b> Mengubah kartu terakhir otomatis bernilai 21.</div>
                         <div class="text-rose-300">👁️ <b>REVELIO:</b> Membuka kartu rahasia dealer secara instan.</div>
                         <div class="text-red-400">💣 <b>BUSTER:</b> Memaksa dealer otomatis BUST!</div>
-                        <div class="text-amber-300">⚡ <b>DRIAN'S MERCY:</b> Ambil 1 kartu & Stand. Win = Streak x2 (Unlock @17 Resets).</div>
+                        <div class="text-amber-300">⚡ <b>DRIAN'S MERCY:</b> Ambil 1 kartu & Stand. Win = Streak x2 (Unlock @17 Resets, Reset Count ke 0 setelah pakai).</div>
                         <div class="text-emerald-300">🛡️ <b>SHIELD:</b> Mencegah streak habis saat kalah. +1 Shield tiap 3-Win Streak.</div>
                     </div>
                 </div>
@@ -1605,6 +1605,11 @@
             playMercySound();
             triggerHaptic('heavy');
             isDriansMercyActive = true;
+            
+            // Menggunakan Drian's Mercy akan mereset hitungan totalResets kembali ke 0
+            totalResets = 0;
+            document.getElementById('totalResetsText').textContent = totalResets;
+
             hit();
             if (isGameActive) stand();
         }
