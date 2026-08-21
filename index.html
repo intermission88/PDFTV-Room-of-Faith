@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDFTV | Experience Room</title>
-    <!-- Favicon -->
     <link rel="icon" type="image/webp" href="assets/PDFTV_favicon.webp">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,11 +32,17 @@
             transition: all 0.5s ease;
         }
 
-        /* SUASANA ARENA BOSS BATTLE */
+        /* EPIC BOSS BATTLE ARENA */
         .boss-card-bg {
-            background: radial-gradient(circle at top, rgba(225, 29, 72, 0.2) 0%, rgba(15, 5, 8, 0.98) 100%) !important;
-            border: 1px solid rgba(225, 29, 72, 0.6) !important;
-            box-shadow: 0 0 35px rgba(225, 29, 72, 0.3) !important;
+            background: radial-gradient(circle at top, rgba(225, 29, 72, 0.3) 0%, rgba(15, 5, 8, 0.98) 100%) !important;
+            border: 1px solid rgba(225, 29, 72, 0.8) !important;
+            box-shadow: 0 0 45px rgba(225, 29, 72, 0.5) !important;
+            animation: bossPulse 1.5s infinite alternate;
+        }
+
+        @keyframes bossPulse {
+            0% { border-color: rgba(225, 29, 72, 0.5); box-shadow: 0 0 25px rgba(225, 29, 72, 0.3); }
+            100% { border-color: rgba(255, 0, 0, 1); box-shadow: 0 0 50px rgba(255, 0, 0, 0.7); }
         }
 
         .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -59,31 +64,19 @@
             animation: blink 0.7s infinite;
             color: #10b981;
         }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         @keyframes pageIn {
             0% { opacity: 0; transform: translateY(14px) scale(0.98); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
-
-        .page-transition {
-            animation: pageIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            will-change: opacity, transform;
-        }
+        .page-transition { animation: pageIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         @keyframes cardDeal {
             0% { transform: translateY(-30px) scale(0.7) rotate(-8deg); opacity: 0; }
             100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
         }
-        
-        .card-animate {
-            animation: cardDeal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            transform-style: preserve-3d;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-        }
+        .card-animate { animation: cardDeal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
         .gold-rank {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(20, 20, 30, 0.6) 100%);
@@ -93,16 +86,16 @@
 
         @keyframes shake {
             0%, 100% { transform: translate(0, 0); }
-            20% { transform: translate(-5px, 3px); }
-            40% { transform: translate(5px, -3px); }
-            60% { transform: translate(-3px, -2px); }
-            80% { transform: translate(3px, 2px); }
+            20% { transform: translate(-8px, 5px); }
+            40% { transform: translate(8px, -5px); }
+            60% { transform: translate(-5px, -3px); }
+            80% { transform: translate(5px, 3px); }
         }
         .shake-effect { animation: shake 0.3s ease-in-out; }
 
         @keyframes winPulse {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8); }
-            70% { box-shadow: 0 0 0 25px rgba(16, 185, 129, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.9); }
+            70% { box-shadow: 0 0 0 35px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
         .win-pulse { animation: winPulse 0.8s ease-out; }
@@ -111,13 +104,20 @@
             position: fixed;
             pointer-events: none;
             z-index: 100;
-            font-size: 22px;
+            font-size: 26px;
             animation: floatUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(0.8) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-130px) scale(1.6) rotate(360deg); }
+            100% { opacity: 0; transform: translateY(-150px) scale(1.8) rotate(360deg); }
         }
+
+        /* GACHA JACKPOT ANIMATION */
+        @keyframes slotGlow {
+            0%, 100% { border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+            50% { border-color: rgba(236, 72, 153, 1); box-shadow: 0 0 30px rgba(236, 72, 153, 0.8); }
+        }
+        .gacha-active { animation: slotGlow 0.2s infinite; }
 
         .btn-dopamine {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -128,9 +128,7 @@
             transform: translateY(-2px) scale(1.01);
             box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
-        .btn-dopamine:active {
-            transform: translateY(1px) scale(0.98);
-        }
+        .btn-dopamine:active { transform: translateY(1px) scale(0.98); }
     </style>
 </head>
 <body class="scrollbar-hide min-h-screen flex flex-col justify-between pb-20">
@@ -169,10 +167,10 @@
         </div>
     </div>
 
-    <!-- MAIN CONTAINER (OPTIMIZED FOR IPHONE 15 PRO) -->
+    <!-- MAIN CONTAINER -->
     <main class="px-3 pb-8 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
         
-        <!-- ================= MODE 0: LANDING PAGE ================= -->
+        <!-- MODE 0: LANDING PAGE -->
         <div id="viewLanding" class="space-y-4 pt-14 my-auto text-center">
             <header class="space-y-1 py-1">
                 <p class="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-snug min-h-[48px] flex items-center justify-center">
@@ -240,7 +238,7 @@
             </div>
         </div>
 
-        <!-- ================= MODE 1: FEEDS (UNDER MAINTENANCE) ================= -->
+        <!-- MODE 1: FEEDS (MAINTENANCE) -->
         <div id="viewFeeds" class="hidden pt-16 pb-8 flex flex-col items-center justify-center text-center">
             <div class="glass p-6 rounded-3xl border border-amber-500/30 max-w-xs w-full space-y-3 shadow-2xl relative overflow-hidden">
                 <div class="text-4xl animate-bounce">🚧</div>
@@ -258,10 +256,10 @@
             </div>
         </div>
 
-        <!-- ================= MODE 2: ARCADE ================= -->
+        <!-- MODE 2: ARCADE -->
         <div id="viewArcade" class="hidden space-y-3 pt-14">
 
-            <!-- A. ARCADE LOBBY VIEW -->
+            <!-- LOBBY -->
             <div id="arcadeLobby" class="space-y-4">
                 <div class="relative overflow-hidden rounded-3xl p-5 border border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-[#0a0a12] to-[#050508] shadow-2xl text-center">
                     <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-mono-custom font-bold tracking-widest uppercase mb-2">
@@ -301,10 +299,9 @@
                 </section>
             </div>
 
-            <!-- B. GAMEPLAY BOARD UI (OPTIMIZED FOR IPHONE 15 PRO) -->
+            <!-- GAMEPLAY UI -->
             <div id="arcadeGameUI" class="hidden space-y-2.5">
                 
-                <!-- TOP GAME HEADER -->
                 <div class="flex items-center justify-between glass px-3 py-2 rounded-xl border border-white/10">
                     <button onclick="exitCasinoGame()" class="text-slate-400 hover:text-white text-[11px] font-bold flex items-center gap-1 transition active:scale-95">
                         <span>⬅</span> LOBBY
@@ -317,7 +314,6 @@
                     </button>
                 </div>
 
-                <!-- RULES ACCORDION -->
                 <div id="rulesAccordion" class="hidden p-3 rounded-2xl glass border border-amber-500/20 text-[10px] text-slate-300 space-y-1.5">
                     <div class="font-bold text-amber-400 border-b border-white/10 pb-0.5">📜 Aturan, Buff & Consumables:</div>
                     <p class="text-[9px] text-slate-400 leading-relaxed">Dapatkan nilai kartu mendekati <b>21</b> tanpa melebihi (*BUST*). Kumpulkan streak sebanyak mungkin!</p>
@@ -345,7 +341,6 @@
                 <!-- MAIN CARD CASINO CONTAINER -->
                 <div id="blackjackCard" class="casino-card-bg p-3.5 rounded-2xl shadow-2xl relative space-y-2.5">
                     
-                    <!-- COMPACT STATS HEADER (SESSION, STREAK & WINRATE) -->
                     <div class="bg-black/50 p-2 rounded-xl border border-white/10 space-y-1.5">
                         <div class="flex items-center justify-between text-xs">
                             <div class="flex items-center gap-2">
@@ -356,7 +351,6 @@
                             </div>
                         </div>
 
-                        <!-- MINI STATS BAR -->
                         <div class="grid grid-cols-3 gap-1.5 text-center font-mono-custom pt-1 border-t border-white/5">
                             <div class="bg-white/5 py-1 px-1 rounded-lg border border-white/5">
                                 <div class="text-[7px] text-slate-400 uppercase">W - L - D</div>
@@ -372,7 +366,6 @@
                             </div>
                         </div>
 
-                        <!-- BADGE PASIF AKTIF -->
                         <div id="activePassivesContainer" class="hidden pt-0.5 flex flex-wrap gap-1 justify-center">
                             <span id="badgeGoldenBoot" class="hidden text-[8px] font-bold font-mono-custom bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2 py-0.5 rounded-full">👢 Golden Boot (+2)</span>
                             <span id="badgeHeartbreaker" class="hidden text-[8px] font-bold font-mono-custom bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full">💔 Heartbreaker</span>
@@ -402,14 +395,14 @@
                         </div>
                     </div>
 
-                    <!-- DRIAN'S MERCY POWER-UP -->
+                    <!-- DRIAN'S MERCY -->
                     <button onclick="toggleDriansMercy()" id="btnDriansMercy" class="w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-wider text-amber-100 flex items-center justify-center gap-1.5 border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 disabled:pointer-events-none" disabled>
                         <span>⚡</span> DRIAN'S MERCY <span>(2X STREAK)</span>
                     </button>
 
                     <!-- PLAYING TABLE AREA -->
                     <div class="space-y-2 bg-black/60 p-3 rounded-xl border border-white/10">
-                        <!-- DEALER SECTION -->
+                        <!-- DEALER -->
                         <div>
                             <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
                                 <span class="font-bold tracking-wider flex items-center gap-1 text-slate-300">
@@ -422,7 +415,7 @@
 
                         <div class="border-b border-white/10 my-1"></div>
 
-                        <!-- PLAYER SECTION -->
+                        <!-- PLAYER -->
                         <div>
                             <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
                                 <span class="font-bold tracking-wider flex items-center gap-1 text-slate-300">
@@ -496,7 +489,7 @@
         </div>
     </div>
 
-    <!-- MODAL PEMILIHAN PASIF (3 OPSI SETELAH MENGALAHKAN BOSS) -->
+    <!-- MODAL PEMILIHAN PASIF (3 OPSI) -->
     <div id="passiveChoiceModal" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
             <div class="text-3xl mb-1">🎁</div>
@@ -544,19 +537,19 @@
         </div>
     </div>
 
-    <!-- MODAL ENCOUNTER DEALER CONSUMABLES (GACHA ROLL) -->
+    <!-- MODAL ENCOUNTER DEALER CONSUMABLES (GACHA CASINO ROULETTE) -->
     <div id="dealerEncounterModal" class="modal-base hidden-modal fixed inset-0 z-[66] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-indigo-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
-            <div class="text-3xl mb-1">🎰</div>
-            <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider">GACHA CONSUMABLE ROLL</h3>
-            <p class="text-slate-400 text-[10px] mb-3">Putar gacha roll untuk mendapatkan 1 consumable gratis!</p>
+        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-purple-500/50 shadow-2xl text-center bg-[#0d0714] relative overflow-hidden">
+            <div class="text-4xl mb-1 animate-pulse">🎰</div>
+            <h3 class="text-sm font-black text-purple-300 uppercase tracking-wider font-mono-custom">GACHA CONSUMABLE ROLL</h3>
+            <p class="text-slate-400 text-[10px] mb-3">Tekan tombol untuk memutar slot keberuntungan!</p>
 
-            <div id="gachaRollBox" class="p-3 bg-indigo-950/50 border border-indigo-500/30 rounded-xl mb-3 text-xs font-mono-custom font-bold text-indigo-200">
-                Tekan tombol di bawah untuk roll!
+            <div id="gachaRollBox" class="p-4 bg-purple-950/60 border border-purple-500/40 rounded-2xl mb-3 text-sm font-mono-custom font-black text-amber-300 flex items-center justify-center gap-2 min-h-[50px] shadow-inner">
+                Tekan Roll! 🎲
             </div>
 
-            <button id="btnSpinGacha" onclick="executeGachaRoll()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl uppercase tracking-wider transition shadow">
-                🎲 ROLL SEKARANG
+            <button id="btnSpinGacha" onclick="executeGachaRoll()" class="w-full py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-90 text-white text-xs font-black rounded-xl uppercase tracking-wider transition shadow-lg active:scale-95">
+                🎲 SPIN GACHA NOW!
             </button>
         </div>
     </div>
@@ -596,10 +589,26 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
 
+        // --- HAPTIC FEEDBACK ENGINE ---
+        function triggerHaptic(type = 'light') {
+            if (!('vibrate' in navigator)) return;
+            switch(type) {
+                case 'light': navigator.vibrate(12); break;
+                case 'medium': navigator.vibrate(30); break;
+                case 'heavy': navigator.vibrate(60); break;
+                case 'gacha_tick': navigator.vibrate(15); break;
+                case 'gacha_win': navigator.vibrate([40, 60, 40, 60, 100]); break;
+                case 'boss_hit': navigator.vibrate([80, 40, 80]); break;
+                case 'boss_defeat': navigator.vibrate([100, 50, 100, 50, 200, 50, 300]); break;
+                case 'bust': navigator.vibrate([120, 80, 150]); break;
+            }
+        }
+
         // --- ADMIN SYSTEM & STATE ---
         let isAdminLoggedIn = false;
 
         function toggleAdminModal(open) {
+            triggerHaptic('light');
             const modal = document.getElementById('adminModal');
             if (open) { 
                 modal.classList.remove('hidden-modal'); 
@@ -619,13 +628,16 @@
                 isAdminLoggedIn = true;
                 toggleAdminModal(false);
                 updateAdminUI();
+                triggerHaptic('heavy');
                 showToast("🔓 Akses Admin Berhasil!");
             } else {
+                triggerHaptic('bust');
                 alert("Password Admin Salah!");
             }
         }
 
         function handleAdminLogout() {
+            triggerHaptic('light');
             isAdminLoggedIn = false;
             updateAdminUI();
             showToast("🔒 Keluar dari Mode Admin.");
@@ -666,7 +678,7 @@
         }
         typeWriter();
 
-        // --- SOUND EFFECTS ENGINE (WEB AUDIO API) ---
+        // --- ADVANCED AUDIO ENGINE (WEB AUDIO API) ---
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
@@ -722,14 +734,62 @@
             osc.stop(audioCtx.currentTime + 0.3);
         }
 
+        function playGachaTickSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800 + Math.random() * 400, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.04);
+        }
+
+        function playJackpotSound() {
+            initAudio();
+            const arpeggio = [440, 554.37, 659.25, 880, 1108.73, 1318.51, 1760];
+            arpeggio.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime + i * 0.06);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.06 + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + i * 0.06);
+                osc.stop(audioCtx.currentTime + i * 0.06 + 0.4);
+            });
+        }
+
+        function playBossDefeatSound() {
+            initAudio();
+            const freqs = [300, 200, 150, 100, 600, 900, 1200];
+            freqs.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.1 + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + idx * 0.1);
+                osc.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+            });
+        }
+
         function spawnCoins() {
-            const emojis = ['🪙', '💰', '✨', '🔥'];
-            for (let i = 0; i < 12; i++) {
+            const emojis = ['🪙', '💰', '✨', '🔥', '👑', '🎰'];
+            for (let i = 0; i < 18; i++) {
                 const coin = document.createElement('div');
                 coin.className = 'coin-particle';
                 coin.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                coin.style.left = (window.innerWidth / 2 + (Math.random() * 180 - 90)) + 'px';
-                coin.style.top = (window.innerHeight / 2 + (Math.random() * 80 - 40)) + 'px';
+                coin.style.left = (window.innerWidth / 2 + (Math.random() * 220 - 110)) + 'px';
+                coin.style.top = (window.innerHeight / 2 + (Math.random() * 100 - 50)) + 'px';
                 document.body.appendChild(coin);
                 setTimeout(() => coin.remove(), 1200);
             }
@@ -750,6 +810,7 @@
         }
 
         function handleFeedsClick() {
+            triggerHaptic('light');
             switchMode('feeds');
         }
 
@@ -760,6 +821,7 @@
         }
 
         function switchMode(mode) {
+            triggerHaptic('light');
             const viewLanding = document.getElementById('viewLanding');
             const viewFeeds = document.getElementById('viewFeeds');
             const viewArcade = document.getElementById('viewArcade');
@@ -808,6 +870,7 @@
         }
 
         function enterCasinoGame() {
+            triggerHaptic('medium');
             const lobby = document.getElementById('arcadeLobby');
             const gameUI = document.getElementById('arcadeGameUI');
 
@@ -821,6 +884,7 @@
         }
 
         function exitCasinoGame() {
+            triggerHaptic('light');
             const lobby = document.getElementById('arcadeLobby');
             const gameUI = document.getElementById('arcadeGameUI');
 
@@ -831,11 +895,13 @@
         }
 
         function toggleRulesAccordion() {
+            triggerHaptic('light');
             const rules = document.getElementById('rulesAccordion');
             rules.classList.toggle('hidden');
         }
 
         function closeScoreModal() {
+            triggerHaptic('light');
             const modal = document.getElementById('scoreSubmitModal');
             modal.classList.remove('show-modal');
             modal.classList.add('hidden-modal');
@@ -895,31 +961,26 @@
         let isShieldActive = true;
         let isDriansMercyActive = false;
         
-        // TOTAL RESETS COUNTER
         let totalResets = 0;
 
-        // CONSUMABLES STATE
         let holyCrystalCount = 1;
         let revelioCount = 1;
         let busterCount = 1;
         let isDealerRevealed = false; 
 
-        // PASSIF STATE
         let activePassives = {
             golden_boot: false,
             heartbreaker: false,
             lifesteal: false
         };
 
-        // BOSS SYSTEM & HP (3 HEARTS)
         let isBossLevel = false;
         let currentBoss = null;
         let bossHP = 3;
 
-        // TARGET STREAK BOSS: 5-10, 10-15, 15-20 (RANDOM)
-        let bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;   // 5 s/d 10
-        let bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;  // 10 s/d 15
-        let bossStreakTarget3 = Math.floor(Math.random() * 6) + 15;  // 15 s/d 20
+        let bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;   
+        let bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;  
+        let bossStreakTarget3 = Math.floor(Math.random() * 6) + 15;  
 
         const BOSSES = [
             {
@@ -931,7 +992,7 @@
             {
                 name: "SUNARTO",
                 avatar: "👑",
-                perkDesc: "Player dipaksa tidak bisa Stand jika poin di bawah 20.",
+                perkDesc: "Tombol Stand dikunci jika poin kamu di bawah 20!",
                 perkType: "force_stand_20"
             },
             {
@@ -1040,6 +1101,27 @@
                 document.getElementById('dealerScore').textContent = calculateScore(dealerHand);
             }
 
+            // CEK KUNCI STAND SUNARTO
+            const btnStand = document.getElementById('btnStand');
+            const pScore = calculateScore(playerHand);
+            if (isBossLevel && currentBoss && currentBoss.perkType === 'force_stand_20' && isGameActive) {
+                if (pScore < 20) {
+                    btnStand.disabled = true;
+                    btnStand.innerHTML = 'STAND 🔒 (MIN 20)';
+                    btnStand.classList.add('opacity-40');
+                } else {
+                    btnStand.disabled = false;
+                    btnStand.innerHTML = 'STAND ✋';
+                    btnStand.classList.remove('opacity-40');
+                }
+            } else {
+                if (isGameActive) {
+                    btnStand.disabled = false;
+                    btnStand.innerHTML = 'STAND ✋';
+                    btnStand.classList.remove('opacity-40');
+                }
+            }
+
             updateConsumableUI();
         }
 
@@ -1069,6 +1151,7 @@
         function useHolyCrystal() {
             if (isBossLevel) return;
             if (!isGameActive || holyCrystalCount <= 0 || playerHand.length === 0) return;
+            triggerHaptic('heavy');
             holyCrystalCount--;
             
             playerHand[playerHand.length - 1] = { suit: '🔮', value: '21' };
@@ -1081,6 +1164,7 @@
         function useRevelio() {
             if (isBossLevel) return;
             if (!isGameActive || revelioCount <= 0 || isDealerRevealed) return;
+            triggerHaptic('medium');
             revelioCount--;
             isDealerRevealed = true;
             showToast("👁️ REVELIO! Kartu dealer terungkap!");
@@ -1091,6 +1175,7 @@
         function useBuster() {
             if (isBossLevel) return;
             if (!isGameActive || busterCount <= 0) return;
+            triggerHaptic('heavy');
             busterCount--;
             
             showToast("💣 BUSTER! Dealer BUST otomatis!");
@@ -1104,13 +1189,13 @@
         }
 
         function startNewGame() {
+            triggerHaptic('light');
             deck = createDeck();
             playerHand = [deck.pop(), deck.pop()];
             dealerHand = [deck.pop(), deck.pop()];
             isGameActive = true;
             isDealerRevealed = false;
 
-            // CEK EVENT BOSS BATTLE DENGAN TARGET STREAK ACAK (5-10, 10-15, 15-20)
             if (bossHP < 3 && currentBoss) {
                 isBossLevel = true;
             } else if (streak > 0 && (streak === bossStreakTarget1 || streak === bossStreakTarget2 || streak === bossStreakTarget3)) {
@@ -1129,6 +1214,7 @@
             const tableTitle = document.getElementById('tableHeaderTitle');
 
             if (isBossLevel && currentBoss) {
+                triggerHaptic('boss_hit');
                 cardUI.classList.add('boss-card-bg');
                 bossAlert.classList.remove('hidden');
                 document.getElementById('bossNameTitle').textContent = `${currentBoss.avatar} ${currentBoss.name}`;
@@ -1172,6 +1258,7 @@
 
         function hit() {
             if (!isGameActive) return;
+            triggerHaptic('light');
             playerHand.push(deck.pop());
             playCardSound();
             renderCards();
@@ -1189,10 +1276,12 @@
             let pScore = calculateScore(playerHand);
 
             if (isBossLevel && currentBoss && currentBoss.perkType === 'force_stand_20' && pScore < 20) {
-                showToast("👑 SUNARTO: Poin di bawah 20 dilarang Stand! Hit!");
+                triggerHaptic('bust');
+                showToast("👑 SUNARTO: Poin di bawah 20 dilarang Stand!");
                 return;
             }
 
+            triggerHaptic('medium');
             isDealerRevealed = true;
             let dScore = calculateScore(dealerHand);
 
@@ -1221,6 +1310,7 @@
         }
 
         function toggleShield() {
+            triggerHaptic('light');
             if (shieldCount > 0) {
                 isShieldActive = !isShieldActive;
                 updateShieldUI();
@@ -1247,11 +1337,13 @@
 
         function toggleDriansMercy() {
             if (totalResets < 17) {
+                triggerHaptic('bust');
                 showToast(`🔒 Membutuhkan 17 Reset! (Saat ini: ${totalResets})`);
                 return;
             }
             if (!isGameActive) return;
 
+            triggerHaptic('heavy');
             isDriansMercyActive = true;
             hit();
             if (isGameActive) stand();
@@ -1264,6 +1356,7 @@
         }
 
         function selectPassive(type) {
+            triggerHaptic('heavy');
             if (type === 'golden_boot') activePassives.golden_boot = true;
             if (type === 'heartbreaker') activePassives.heartbreaker = true;
             if (type === 'lifesteal') activePassives.lifesteal = true;
@@ -1283,6 +1376,7 @@
         }
 
         function chooseBossReward(itemType) {
+            triggerHaptic('medium');
             if (itemType === 'crystal') holyCrystalCount++;
             if (itemType === 'revelio') revelioCount++;
             if (itemType === 'buster') busterCount++;
@@ -1298,24 +1392,38 @@
             const modal = document.getElementById('dealerEncounterModal');
             modal.classList.remove('hidden-modal');
             modal.classList.add('show-modal');
-            document.getElementById('gachaRollBox').textContent = "Tekan tombol di bawah untuk roll!";
+            document.getElementById('gachaRollBox').textContent = "Tekan Roll untuk Spin! 🎲";
             document.getElementById('btnSpinGacha').disabled = false;
         }
 
         function executeGachaRoll() {
+            triggerHaptic('heavy');
             const rollBox = document.getElementById('gachaRollBox');
-            document.getElementById('btnSpinGacha').disabled = true;
+            const spinBtn = document.getElementById('btnSpinGacha');
+            spinBtn.disabled = true;
+
+            rollBox.classList.add('gacha-active');
 
             let counter = 0;
             const items = ["🔮 Holy Crystal", "👁️ Revelio", "💣 Buster"];
             
             const spinInterval = setInterval(() => {
-                rollBox.textContent = items[Math.floor(Math.random() * items.length)];
+                const randomItem = items[Math.floor(Math.random() * items.length)];
+                rollBox.textContent = randomItem;
+                playGachaTickSound();
+                triggerHaptic('gacha_tick');
                 counter++;
-                if (counter > 10) {
+
+                if (counter > 15) {
                     clearInterval(spinInterval);
+                    rollBox.classList.remove('gacha-active');
+
                     const wonItem = items[Math.floor(Math.random() * items.length)];
-                    rollBox.textContent = `🎉 SELAMAT! Mendapatkan ${wonItem}`;
+                    rollBox.innerHTML = `✨ JACKPOT! <br><span class="text-emerald-400 text-base">${wonItem}</span>`;
+                    
+                    playJackpotSound();
+                    triggerHaptic('gacha_win');
+                    spawnCoins();
 
                     if (wonItem.includes("Crystal")) holyCrystalCount++;
                     else if (wonItem.includes("Revelio")) revelioCount++;
@@ -1326,9 +1434,9 @@
                         const modal = document.getElementById('dealerEncounterModal');
                         modal.classList.remove('show-modal');
                         modal.classList.add('hidden-modal');
-                    }, 1200);
+                    }, 1800);
                 }
-            }, 100);
+            }, 80);
         }
 
         function endRound(result, message) {
@@ -1346,6 +1454,7 @@
                 playWinSound();
                 triggerWinPulse();
                 spawnCoins();
+                triggerHaptic('medium');
 
                 let addedStreak = 1;
                 if (activePassives.golden_boot) addedStreak += 2;
@@ -1354,7 +1463,6 @@
                 streak += addedStreak;
                 wins++;
 
-                // PASIF LIFESTEAL: Score 21 = Restore Shield
                 if (activePassives.lifesteal && calculateScore(playerHand) === 21) {
                     shieldCount++;
                     showToast("🩸 LIFESTEAL: Score 21 Memberikan +1 Aegis Shield!");
@@ -1368,9 +1476,10 @@
 
                     if (bossHP <= 0) {
                         spawnCoins();
-                        playWinSound();
+                        playBossDefeatSound();
                         triggerScreenShake();
-                        showToast(`🌟 BOSS ${currentBoss.name} DIELIMINASI!`);
+                        triggerHaptic('boss_defeat');
+                        showToast(`💥 VICTORY! BOSS ${currentBoss.name} TUMBANG!`);
                         
                         isBossLevel = false;
                         currentBoss = null;
@@ -1378,7 +1487,7 @@
                         setTimeout(() => {
                             triggerPassiveChoiceModal();
                             triggerBossRewardModal();
-                        }, 700);
+                        }, 800);
                     } else {
                         showToast(`⚔️ Ronde Menang! Sisa HP Boss: ${bossHP} Hearts.`);
                     }
@@ -1393,6 +1502,7 @@
             } else if (isLoss) {
                 playBustSound();
                 triggerScreenShake();
+                triggerHaptic('bust');
                 losses++;
 
                 if (isShieldActive && shieldCount > 0) {
@@ -1400,7 +1510,6 @@
                     showToast("🛡️ SHIELD DIGUNAKAN! Streak Aman!");
                     if (shieldCount === 0) isShieldActive = false;
                 } else {
-                    // RESETS COUNTER INCREMENT
                     totalResets++;
                     document.getElementById('totalResetsText').textContent = totalResets;
 
@@ -1429,7 +1538,6 @@
             busterCount = 1;
             activePassives = { golden_boot: false, heartbreaker: false, lifesteal: false };
             
-            // ACAK KEMBALI TARGET STREAK BOSS UNTUK RUN BERIKUTNYA
             bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;
             bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;
             bossStreakTarget3 = Math.floor(Math.random() * 6) + 15;
@@ -1451,7 +1559,6 @@
 
             updateShieldUI();
 
-            // UNLOCK DRIAN'S MERCY JIKA TOTAL RESETS >= 17
             const btnMercy = document.getElementById('btnDriansMercy');
             btnMercy.disabled = totalResets < 17 || !isGameActive;
 
@@ -1480,6 +1587,7 @@
         }
 
         function toggleNameInput(checked) {
+            triggerHaptic('light');
             const container = document.getElementById('nameInputContainer');
             const input = document.getElementById('playerName');
             if (checked) {
@@ -1493,6 +1601,7 @@
 
         async function submitHighScore(e) {
             e.preventDefault();
+            triggerHaptic('heavy');
             const saveToLB = document.getElementById('saveToLeaderboard').checked;
             const nameInput = document.getElementById('playerName').value.trim();
 
