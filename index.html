@@ -1856,6 +1856,7 @@
             }
         }
 
+        // --- MENCEGAH ERROR INSERT LEADERBOARD SUPABASE ---
         async function submitHighScore(e) {
             e.preventDefault();
             const saveToLB = document.getElementById('saveToLeaderboard').checked;
@@ -1863,18 +1864,24 @@
 
             if (saveToLB && nameInput) {
                 try {
+                    // Payload aman dan bersih tanpa konfiks tipe data/kolom otomatis
                     const payload = {
                         player_name: nameInput,
-                        streak_count: streakToSubmit,
-                        created_at: new Date().toISOString()
+                        streak_count: Number(streakToSubmit)
                     };
-                    const { error } = await supabaseClient.from(LEADERBOARD_TABLE).insert([payload]);
-                    if (error) throw error;
+
+                    const { data, error } = await supabaseClient.from(LEADERBOARD_TABLE).insert([payload]).select();
+                    
+                    if (error) {
+                        console.error("Detail Error Supabase Insert:", error);
+                        throw new Error(error.message || "Gagal insert data ke Supabase.");
+                    }
 
                     showToast("🏆 Rekor berhasil dicatat!");
+                    await fetchLeaderboard();
                 } catch (err) {
-                    console.error(err);
-                    alert("Gagal mencatat rekor.");
+                    console.error('Error submitting score:', err);
+                    alert("Gagal mencatat rekor: " + (err.message || "Pastikan tabel 'PDFTV Blackjack Leaderboard' di Supabase sudah mengizinkan RLS (INSERT) untuk publik."));
                 }
             }
 
@@ -1882,7 +1889,7 @@
             exitCasinoGame();
         }
 
-        // --- LEADERBOARD & RESET COUNTDOWN SYSTEM ---
+        // --- LEADERBOARD & EFEK KOSONG (EMPTY STATE) TOP 5 ---
         async function fetchLeaderboard() {
             const listEl = document.getElementById('leaderboardList');
             try {
@@ -1894,8 +1901,26 @@
 
                 if (error) throw error;
 
+                // EFEK ATRAKTIF SAAT TOP 5 MASIH KOSONG
                 if (!data || data.length === 0) {
-                    listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-6 italic">Belum ada rekor tercatat.</div>`;
+                    listEl.innerHTML = `
+                        <div class="relative overflow-hidden p-6 rounded-2xl border-2 border-dashed border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-black/40 to-transparent text-center space-y-3 group hover:border-amber-500/60 transition-all duration-500 shadow-[0_0_25px_rgba(245,158,11,0.1)]">
+                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 text-2xl animate-bounce shadow-lg">
+                                👑
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="text-xs font-black text-amber-400 uppercase tracking-widest font-mono-custom">
+                                    TAHTA MASIH KOSONG!
+                                </h4>
+                                <p class="text-[10px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                                    Belum ada jawara yang mencatatkan namanya. Jadilah <span class="text-amber-300 font-bold">High-Roller pertama</span> yang mengukir rekor di Hall of Fame!
+                                </p>
+                            </div>
+                            <button onclick="enterCasinoGame()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-mono-custom font-bold tracking-wider uppercase transition active:scale-95 shadow-md">
+                                <span>🎰</span> REBUT TAHTA SEKARANG ➔
+                            </button>
+                        </div>
+                    `;
                     return;
                 }
 
@@ -1905,7 +1930,7 @@
                             <span class="font-mono-custom font-bold text-xs ${idx === 0 ? 'text-amber-400 text-sm' : 'text-slate-400'}">#${idx + 1}</span>
                             <div>
                                 <div class="text-xs font-bold text-white font-mono-custom">${escapeHtml(item.player_name)}</div>
-                                <div class="text-[9px] text-slate-500 font-mono-custom">${timeAgo(new Date(item.created_at).getTime())}</div>
+                                <div class="text-[9px] text-slate-500 font-mono-custom">${item.created_at ? timeAgo(new Date(item.created_at).getTime()) : 'baru saja'}</div>
                             </div>
                         </div>
                         <div class="font-mono-custom font-bold text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
@@ -1915,94 +1940,31 @@
                 `).join('');
             } catch (err) {
                 console.error('Error fetching leaderboard:', err);
-                listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-6 italic">Gagal memuat papan peringkat.</div>`;
+                listEl.innerHTML = `<div class="text-center text-red-400 text-xs py-6 font-mono-custom">⚠️ Gagal memuat leaderboard.</div>`;
             }
-        }
-
-        async function checkResetCountdown() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from(CONFIG_TABLE)
-                    .select('*')
-                    .eq('key', 'leaderboard_reset_time')
-                    .single();
-
-                const banner = document.getElementById('resetCountdownBanner');
-                if (error || !data || !data.value) {
-                    if (banner) banner.classList.add('hidden');
-                    return;
-                }
-
-                const targetTime = new Date(data.value).getTime();
-                const now = Date.now();
-                const diff = targetTime - now;
-
-                if (diff > 0) {
-                    if (banner) banner.classList.remove('hidden');
-                    startResetCountdownTimer(targetTime);
-                } else {
-                    if (banner) banner.classList.add('hidden');
-                }
-            } catch (e) {
-                console.error("Countdown check error:", e);
-            }
-        }
-
-        function startResetCountdownTimer(targetTime) {
-            if (resetCountdownTimer) clearInterval(resetCountdownTimer);
-            
-            function updateTimer() {
-                const now = Date.now();
-                const diff = targetTime - now;
-                const timerEl = document.getElementById('countdownTimer');
-
-                if (diff <= 0) {
-                    clearInterval(resetCountdownTimer);
-                    if (timerEl) timerEl.textContent = "00:00";
-                    fetchLeaderboard();
-                    const banner = document.getElementById('resetCountdownBanner');
-                    if (banner) banner.classList.add('hidden');
-                    return;
-                }
-
-                const mins = Math.floor(diff / 60000);
-                const secs = Math.floor((diff % 60000) / 1000);
-                if (timerEl) {
-                    timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-                }
-            }
-
-            updateTimer();
-            resetCountdownTimer = setInterval(updateTimer, 1000);
         }
 
         async function confirmResetLeaderboard() {
-            if (!isAdminLoggedIn) {
-                alert("Hanya Admin yang dapat memicu reset leaderboard!");
-                return;
-            }
-            if (!confirm("Apakah Anda yakin ingin menghapus seluruh data Leaderboard?")) return;
+            if (!isAdminLoggedIn) return;
+            if (!confirm("⚠️ Apakah Anda yakin ingin mengosongkan seluruh data Leaderboard?")) return;
 
             try {
-                const { error } = await supabaseClient
-                    .from(LEADERBOARD_TABLE)
-                    .delete()
-                    .neq('streak_count', -1);
-
+                const { error } = await supabaseClient.from(LEADERBOARD_TABLE).delete().neq('streak_count', -1);
                 if (error) throw error;
-
-                showToast("🔄 Leaderboard berhasil direset!");
-                fetchLeaderboard();
+                showToast("🔄 Leaderboard telah direset!");
+                await fetchLeaderboard();
             } catch (err) {
-                console.error("Error resetting leaderboard:", err);
+                console.error('Gagal reset leaderboard:', err);
                 alert("Gagal mereset leaderboard.");
             }
         }
 
-        // Inisialisasi awal saat halaman dibuka
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchLeaderboard();
-        });
+        function checkResetCountdown() {
+            // Placeholder fungsi siklus countdown reset jika diaktifkan
+        }
+
+        // --- INITIALIZATION ---
+        fetchLeaderboard();
     </script>
 </body>
 </html>
