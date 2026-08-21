@@ -911,6 +911,7 @@
                 tabArcade.className = activeClass;
                 
                 triggerPageAnimation(viewArcade);
+                checkResetCountdown();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1740,7 +1741,6 @@
                     bossHP--;
                     updateBossHeartsUI();
                     if (bossHP <= 0) {
-                        // EFEK KEMENANGAN SPESIAL (Partikel emas-merah + audio + layar kilat)
                         spawnCoins();
                         playWinSound();
                         triggerScreenShake();
@@ -1749,7 +1749,6 @@
                         isBossLevel = false;
                         currentBoss = null;
 
-                        // MUNCULKAN PILIHAN PASIF SETELAH BOSS DIELIMINASI SEPENUHNYA
                         setTimeout(() => {
                             triggerPassiveChoiceModal();
                             triggerBossRewardModal();
@@ -1861,28 +1860,21 @@
             e.preventDefault();
             const saveToLB = document.getElementById('saveToLeaderboard').checked;
             const nameInput = document.getElementById('playerName').value.trim();
-            const btnSubmit = document.getElementById('btnSubmitScore');
 
             if (saveToLB && nameInput) {
-                btnSubmit.disabled = true;
-                btnSubmit.textContent = "MENYIMPAN...";
-                
                 try {
-                    // Penyesuaian skema payload Supabase agar tidak error saat dikirim
                     const payload = {
                         player_name: nameInput,
-                        streak_count: Number(streakToSubmit)
+                        streak_count: streakToSubmit,
+                        created_at: new Date().toISOString()
                     };
                     const { error } = await supabaseClient.from(LEADERBOARD_TABLE).insert([payload]);
                     if (error) throw error;
 
                     showToast("🏆 Rekor berhasil dicatat!");
                 } catch (err) {
-                    console.error('Error saat menyimpan skor:', err);
-                    alert("Gagal mencatat rekor ke Supabase: " + (err.message || err));
-                } finally {
-                    btnSubmit.disabled = false;
-                    btnSubmit.textContent = "SIMPAN REKOR 🏆";
+                    console.error(err);
+                    alert("Gagal mencatat rekor.");
                 }
             }
 
@@ -1912,38 +1904,105 @@
                         <div class="flex items-center gap-3">
                             <span class="font-mono-custom font-bold text-xs ${idx === 0 ? 'text-amber-400 text-sm' : 'text-slate-400'}">#${idx + 1}</span>
                             <div>
-                                <div class="text-xs font-bold text-white font-mono-custom">${escapeHtml(item.player_name || item.alias || 'Anon')}</div>
-                                <div class="text-[9px] text-slate-500 font-mono-custom">${timeAgo(new Date(item.created_at || item.timestamp || Date.now()).getTime())}</div>
+                                <div class="text-xs font-bold text-white font-mono-custom">${escapeHtml(item.player_name)}</div>
+                                <div class="text-[9px] text-slate-500 font-mono-custom">${timeAgo(new Date(item.created_at).getTime())}</div>
                             </div>
                         </div>
                         <div class="font-mono-custom font-bold text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
-                            ${item.streak_count || item.streak || 0} STREAK
+                            ${item.streak_count} STREAK
                         </div>
                     </div>
                 `).join('');
             } catch (err) {
-                console.error("Leaderboard fetch error:", err);
+                console.error('Error fetching leaderboard:', err);
                 listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-6 italic">Gagal memuat papan peringkat.</div>`;
             }
         }
 
-        async function confirmResetLeaderboard() {
-            if (!isAdminLoggedIn) return;
-            if (confirm("Apakah kamu yakin ingin mereset seluruh Leaderboard?")) {
-                try {
-                    const { error } = await supabaseClient.from(LEADERBOARD_TABLE).delete().neq('id', 0);
-                    if (error) throw error;
-                    showToast("🔄 Leaderboard telah direset!");
-                    fetchLeaderboard();
-                } catch (err) {
-                    console.error("Error reset leaderboard:", err);
-                    alert("Gagal mereset leaderboard.");
+        async function checkResetCountdown() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from(CONFIG_TABLE)
+                    .select('*')
+                    .eq('key', 'leaderboard_reset_time')
+                    .single();
+
+                const banner = document.getElementById('resetCountdownBanner');
+                if (error || !data || !data.value) {
+                    if (banner) banner.classList.add('hidden');
+                    return;
                 }
+
+                const targetTime = new Date(data.value).getTime();
+                const now = Date.now();
+                const diff = targetTime - now;
+
+                if (diff > 0) {
+                    if (banner) banner.classList.remove('hidden');
+                    startResetCountdownTimer(targetTime);
+                } else {
+                    if (banner) banner.classList.add('hidden');
+                }
+            } catch (e) {
+                console.error("Countdown check error:", e);
+            }
+        }
+
+        function startResetCountdownTimer(targetTime) {
+            if (resetCountdownTimer) clearInterval(resetCountdownTimer);
+            
+            function updateTimer() {
+                const now = Date.now();
+                const diff = targetTime - now;
+                const timerEl = document.getElementById('countdownTimer');
+
+                if (diff <= 0) {
+                    clearInterval(resetCountdownTimer);
+                    if (timerEl) timerEl.textContent = "00:00";
+                    fetchLeaderboard();
+                    const banner = document.getElementById('resetCountdownBanner');
+                    if (banner) banner.classList.add('hidden');
+                    return;
+                }
+
+                const mins = Math.floor(diff / 60000);
+                const secs = Math.floor((diff % 60000) / 1000);
+                if (timerEl) {
+                    timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                }
+            }
+
+            updateTimer();
+            resetCountdownTimer = setInterval(updateTimer, 1000);
+        }
+
+        async function confirmResetLeaderboard() {
+            if (!isAdminLoggedIn) {
+                alert("Hanya Admin yang dapat memicu reset leaderboard!");
+                return;
+            }
+            if (!confirm("Apakah Anda yakin ingin menghapus seluruh data Leaderboard?")) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from(LEADERBOARD_TABLE)
+                    .delete()
+                    .neq('streak_count', -1);
+
+                if (error) throw error;
+
+                showToast("🔄 Leaderboard berhasil direset!");
+                fetchLeaderboard();
+            } catch (err) {
+                console.error("Error resetting leaderboard:", err);
+                alert("Gagal mereset leaderboard.");
             }
         }
 
         // Inisialisasi awal saat halaman dibuka
-        fetchLeaderboard();
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchLeaderboard();
+        });
     </script>
 </body>
 </html>
