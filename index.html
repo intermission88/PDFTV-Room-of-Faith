@@ -1912,58 +1912,119 @@
                                 <h4 class="text-xs font-black text-amber-400 uppercase tracking-widest font-mono-custom">
                                     TAHTA MASIH KOSONG!
                                 </h4>
-                                <p class="text-[10px] text-slate-400 max-w-xs mx-auto leading-relaxed">
-                                    Belum ada jawara yang mencatatkan namanya. Jadilah <span class="text-amber-300 font-bold">High-Roller pertama</span> yang mengukir rekor di Hall of Fame!
+                                <p class="text-[10px] text-slate-400 max-w-[200px] mx-auto leading-relaxed">
+                                    Belum ada Jawara yang mencatatkan Win-Streak. Jadilah yang Pertama!
                                 </p>
                             </div>
-                            <button onclick="enterCasinoGame()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-mono-custom font-bold tracking-wider uppercase transition active:scale-95 shadow-md">
-                                <span>🎰</span> REBUT TAHTA SEKARANG ➔
+                            <button onclick="enterCasinoGame()" class="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-bold rounded-xl transition active:scale-95 uppercase tracking-wider">
+                                MAIN & CATAT REKOR ➔
                             </button>
                         </div>
                     `;
                     return;
                 }
 
-                listEl.innerHTML = data.map((item, idx) => `
-                    <div class="flex items-center justify-between p-3 rounded-2xl border ${idx === 0 ? 'gold-rank' : 'bg-white/5 border-white/10'}">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono-custom font-bold text-xs ${idx === 0 ? 'text-amber-400 text-sm' : 'text-slate-400'}">#${idx + 1}</span>
-                            <div>
-                                <div class="text-xs font-bold text-white font-mono-custom">${escapeHtml(item.player_name)}</div>
-                                <div class="text-[9px] text-slate-500 font-mono-custom">${item.created_at ? timeAgo(new Date(item.created_at).getTime()) : 'baru saja'}</div>
+                listEl.innerHTML = data.map((item, index) => {
+                    let rankBadge = `${index + 1}`;
+                    let cardClass = "glass border-white/10";
+                    if (index === 0) {
+                        rankBadge = "🥇 1ST";
+                        cardClass = "gold-rank";
+                    } else if (index === 1) {
+                        rankBadge = "🥈 2ND";
+                    } else if (index === 2) {
+                        rankBadge = "🥉 3RD";
+                    }
+
+                    return `
+                        <div class="${cardClass} p-3 rounded-2xl flex items-center justify-between transition hover:border-white/20">
+                            <div class="flex items-center gap-3">
+                                <span class="text-[10px] font-black font-mono-custom px-2 py-1 bg-white/5 rounded-lg border border-white/10 text-amber-400">${rankBadge}</span>
+                                <span class="text-xs font-bold text-white font-mono-custom">${escapeHtml(item.player_name)}</span>
+                            </div>
+                            <div class="text-xs font-black font-mono-custom text-emerald-400 flex items-center gap-1">
+                                <span>${item.streak_count}</span>
+                                <span class="text-[10px]">🔥</span>
                             </div>
                         </div>
-                        <div class="font-mono-custom font-bold text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
-                            ${item.streak_count} STREAK
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch (err) {
-                console.error('Error fetching leaderboard:', err);
-                listEl.innerHTML = `<div class="text-center text-red-400 text-xs py-6 font-mono-custom">⚠️ Gagal memuat leaderboard.</div>`;
+                console.error('Gagal memuat leaderboard:', err);
+                listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-4 italic">Gagal memuat leaderboard.</div>`;
+            }
+        }
+
+        async function checkResetCountdown() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from(CONFIG_TABLE)
+                    .select('*')
+                    .eq('key', 'reset_timestamp')
+                    .single();
+
+                const banner = document.getElementById('resetCountdownBanner');
+                const timerEl = document.getElementById('countdownTimer');
+
+                if (error || !data || !data.value) {
+                    banner.classList.add('hidden');
+                    return;
+                }
+
+                const resetTime = Number(data.value);
+                const now = Date.now();
+                const diff = resetTime - now;
+
+                if (diff <= 0) {
+                    banner.classList.add('hidden');
+                    if (resetCountdownTimer) clearInterval(resetCountdownTimer);
+                    return;
+                }
+
+                banner.classList.remove('hidden');
+
+                if (resetCountdownTimer) clearInterval(resetCountdownTimer);
+                resetCountdownTimer = setInterval(() => {
+                    const currentDiff = resetTime - Date.now();
+                    if (currentDiff <= 0) {
+                        clearInterval(resetCountdownTimer);
+                        banner.classList.add('hidden');
+                        fetchLeaderboard();
+                        return;
+                    }
+                    const mins = Math.floor(currentDiff / 60000);
+                    const secs = Math.floor((currentDiff % 60000) / 1000);
+                    timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                }, 1000);
+            } catch (err) {
+                console.error('Error countdown reset:', err);
             }
         }
 
         async function confirmResetLeaderboard() {
-            if (!isAdminLoggedIn) return;
-            if (!confirm("⚠️ Apakah Anda yakin ingin mengosongkan seluruh data Leaderboard?")) return;
+            if (!isAdminLoggedIn) {
+                alert("Akses hanya untuk Admin!");
+                return;
+            }
+            if (confirm("Apakah Anda yakin ingin mereset seluruh Leaderboard?")) {
+                try {
+                    const { error } = await supabaseClient
+                        .from(LEADERBOARD_TABLE)
+                        .delete()
+                        .neq('id', 0);
 
-            try {
-                const { error } = await supabaseClient.from(LEADERBOARD_TABLE).delete().neq('streak_count', -1);
-                if (error) throw error;
-                showToast("🔄 Leaderboard telah direset!");
-                await fetchLeaderboard();
-            } catch (err) {
-                console.error('Gagal reset leaderboard:', err);
-                alert("Gagal mereset leaderboard.");
+                    if (error) throw error;
+
+                    showToast("🔄 Leaderboard berhasil di-reset!");
+                    fetchLeaderboard();
+                } catch (err) {
+                    console.error('Gagal reset leaderboard:', err);
+                    alert("Gagal mereset leaderboard: " + err.message);
+                }
             }
         }
 
-        function checkResetCountdown() {
-            // Placeholder fungsi siklus countdown reset jika diaktifkan
-        }
-
-        // --- INITIALIZATION ---
+        // INITIAL LOAD
         fetchLeaderboard();
     </script>
 </body>
