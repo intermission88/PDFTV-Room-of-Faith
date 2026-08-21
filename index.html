@@ -227,7 +227,7 @@
             </div>
 
             <div class="pt-2 flex flex-col items-center justify-center gap-1">
-                <a href="https://instagram.com/pdftv_life" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-white transition-colors duration-200 p-1" aria-label="Instagram">
+                <a href="https://instagram.com/pdftv_life" target="_blank" rel="noopener noreferrer" onclick="playClickSound()" class="text-slate-500 hover:text-white transition-colors duration-200 p-1" aria-label="Instagram">
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
@@ -258,6 +258,36 @@
 
         <!-- MODE 2: ARCADE -->
         <div id="viewArcade" class="hidden space-y-3 pt-14">
+
+            <!-- ADMIN CHEAT PANEL (TRIGGERED UPON ADMIN ACCESS) -->
+            <div id="adminCheatPanel" class="hidden glass p-3.5 rounded-2xl border border-red-500/50 bg-red-950/20 space-y-2 text-xs font-mono-custom shadow-2xl">
+                <div class="flex items-center justify-between border-b border-red-500/30 pb-1.5">
+                    <span class="font-black text-red-400 flex items-center gap-1">
+                        🛠️ CHEAT PANEL (ADMIN ACTIVE)
+                    </span>
+                    <span id="cheatStatusBadge" class="text-[8px] bg-red-500/20 border border-red-500/40 text-red-300 px-2 py-0.5 rounded-full font-bold">READY</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 pt-1">
+                    <button onclick="cheatToggleUnlimitedConsumables()" id="btnCheatConsumables" class="py-1.5 px-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 border border-red-500/40 rounded-xl text-[9px] font-bold transition active:scale-95 flex items-center justify-center gap-1">
+                        🧪 Unlimited Consumables: <b id="textCheatConsumables">OFF</b>
+                    </button>
+                    <button onclick="cheatAddStreak(5)" class="py-1.5 px-2 bg-amber-500/20 hover:bg-amber-500/40 text-amber-200 border border-amber-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                        🔥 +5 Win Streak
+                    </button>
+                    <button onclick="cheatInstantWin()" class="py-1.5 px-2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-200 border border-emerald-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                        👑 Instant Round Win
+                    </button>
+                    <button onclick="cheatForceBoss()" class="py-1.5 px-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                        ⚔️ Force Boss Fight
+                    </button>
+                    <button onclick="cheatInstantKillBoss()" class="py-1.5 px-2 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                        💥 Defeat Boss Instant
+                    </button>
+                    <button onclick="cheatAddShields(3)" class="py-1.5 px-2 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200 border border-indigo-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                        🛡️ +3 Aegis Shields
+                    </button>
+                </div>
+            </div>
 
             <!-- LOBBY -->
             <div id="arcadeLobby" class="space-y-4">
@@ -604,10 +634,12 @@
             }
         }
 
-        // --- ADMIN SYSTEM & STATE ---
+        // --- ADMIN SYSTEM & CHEAT ENGINE STATE ---
         let isAdminLoggedIn = false;
+        let cheatUnlimitedConsumables = false;
 
         function toggleAdminModal(open) {
+            playModalSound();
             triggerHaptic('light');
             const modal = document.getElementById('adminModal');
             if (open) { 
@@ -628,33 +660,39 @@
                 isAdminLoggedIn = true;
                 toggleAdminModal(false);
                 updateAdminUI();
+                playAdminSound();
                 triggerHaptic('heavy');
-                showToast("🔓 Akses Admin Berhasil!");
+                showToast("🔓 Akses Admin & Cheat Panel Aktif!");
             } else {
+                playBustSound();
                 triggerHaptic('bust');
                 alert("Password Admin Salah!");
             }
         }
 
         function handleAdminLogout() {
+            playClickSound();
             triggerHaptic('light');
             isAdminLoggedIn = false;
+            cheatUnlimitedConsumables = false;
             updateAdminUI();
-            showToast("🔒 Keluar dari Mode Admin.");
+            showToast("🔒 Mode Admin Dikeluarkan.");
         }
 
         function updateAdminUI() {
             const adminContainer = document.getElementById('adminHeaderContainer');
             const adminResetBtn = document.getElementById('adminResetLeaderboardBtn');
+            const adminCheatPanel = document.getElementById('adminCheatPanel');
 
             if (isAdminLoggedIn) {
                 adminContainer.innerHTML = `
                     <div class="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-xl">
-                        <span class="text-[8px] font-mono-custom font-bold text-emerald-400 uppercase">ADMIN</span>
+                        <span class="text-[8px] font-mono-custom font-bold text-emerald-400 uppercase">ADMIN MODE</span>
                         <button onclick="handleAdminLogout()" class="text-slate-400 hover:text-white text-xs font-bold ml-1">✕</button>
                     </div>
                 `;
                 if (adminResetBtn) adminResetBtn.classList.remove('hidden');
+                if (adminCheatPanel) adminCheatPanel.classList.remove('hidden');
             } else {
                 adminContainer.innerHTML = `
                     <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 py-1 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
@@ -662,6 +700,76 @@
                     </button>
                 `;
                 if (adminResetBtn) adminResetBtn.classList.add('hidden');
+                if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
+            }
+        }
+
+        // --- CHEAT FUNCTIONS FOR TESTING ---
+        function cheatToggleUnlimitedConsumables() {
+            playAdminSound();
+            cheatUnlimitedConsumables = !cheatUnlimitedConsumables;
+            document.getElementById('textCheatConsumables').textContent = cheatUnlimitedConsumables ? "ON" : "OFF";
+            document.getElementById('btnCheatConsumables').classList.toggle('bg-emerald-500/30', cheatUnlimitedConsumables);
+            
+            if (cheatUnlimitedConsumables) {
+                holyCrystalCount = 99;
+                revelioCount = 99;
+                busterCount = 99;
+            }
+            updateConsumableUI();
+            showToast(`🧪 Unlimited Consumables: ${cheatUnlimitedConsumables ? 'ON' : 'OFF'}`);
+        }
+
+        function cheatAddStreak(amt) {
+            playWinSound();
+            streak += amt;
+            updateUIStats();
+            showToast(`🔥 Cheat: +${amt} Streak Added!`);
+        }
+
+        function cheatInstantWin() {
+            if (!isGameActive) startNewGame();
+            endRound('win', '👑 CHEAT: Instant Round Win!');
+        }
+
+        function cheatForceBoss() {
+            playBossAlertSound();
+            isBossLevel = true;
+            currentBoss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
+            bossHP = 3;
+            startNewGame();
+            showToast(`⚔️ CHEAT: Spawn Boss ${currentBoss.name}!`);
+        }
+
+        function cheatInstantKillBoss() {
+            if (isBossLevel && currentBoss) {
+                bossHP = 1;
+                endRound('win', `💥 CHEAT: Defeated Boss ${currentBoss.name}!`);
+            } else {
+                showToast("⚠️ Hanya bekerja saat Boss Battle!");
+            }
+        }
+
+        function cheatAddShields(amt) {
+            playShieldSound();
+            shieldCount += amt;
+            isShieldActive = true;
+            updateShieldUI();
+            showToast(`🛡️ CHEAT: +${amt} Shields Added!`);
+        }
+
+        async function confirmResetLeaderboard() {
+            playClickSound();
+            if (!isAdminLoggedIn) return;
+            if (confirm("⚠️ Yakin ingin menghapus seluruh Leaderboard?")) {
+                try {
+                    const { error } = await supabaseClient.from(LEADERBOARD_TABLE).delete().neq('id', 0);
+                    if (error) throw error;
+                    showToast("🔄 Leaderboard berhasil direset!");
+                    fetchLeaderboard();
+                } catch(e) {
+                    alert("Gagal reset leaderboard: " + e.message);
+                }
             }
         }
 
@@ -678,13 +786,43 @@
         }
         typeWriter();
 
-        // --- ADVANCED AUDIO ENGINE (WEB AUDIO API) ---
+        // --- COMPLETE ADVANCED AUDIO ENGINE (WEB AUDIO API) ---
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
         function initAudio() {
             if (!audioCtx) audioCtx = new AudioCtx();
             if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playClickSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.04);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.04);
+        }
+
+        function playModalSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
         }
 
         function playCardSound() {
@@ -732,6 +870,115 @@
             gain.connect(audioCtx.destination);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function playHolyCrystalSound() {
+            initAudio();
+            const notes = [1046.50, 1318.51, 1567.98, 2093.00];
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.05 + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + i * 0.05);
+                osc.stop(audioCtx.currentTime + i * 0.05 + 0.25);
+            });
+        }
+
+        function playRevelioSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1800, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        function playBusterSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.4);
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function playShieldSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.12);
+        }
+
+        function playMercySound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.25);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+        }
+
+        function playBossAlertSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playAdminSound() {
+            initAudio();
+            const notes = [440, 880, 1320];
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.06);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.06 + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + i * 0.06);
+                osc.stop(audioCtx.currentTime + i * 0.06 + 0.2);
+            });
         }
 
         function playGachaTickSound() {
@@ -810,6 +1057,7 @@
         }
 
         function handleFeedsClick() {
+            playClickSound();
             triggerHaptic('light');
             switchMode('feeds');
         }
@@ -821,6 +1069,7 @@
         }
 
         function switchMode(mode) {
+            playClickSound();
             triggerHaptic('light');
             const viewLanding = document.getElementById('viewLanding');
             const viewFeeds = document.getElementById('viewFeeds');
@@ -870,6 +1119,7 @@
         }
 
         function enterCasinoGame() {
+            playClickSound();
             triggerHaptic('medium');
             const lobby = document.getElementById('arcadeLobby');
             const gameUI = document.getElementById('arcadeGameUI');
@@ -884,6 +1134,7 @@
         }
 
         function exitCasinoGame() {
+            playClickSound();
             triggerHaptic('light');
             const lobby = document.getElementById('arcadeLobby');
             const gameUI = document.getElementById('arcadeGameUI');
@@ -895,12 +1146,14 @@
         }
 
         function toggleRulesAccordion() {
+            playClickSound();
             triggerHaptic('light');
             const rules = document.getElementById('rulesAccordion');
             rules.classList.toggle('hidden');
         }
 
         function closeScoreModal() {
+            playClickSound();
             triggerHaptic('light');
             const modal = document.getElementById('scoreSubmitModal');
             modal.classList.remove('show-modal');
@@ -940,10 +1193,10 @@
             });
         }
 
-        function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateSliderUI(); resetTimer(); }
-        function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateSliderUI(); resetTimer(); }
-        function goToSlide(index) { currentSlide = index; updateSliderUI(); resetTimer(); }
-        function startTimer() { slideInterval = setInterval(nextSlide, 3500); }
+        function nextSlide() { playClickSound(); currentSlide = (currentSlide + 1) % totalSlides; updateSliderUI(); resetTimer(); }
+        function prevSlide() { playClickSound(); currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateSliderUI(); resetTimer(); }
+        function goToSlide(index) { playClickSound(); currentSlide = index; updateSliderUI(); resetTimer(); }
+        function startTimer() { slideInterval = setInterval(() => { currentSlide = (currentSlide + 1) % totalSlides; updateSliderUI(); }, 3500); }
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
@@ -1126,60 +1379,63 @@
         }
 
         function updateConsumableUI() {
-            document.getElementById('countHolyCrystal').textContent = holyCrystalCount;
-            document.getElementById('countRevelio').textContent = revelioCount;
-            document.getElementById('countBuster').textContent = busterCount;
+            document.getElementById('countHolyCrystal').textContent = cheatUnlimitedConsumables ? '∞' : holyCrystalCount;
+            document.getElementById('countRevelio').textContent = cheatUnlimitedConsumables ? '∞' : revelioCount;
+            document.getElementById('countBuster').textContent = cheatUnlimitedConsumables ? '∞' : busterCount;
 
             const btnCrystal = document.getElementById('btnHolyCrystal');
             const btnRevelio = document.getElementById('btnRevelio');
             const btnBust = document.getElementById('btnBuster');
             const lockTag = document.getElementById('consumablesLockedTag');
 
-            if (isBossLevel) {
+            if (isBossLevel && !cheatUnlimitedConsumables) {
                 btnCrystal.disabled = true;
                 btnRevelio.disabled = true;
                 btnBust.disabled = true;
                 lockTag.classList.remove('hidden');
             } else {
                 lockTag.classList.add('hidden');
-                btnCrystal.disabled = !isGameActive || holyCrystalCount <= 0 || playerHand.length === 0;
-                btnRevelio.disabled = !isGameActive || revelioCount <= 0 || isDealerRevealed;
-                btnBust.disabled = !isGameActive || busterCount <= 0;
+                btnCrystal.disabled = !isGameActive || (holyCrystalCount <= 0 && !cheatUnlimitedConsumables) || playerHand.length === 0;
+                btnRevelio.disabled = !isGameActive || (revelioCount <= 0 && !cheatUnlimitedConsumables) || isDealerRevealed;
+                btnBust.disabled = !isGameActive || (busterCount <= 0 && !cheatUnlimitedConsumables);
             }
         }
 
         function useHolyCrystal() {
-            if (isBossLevel) return;
-            if (!isGameActive || holyCrystalCount <= 0 || playerHand.length === 0) return;
+            if (isBossLevel && !cheatUnlimitedConsumables) return;
+            if (!isGameActive || (holyCrystalCount <= 0 && !cheatUnlimitedConsumables) || playerHand.length === 0) return;
+            
+            playHolyCrystalSound();
             triggerHaptic('heavy');
-            holyCrystalCount--;
+            if (!cheatUnlimitedConsumables) holyCrystalCount--;
             
             playerHand[playerHand.length - 1] = { suit: '🔮', value: '21' };
             showToast("🔮 HOLY CRYSTAL! Kartu berubah jadi 21!");
-            playWinSound();
             renderCards();
             stand();
         }
 
         function useRevelio() {
-            if (isBossLevel) return;
-            if (!isGameActive || revelioCount <= 0 || isDealerRevealed) return;
+            if (isBossLevel && !cheatUnlimitedConsumables) return;
+            if (!isGameActive || (revelioCount <= 0 && !cheatUnlimitedConsumables) || isDealerRevealed) return;
+            
+            playRevelioSound();
             triggerHaptic('medium');
-            revelioCount--;
+            if (!cheatUnlimitedConsumables) revelioCount--;
             isDealerRevealed = true;
             showToast("👁️ REVELIO! Kartu dealer terungkap!");
-            playCardSound();
             renderCards();
         }
 
         function useBuster() {
-            if (isBossLevel) return;
-            if (!isGameActive || busterCount <= 0) return;
+            if (isBossLevel && !cheatUnlimitedConsumables) return;
+            if (!isGameActive || (busterCount <= 0 && !cheatUnlimitedConsumables)) return;
+            
+            playBusterSound();
             triggerHaptic('heavy');
-            busterCount--;
+            if (!cheatUnlimitedConsumables) busterCount--;
             
             showToast("💣 BUSTER! Dealer BUST otomatis!");
-            playBustSound();
 
             dealerHand.push({ suit: '💥', value: '10' });
             dealerHand.push({ suit: '💥', value: '10' });
@@ -1204,8 +1460,7 @@
                     currentBoss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
                     bossHP = 3;
                 }
-            } else {
-                isBossLevel = false;
+            } else if (!isBossLevel) {
                 currentBoss = null;
             }
 
@@ -1214,6 +1469,7 @@
             const tableTitle = document.getElementById('tableHeaderTitle');
 
             if (isBossLevel && currentBoss) {
+                playBossAlertSound();
                 triggerHaptic('boss_hit');
                 cardUI.classList.add('boss-card-bg');
                 bossAlert.classList.remove('hidden');
@@ -1276,6 +1532,7 @@
             let pScore = calculateScore(playerHand);
 
             if (isBossLevel && currentBoss && currentBoss.perkType === 'force_stand_20' && pScore < 20) {
+                playBustSound();
                 triggerHaptic('bust');
                 showToast("👑 SUNARTO: Poin di bawah 20 dilarang Stand!");
                 return;
@@ -1310,6 +1567,7 @@
         }
 
         function toggleShield() {
+            playShieldSound();
             triggerHaptic('light');
             if (shieldCount > 0) {
                 isShieldActive = !isShieldActive;
@@ -1336,13 +1594,15 @@
         }
 
         function toggleDriansMercy() {
-            if (totalResets < 17) {
+            if (totalResets < 17 && !isAdminLoggedIn) {
+                playBustSound();
                 triggerHaptic('bust');
                 showToast(`🔒 Membutuhkan 17 Reset! (Saat ini: ${totalResets})`);
                 return;
             }
             if (!isGameActive) return;
 
+            playMercySound();
             triggerHaptic('heavy');
             isDriansMercyActive = true;
             hit();
@@ -1350,12 +1610,14 @@
         }
 
         function triggerPassiveChoiceModal() {
+            playModalSound();
             const modal = document.getElementById('passiveChoiceModal');
             modal.classList.remove('hidden-modal');
             modal.classList.add('show-modal');
         }
 
         function selectPassive(type) {
+            playWinSound();
             triggerHaptic('heavy');
             if (type === 'golden_boot') activePassives.golden_boot = true;
             if (type === 'heartbreaker') activePassives.heartbreaker = true;
@@ -1370,12 +1632,14 @@
         }
 
         function triggerBossRewardModal() {
+            playModalSound();
             const modal = document.getElementById('bossRewardModal');
             modal.classList.remove('hidden-modal');
             modal.classList.add('show-modal');
         }
 
         function chooseBossReward(itemType) {
+            playWinSound();
             triggerHaptic('medium');
             if (itemType === 'crystal') holyCrystalCount++;
             if (itemType === 'revelio') revelioCount++;
@@ -1389,6 +1653,7 @@
         }
 
         function triggerDealerEncounterModal() {
+            playModalSound();
             const modal = document.getElementById('dealerEncounterModal');
             modal.classList.remove('hidden-modal');
             modal.classList.add('show-modal');
@@ -1523,6 +1788,7 @@
                 }
             } else {
                 draws++;
+                playClickSound();
             }
 
             isDriansMercyActive = false;
@@ -1533,9 +1799,11 @@
         function resetSessionBuffs() {
             shieldCount = 1;
             isShieldActive = true;
-            holyCrystalCount = 1;
-            revelioCount = 1;
-            busterCount = 1;
+            if (!cheatUnlimitedConsumables) {
+                holyCrystalCount = 1;
+                revelioCount = 1;
+                busterCount = 1;
+            }
             activePassives = { golden_boot: false, heartbreaker: false, lifesteal: false };
             
             bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;
@@ -1560,7 +1828,7 @@
             updateShieldUI();
 
             const btnMercy = document.getElementById('btnDriansMercy');
-            btnMercy.disabled = totalResets < 17 || !isGameActive;
+            btnMercy.disabled = (totalResets < 17 && !isAdminLoggedIn) || !isGameActive;
 
             const passivesContainer = document.getElementById('activePassivesContainer');
             const bGolden = document.getElementById('badgeGoldenBoot');
@@ -1580,6 +1848,7 @@
 
         function showScoreModal(finalStreak) {
             if (finalStreak <= 0) return;
+            playModalSound();
             document.getElementById('finalStreak').textContent = finalStreak;
             const modal = document.getElementById('scoreSubmitModal');
             modal.classList.remove('hidden-modal');
@@ -1587,6 +1856,7 @@
         }
 
         function toggleNameInput(checked) {
+            playClickSound();
             triggerHaptic('light');
             const container = document.getElementById('nameInputContainer');
             const input = document.getElementById('playerName');
@@ -1601,6 +1871,7 @@
 
         async function submitHighScore(e) {
             e.preventDefault();
+            playWinSound();
             triggerHaptic('heavy');
             const saveToLB = document.getElementById('saveToLeaderboard').checked;
             const nameInput = document.getElementById('playerName').value.trim();
