@@ -911,7 +911,6 @@
                 tabArcade.className = activeClass;
                 
                 triggerPageAnimation(viewArcade);
-                checkResetCountdown();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1750,7 +1749,7 @@
                         isBossLevel = false;
                         currentBoss = null;
 
-                        // MUNCULKAN PILIHAN PASIF SETELAH BOSS DIELIMINASI SEPENUHNYA[cite: 1]
+                        // MUNCULKAN PILIHAN PASIF SETELAH BOSS DIELIMINASI SEPENUHNYA
                         setTimeout(() => {
                             triggerPassiveChoiceModal();
                             triggerBossRewardModal();
@@ -1862,21 +1861,28 @@
             e.preventDefault();
             const saveToLB = document.getElementById('saveToLeaderboard').checked;
             const nameInput = document.getElementById('playerName').value.trim();
+            const btnSubmit = document.getElementById('btnSubmitScore');
 
             if (saveToLB && nameInput) {
+                btnSubmit.disabled = true;
+                btnSubmit.textContent = "MENYIMPAN...";
+                
                 try {
+                    // Penyesuaian skema payload Supabase agar tidak error saat dikirim
                     const payload = {
                         player_name: nameInput,
-                        streak_count: streakToSubmit,
-                        created_at: new Date().toISOString()
+                        streak_count: Number(streakToSubmit)
                     };
                     const { error } = await supabaseClient.from(LEADERBOARD_TABLE).insert([payload]);
                     if (error) throw error;
 
                     showToast("🏆 Rekor berhasil dicatat!");
                 } catch (err) {
-                    console.error(err);
-                    alert("Gagal mencatat rekor.");
+                    console.error('Error saat menyimpan skor:', err);
+                    alert("Gagal mencatat rekor ke Supabase: " + (err.message || err));
+                } finally {
+                    btnSubmit.disabled = false;
+                    btnSubmit.textContent = "SIMPAN REKOR 🏆";
                 }
             }
 
@@ -1906,99 +1912,38 @@
                         <div class="flex items-center gap-3">
                             <span class="font-mono-custom font-bold text-xs ${idx === 0 ? 'text-amber-400 text-sm' : 'text-slate-400'}">#${idx + 1}</span>
                             <div>
-                                <div class="text-xs font-bold text-white font-mono-custom">${escapeHtml(item.player_name)}</div>
-                                <div class="text-[9px] text-slate-500 font-mono-custom">${timeAgo(new Date(item.created_at).getTime())}</div>
+                                <div class="text-xs font-bold text-white font-mono-custom">${escapeHtml(item.player_name || item.alias || 'Anon')}</div>
+                                <div class="text-[9px] text-slate-500 font-mono-custom">${timeAgo(new Date(item.created_at || item.timestamp || Date.now()).getTime())}</div>
                             </div>
                         </div>
                         <div class="font-mono-custom font-bold text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20">
-                            ${item.streak_count} STREAK
+                            ${item.streak_count || item.streak || 0} STREAK
                         </div>
                     </div>
                 `).join('');
-
             } catch (err) {
-                console.error(err);
-                listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-6 italic">Gagal memuat Hall of Fame.</div>`;
+                console.error("Leaderboard fetch error:", err);
+                listEl.innerHTML = `<div class="text-center text-slate-500 text-xs py-6 italic">Gagal memuat papan peringkat.</div>`;
             }
-        }
-
-        async function checkResetCountdown() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from(CONFIG_TABLE)
-                    .select('*')
-                    .eq('key', 'leaderboard_reset_time')
-                    .single();
-
-                if (error && error.code !== 'PGRST116') throw error;
-
-                const banner = document.getElementById('resetCountdownBanner');
-                if (data && data.value) {
-                    const resetTime = new Date(data.value).getTime();
-                    const now = Date.now();
-
-                    if (resetTime > now) {
-                        banner.classList.remove('hidden');
-                        startCountdownTimer(resetTime);
-                    } else {
-                        banner.classList.add('hidden');
-                    }
-                } else {
-                    banner.classList.add('hidden');
-                }
-            } catch (err) {
-                console.error('Error reset timer:', err);
-            }
-        }
-
-        function startCountdownTimer(targetTime) {
-            if (resetCountdownTimer) clearInterval(resetCountdownTimer);
-
-            const timerEl = document.getElementById('countdownTimer');
-
-            resetCountdownTimer = setInterval(() => {
-                const now = Date.now();
-                const diff = targetTime - now;
-
-                if (diff <= 0) {
-                    clearInterval(resetCountdownTimer);
-                    document.getElementById('resetCountdownBanner').classList.add('hidden');
-                    fetchLeaderboard();
-                    return;
-                }
-
-                const mins = Math.floor(diff / (1000 * 60));
-                const secs = Math.floor((diff % (1000 * 60)) / 1000);
-                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            }, 1000);
         }
 
         async function confirmResetLeaderboard() {
             if (!isAdminLoggedIn) return;
-            if (!confirm("Reset seluruh Leaderboard sekarang?")) return;
-
-            try {
-                const { error } = await supabaseClient.from(LEADERBOARD_TABLE).delete().gte('id', 0);
-                if (error) throw error;
-
-                const resetTarget = new Date(Date.now() + 30 * 60 * 1000).toISOString();
-                await supabaseClient.from(CONFIG_TABLE).upsert({ key: 'leaderboard_reset_time', value: resetTarget });
-
-                totalResets++;
-                document.getElementById('totalResetsText').textContent = totalResets;
-
-                showToast("🔄 Leaderboard berhasil direset!");
-                fetchLeaderboard();
-                checkResetCountdown();
-            } catch (err) {
-                console.error(err);
-                alert("Gagal me-reset leaderboard.");
+            if (confirm("Apakah kamu yakin ingin mereset seluruh Leaderboard?")) {
+                try {
+                    const { error } = await supabaseClient.from(LEADERBOARD_TABLE).delete().neq('id', 0);
+                    if (error) throw error;
+                    showToast("🔄 Leaderboard telah direset!");
+                    fetchLeaderboard();
+                } catch (err) {
+                    console.error("Error reset leaderboard:", err);
+                    alert("Gagal mereset leaderboard.");
+                }
             }
         }
 
-        // Initialize UI
-        updateAdminUI();
-        updateUIStats();
+        // Inisialisasi awal saat halaman dibuka
+        fetchLeaderboard();
     </script>
 </body>
 </html>
