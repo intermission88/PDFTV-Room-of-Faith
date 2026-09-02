@@ -9,33 +9,62 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,800;1,400&family=Space+Grotesk:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,800;1,400&family=Space+Grotesk:wght@500;700;900&family=Silkscreen:wght@400;700&display=swap');
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #050508; 
+            background-color: #040407; 
             color: #cbd5e1; 
             overflow-x: hidden; 
         }
 
         .font-mono-custom { font-family: 'Space Grotesk', monospace; }
+        .font-pixel { font-family: 'Silkscreen', 'Space Grotesk', monospace; }
 
         .glass { 
-            background: rgba(18, 18, 26, 0.65); 
+            background: rgba(18, 18, 26, 0.75); 
             backdrop-filter: blur(16px); 
             border: 1px solid rgba(255, 255, 255, 0.08); 
         }
 
+        /* BALATRO RETRO CRT ARENA */
+        .crt-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .crt-container::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+            z-index: 15;
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+            opacity: 0.65;
+            border-radius: inherit;
+        }
+        .crt-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+            z-index: 16;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
         .casino-card-bg {
-            background: radial-gradient(circle at top, rgba(16, 185, 129, 0.08) 0%, rgba(5, 5, 8, 0.95) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            background: radial-gradient(circle at top, rgba(245, 158, 11, 0.1) 0%, rgba(5, 5, 8, 0.98) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
             transition: all 0.5s ease;
         }
 
         /* EPIC BOSS BATTLE ARENA */
         .boss-card-bg {
-            background: radial-gradient(circle at top, rgba(225, 29, 72, 0.35) 0%, rgba(15, 5, 8, 0.98) 100%) !important;
-            border: 1px solid rgba(225, 29, 72, 0.9) !important;
+            background: radial-gradient(circle at top, rgba(225, 29, 72, 0.4) 0%, rgba(15, 5, 8, 0.98) 100%) !important;
+            border: 1.5px solid rgba(225, 29, 72, 0.9) !important;
             box-shadow: 0 0 55px rgba(225, 29, 72, 0.6) !important;
             animation: bossPulse 1.2s infinite alternate;
         }
@@ -78,6 +107,13 @@
         }
         .card-animate { animation: cardDeal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
+        @keyframes tensionCardDeal {
+            0% { transform: scale(1.25) translateY(-20px) rotate(5deg); box-shadow: 0 0 30px rgba(245, 158, 11, 0.8); }
+            50% { transform: scale(1.1) translateY(-10px) rotate(-3deg); }
+            100% { transform: scale(1) translateY(0) rotate(0deg); box-shadow: none; }
+        }
+        .tension-card-anim { animation: tensionCardDeal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
         .gold-rank {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(20, 20, 30, 0.6) 100%);
             border: 1px solid rgba(245, 158, 11, 0.4) !important;
@@ -94,9 +130,9 @@
         .shake-effect { animation: shake 0.3s ease-in-out; }
 
         @keyframes winPulse {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.9); }
-            70% { box-shadow: 0 0 0 35px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.9); }
+            70% { box-shadow: 0 0 0 35px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
         }
         .win-pulse { animation: winPulse 0.8s ease-out; }
 
@@ -112,6 +148,22 @@
             100% { opacity: 0; transform: translateY(-150px) scale(1.8) rotate(360deg); }
         }
 
+        /* BALATRO FLOATING MULTIPLIER POPUPS */
+        .balatro-popup {
+            position: fixed;
+            pointer-events: none;
+            z-index: 110;
+            font-weight: 900;
+            text-align: center;
+            animation: balatroPop 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes balatroPop {
+            0% { opacity: 0; transform: translate(-50%, 20px) scale(0.6); }
+            25% { opacity: 1; transform: translate(-50%, -10px) scale(1.3); }
+            75% { opacity: 1; transform: translate(-50%, -35px) scale(1.1); }
+            100% { opacity: 0; transform: translate(-50%, -60px) scale(0.9); }
+        }
+
         @keyframes slotGlow {
             0%, 100% { border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
             50% { border-color: rgba(236, 72, 153, 1); box-shadow: 0 0 30px rgba(236, 72, 153, 0.8); }
@@ -119,15 +171,26 @@
         .gacha-active { animation: slotGlow 0.2s infinite; }
 
         .btn-dopamine {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .btn-dopamine:hover {
             transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
         .btn-dopamine:active { transform: translateY(1px) scale(0.98); }
+
+        .btn-hit-balatro {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+        .btn-stand-balatro {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.35) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+        }
     </style>
 </head>
 <body class="scrollbar-hide min-h-screen flex flex-col justify-between pb-20">
@@ -262,28 +325,28 @@
             <div id="adminCheatPanel" class="hidden glass p-3.5 rounded-2xl border border-red-500/50 bg-red-950/20 space-y-2 text-xs font-mono-custom shadow-2xl">
                 <div class="flex items-center justify-between border-b border-red-500/30 pb-1.5">
                     <span class="font-black text-red-400 flex items-center gap-1">
-                        🛠️ CHEAT PANEL (ADMIN ACTIVE)
+                        🛠️ CHEAT PANEL (BALATRO ADMIN)
                     </span>
                     <span id="cheatStatusBadge" class="text-[8px] bg-red-500/20 border border-red-500/40 text-red-300 px-2 py-0.5 rounded-full font-bold">READY</span>
                 </div>
                 <div class="grid grid-cols-2 gap-1.5 pt-1">
                     <button onclick="cheatToggleUnlimitedConsumables()" id="btnCheatConsumables" class="py-1.5 px-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 border border-red-500/40 rounded-xl text-[9px] font-bold transition active:scale-95 flex items-center justify-center gap-1">
-                        🧪 Unlimited Consumables: <b id="textCheatConsumables">OFF</b>
+                        🧪 Unlimited Items: <b id="textCheatConsumables">OFF</b>
                     </button>
-                    <button onclick="cheatAddStreak(5)" class="py-1.5 px-2 bg-amber-500/20 hover:bg-amber-500/40 text-amber-200 border border-amber-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
-                        🔥 +5 Win Streak
+                    <button onclick="cheatAddCash(1000)" class="py-1.5 px-2 bg-amber-500/20 hover:bg-amber-500/40 text-amber-200 border border-amber-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                        💵 +$1,000 Cash
+                    </button>
+                    <button onclick="cheatAddMultiplier(1.0)" class="py-1.5 px-2 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                        🔥 +1.0x Multiplier
+                    </button>
+                    <button onclick="cheatSkipToBoss()" class="py-1.5 px-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                        ⚔️ Jump to Boss (8/8)
                     </button>
                     <button onclick="cheatInstantWin()" class="py-1.5 px-2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-200 border border-emerald-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
                         👑 Instant Round Win
                     </button>
-                    <button onclick="cheatForceBoss()" class="py-1.5 px-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
-                        ⚔️ Force Boss Fight
-                    </button>
-                    <button onclick="cheatInstantKillBoss()" class="py-1.5 px-2 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
-                        💥 Defeat Boss Instant
-                    </button>
                     <button onclick="cheatAddShields(3)" class="py-1.5 px-2 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200 border border-indigo-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
-                        🛡️ +3 Aegis Shields
+                        🛡️ Max Shields (3/3)
                     </button>
                 </div>
             </div>
@@ -292,12 +355,12 @@
             <div id="arcadeLobby" class="space-y-4">
                 <div class="relative overflow-hidden rounded-3xl p-5 border border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-[#0a0a12] to-[#050508] shadow-2xl text-center">
                     <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-mono-custom font-bold tracking-widest uppercase mb-2">
-                        <span>✨</span> VIP High-Roller Lounge
+                        <span>✨</span> Balatro-Style Experience
                     </div>
 
                     <h1 class="text-xl font-black text-white tracking-tight">BLACKJACK <span class="text-amber-400">ROGUELITE</span></h1>
                     <p class="text-slate-400 text-[11px] mt-1 max-w-xs mx-auto leading-relaxed">
-                        Kuasai meja judi, tumpuk *Win-Streak*, dan manfaatkan Power-Up rahasia untuk mencatatkan namamu di sejarah.
+                        Kumpulkan pundi <b>$ (Dollar)</b>, ledakkan <b>Multiplier</b> kombo, dan taklukkan Boss setiap <b>8 Ronde</b> per Ante!
                     </p>
 
                     <button onclick="enterCasinoGame()" class="w-full mt-4 py-3.5 rounded-2xl text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 btn-dopamine">
@@ -311,7 +374,7 @@
                             <span class="text-base">🏆</span>
                             <div>
                                 <h3 class="text-[11px] font-black text-white tracking-widest uppercase">Hall of Fame</h3>
-                                <p class="text-[8px] text-slate-500 font-mono-custom">TOP 5 STREAK TERTINGGI</p>
+                                <p class="text-[8px] text-slate-500 font-mono-custom">TOP 5 SKOR $ CASH & ANTE</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5">
@@ -336,7 +399,7 @@
                         <span>⬅</span> LOBBY
                     </button>
                     <div id="tableHeaderTitle" class="text-[11px] font-black tracking-wider text-amber-400 flex items-center gap-1">
-                        <span>🃏</span> BLACKJACK TABLE
+                        <span>🃏</span> ANTE 1 • ROUND 1/8
                     </div>
                     <button onclick="toggleRulesAccordion()" class="text-[9px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2 py-0.5 rounded-lg transition border border-white/10 flex items-center gap-1">
                         📜 Rules
@@ -344,21 +407,22 @@
                 </div>
 
                 <div id="rulesAccordion" class="hidden p-3 rounded-2xl glass border border-amber-500/20 text-[10px] text-slate-300 space-y-1.5">
-                    <div class="font-bold text-amber-400 border-b border-white/10 pb-0.5">📜 Aturan, Buff & Consumables:</div>
-                    <p class="text-[9px] text-slate-400 leading-relaxed">Dapatkan nilai kartu mendekati <b>21</b> tanpa melebihi (*BUST*). Kumpulkan streak sebanyak mungkin!</p>
+                    <div class="font-bold text-amber-400 border-b border-white/10 pb-0.5">📜 Balatro Multiplier, Boss & Consumables:</div>
+                    <p class="text-[9px] text-slate-400 leading-relaxed">Capai 21 tanpa BUST. Kumpulkan <b>$ (Cash)</b> dengan melipatgandakan <b>Multiplier</b> tiap ronde!</p>
                     <div class="grid grid-cols-1 gap-1 text-[9px] pt-0.5">
-                        <div class="text-indigo-300">🔮 <b>HOLY CRYSTAL:</b> Mengubah kartu terakhir otomatis bernilai 21.</div>
-                        <div class="text-rose-300">👁️ <b>REVELIO:</b> Membuka kartu rahasia dealer secara instan.</div>
-                        <div class="text-red-400">💣 <b>BUSTER:</b> Memaksa dealer otomatis BUST!</div>
-                        <div class="text-amber-300">⚡ <b>DRIAN'S MERCY:</b> Ambil 1 kartu & Stand. Win = Streak x2 (Unlock @17 Resets, Reset Count ke 0 setelah pakai).</div>
-                        <div class="text-emerald-300">🛡️ <b>SHIELD:</b> Mencegah streak habis saat kalah. +1 Shield tiap 3-Win Streak.</div>
+                        <div class="text-amber-300">🔥 <b>MULTIPLIER:</b> Menang berturut-turut memberi +0.2x Multiplier. Suited Hand (+1.5x), Pocket Pair (+1.3x).</div>
+                        <div class="text-rose-400">⚔️ <b>BOSS CYCLE 1/8:</b> Ronde 8/8 adalah Boss Battle! Kalahkan bos untuk naik ke Ante berikutnya & dapatkan bonus besar.</div>
+                        <div class="text-indigo-300">🔄 <b>DISCARD (Max 2):</b> Membuang kartu terakhir yang ditarik & menarik kartu baru dari Shoe Deck.</div>
+                        <div class="text-red-400">💣 <b>BUSTER (Max 2):</b> <i>Overcharge Dealer</i> - Memaksa Dealer menarik +1 kartu ekstra saat Stand.</div>
+                        <div class="text-emerald-300">🛡️ <b>AEGIS SHIELD (Max 3):</b> Menahan loss. Hanya didapat jika menang dengan skor 21. Boss Tax: -1 Shield saat bos kalah.</div>
+                        <div class="text-yellow-300">⚡ <b>DRIAN'S MERCY:</b> Ambil 1 kartu & Stand dengan x2.0 Multiplier instan (Unlock @17 Resets).</div>
                     </div>
                 </div>
 
                 <!-- BOSS BANNER ALERT (REFINED & MORE IMMERSIVE) -->
                 <div id="bossAlertBanner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-red-950 via-rose-900 to-red-950 border-2 border-red-500 text-center shadow-[0_0_30px_rgba(239,68,68,0.4)] space-y-1">
                     <div class="text-[11px] font-black text-white uppercase tracking-widest font-mono-custom flex items-center justify-center gap-1.5 animate-pulse">
-                        <span>⚔️</span> BOSS FIGHT ACTIVE <span>⚔️</span>
+                        <span>⚔️</span> BOSS FIGHT ACTIVE (ROUND 8/8) <span>⚔️</span>
                     </div>
                     <div id="bossNameTitle" class="text-sm font-black text-amber-400 tracking-wider">THE BOSS</div>
                     <div id="bossPerkDescription" class="text-[9px] text-rose-200 font-medium">Perk: Efek khusus bos aktif!</div>
@@ -367,70 +431,88 @@
                     </div>
                 </div>
 
-                <!-- MAIN CARD CASINO CONTAINER -->
-                <div id="blackjackCard" class="casino-card-bg p-3.5 rounded-2xl shadow-2xl relative space-y-2.5">
+                <!-- MAIN CARD CASINO CONTAINER (BALATRO CRT CONTAINER) -->
+                <div id="blackjackCard" class="casino-card-bg crt-container p-3.5 rounded-2xl shadow-2xl relative space-y-2.5">
                     
-                    <div class="bg-black/50 p-2 rounded-xl border border-white/10 space-y-1.5">
-                        <div class="flex items-center justify-between text-xs">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[9px] text-slate-400 font-mono-custom uppercase">RESETS: <b id="totalResetsText" class="text-amber-400 text-xs">0</b>/17</span>
+                    <!-- BALATRO DUAL SCOREBOARD BAR -->
+                    <div class="bg-black/70 p-2.5 rounded-xl border border-white/15 space-y-2 relative z-20">
+                        <div class="grid grid-cols-3 gap-1.5 text-center font-mono-custom">
+                            <!-- ROUND -->
+                            <div class="bg-white/5 py-1.5 px-1 rounded-lg border border-white/10 flex flex-col justify-center items-center">
+                                <div class="text-[7px] text-slate-400 uppercase tracking-widest font-bold">ROUND</div>
+                                <div id="roundCounterText" class="text-[11px] font-black text-white">1/8 <span class="text-[8px] text-amber-400">(A1)</span></div>
                             </div>
-                            <div class="font-mono-custom bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-black text-[11px] shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                                STREAK: <span id="currentStreak" class="text-xs">0</span> 🔥
+                            <!-- CASH -->
+                            <div class="bg-amber-500/10 py-1.5 px-1 rounded-lg border border-amber-500/30 flex flex-col justify-center items-center shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                                <div class="text-[7px] text-amber-300 uppercase tracking-widest font-bold">TOTAL CASH</div>
+                                <div id="totalCashText" class="text-xs font-pixel font-bold text-amber-400">$0</div>
+                            </div>
+                            <!-- MULTIPLIER -->
+                            <div class="bg-rose-500/10 py-1.5 px-1 rounded-lg border border-rose-500/30 flex flex-col justify-center items-center shadow-[0_0_15px_rgba(244,63,94,0.15)]">
+                                <div class="text-[7px] text-rose-300 uppercase tracking-widest font-bold">MULTIPLIER</div>
+                                <div id="activeMultText" class="text-xs font-pixel font-bold text-rose-400">×1.0</div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-1.5 text-center font-mono-custom pt-1 border-t border-white/5">
-                            <div class="bg-white/5 py-1 px-1 rounded-lg border border-white/5">
-                                <div class="text-[7px] text-slate-400 uppercase">W - L - D</div>
-                                <div id="statWLD" class="text-[9px] font-bold text-white">0-0-0</div>
+                        <div class="grid grid-cols-4 gap-1 text-center font-mono-custom pt-1 border-t border-white/5 text-[8px]">
+                            <div class="bg-white/5 py-0.5 rounded border border-white/5">
+                                <span class="text-slate-400">RESETS:</span> <b id="totalResetsText" class="text-amber-400">0</b>/17
                             </div>
-                            <div class="bg-white/5 py-1 px-1 rounded-lg border border-white/5">
-                                <div class="text-[7px] text-slate-400 uppercase">Total</div>
-                                <div id="statTotal" class="text-[9px] font-bold text-slate-300">0</div>
+                            <div class="bg-white/5 py-0.5 rounded border border-white/5">
+                                <span class="text-slate-400">W-L-D:</span> <b id="statWLD" class="text-white">0-0-0</b>
                             </div>
-                            <div class="bg-white/5 py-1 px-1 rounded-lg border border-white/5">
-                                <div class="text-[7px] text-slate-400 uppercase">Winrate</div>
-                                <div id="statWinrate" class="text-[9px] font-bold text-emerald-400">0%</div>
+                            <div class="bg-white/5 py-0.5 rounded border border-white/5">
+                                <span class="text-slate-400">ROUNDS:</span> <b id="statTotal" class="text-slate-300">0</b>
+                            </div>
+                            <div class="bg-white/5 py-0.5 rounded border border-white/5">
+                                <span class="text-slate-400">WIN:</span> <b id="statWinrate" class="text-emerald-400">0%</b>
                             </div>
                         </div>
 
                         <div id="activePassivesContainer" class="hidden pt-0.5 flex flex-wrap gap-1 justify-center">
-                            <span id="badgeGoldenBoot" class="hidden text-[8px] font-bold font-mono-custom bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2 py-0.5 rounded-full">👢 Golden Boot (+2)</span>
+                            <span id="badgeGoldenBoot" class="hidden text-[8px] font-bold font-mono-custom bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2 py-0.5 rounded-full">👢 Golden Boot (+0.5x)</span>
                             <span id="badgeHeartbreaker" class="hidden text-[8px] font-bold font-mono-custom bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full">💔 Heartbreaker</span>
                             <span id="badgeLifesteal" class="hidden text-[8px] font-bold font-mono-custom bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full">🩸 Lifesteal</span>
                         </div>
                     </div>
 
-                    <!-- CONSUMABLES CONTAINER -->
-                    <div class="bg-indigo-950/40 p-2 rounded-xl border border-indigo-500/30 space-y-1">
+                    <!-- CONSUMABLES CONTAINER (BALATRO TACTICAL CONSUMABLES) -->
+                    <div class="bg-indigo-950/50 p-2 rounded-xl border border-indigo-500/30 space-y-1 relative z-20">
                         <div class="flex justify-between items-center text-[9px] font-bold tracking-wider text-indigo-300 uppercase">
-                            <span>🧪 Consumables</span>
-                            <span id="consumablesLockedTag" class="hidden font-mono-custom text-[8px] text-red-400 font-bold">LOCKED IN BOSS BATTLE</span>
+                            <span>🧪 Tactical Items <span class="text-[7px] text-slate-400 font-normal">(Max 2 per item)</span></span>
+                            <span id="consumablesLockedTag" class="hidden font-mono-custom text-[8px] text-red-400 font-bold animate-pulse">LOCKED IN BOSS BATTLE</span>
                         </div>
-                        <div class="grid grid-cols-3 gap-1.5">
-                            <button onclick="useHolyCrystal()" id="btnHolyCrystal" class="py-1.5 px-1 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center">
-                                <span>🔮 Crystal</span>
-                                <span id="countHolyCrystal" class="font-mono-custom bg-indigo-500/30 px-1 rounded text-[7px] mt-0.5">1</span>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="useDiscard()" id="btnDiscard" class="py-1.5 px-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <span>🔄</span>
+                                    <div class="text-left">
+                                        <div class="leading-none">Discard</div>
+                                        <div class="text-[7px] text-slate-400 font-normal">Ganti kartu akhir</div>
+                                    </div>
+                                </div>
+                                <span id="countDiscard" class="font-mono-custom bg-indigo-500/30 px-1.5 py-0.5 rounded text-[8px]">1/2</span>
                             </button>
-                            <button onclick="useRevelio()" id="btnRevelio" class="py-1.5 px-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 border border-rose-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center">
-                                <span>👁️ Revelio</span>
-                                <span id="countRevelio" class="font-mono-custom bg-rose-500/30 px-1 rounded text-[7px] mt-0.5">1</span>
-                            </button>
-                            <button onclick="useBuster()" id="btnBuster" class="py-1.5 px-1 bg-red-600/30 hover:bg-red-600/50 text-red-200 border border-red-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex flex-col items-center justify-center">
-                                <span>💣 Buster</span>
-                                <span id="countBuster" class="font-mono-custom bg-red-500/30 px-1 rounded text-[7px] mt-0.5">1</span>
+                            <button onclick="useBuster()" id="btnBuster" class="py-1.5 px-2 bg-red-600/30 hover:bg-red-600/50 text-red-200 border border-red-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <span>💣</span>
+                                    <div class="text-left">
+                                        <div class="leading-none">Buster</div>
+                                        <div class="text-[7px] text-slate-400 font-normal">Paksa Dealer +1 Hit</div>
+                                    </div>
+                                </div>
+                                <span id="countBuster" class="font-mono-custom bg-red-500/30 px-1.5 py-0.5 rounded text-[8px]">1/2</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- DRIAN'S MERCY -->
-                    <button onclick="toggleDriansMercy()" id="btnDriansMercy" class="w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-wider text-amber-100 flex items-center justify-center gap-1.5 border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 disabled:pointer-events-none" disabled>
-                        <span>⚡</span> DRIAN'S MERCY <span>(2X STREAK)</span>
+                    <button onclick="toggleDriansMercy()" id="btnDriansMercy" class="w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-wider text-amber-100 flex items-center justify-center gap-1.5 border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 disabled:pointer-events-none relative z-20" disabled>
+                        <span>⚡</span> DRIAN'S MERCY <span>(2.0X MULTIPLIER)</span>
                     </button>
 
                     <!-- PLAYING TABLE AREA -->
-                    <div class="space-y-2 bg-black/60 p-3 rounded-xl border border-white/10">
+                    <div class="space-y-2 bg-black/70 p-3 rounded-xl border border-white/10 relative z-20">
                         <!-- DEALER -->
                         <div>
                             <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
@@ -457,7 +539,7 @@
                     </div>
 
                     <!-- SHIELD BAR -->
-                    <div class="bg-slate-900/80 p-2 rounded-xl border border-emerald-500/20 flex items-center justify-between gap-2">
+                    <div class="bg-slate-900/80 p-2 rounded-xl border border-emerald-500/20 flex items-center justify-between gap-2 relative z-20">
                         <div class="flex items-center gap-2">
                             <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs">
                                 🛡️
@@ -467,26 +549,26 @@
                                     Aegis Shield
                                     <span id="shieldBadge" class="text-[7px] px-1 rounded font-mono-custom bg-slate-800 text-slate-400 border border-slate-700">OFF</span>
                                 </div>
-                                <div class="text-[8px] text-slate-400">Proteksi Loss Streak</div>
+                                <div class="text-[8px] text-slate-400">Proteksi Loss (Max 3 • Didapat saat 21)</div>
                             </div>
                         </div>
 
                         <button onclick="toggleShield()" id="btnShieldToggle" class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border transition-all flex items-center gap-1 active:scale-95">
                             <span>KUOTA:</span>
-                            <span id="shieldCount" class="font-mono-custom text-[10px] font-bold text-emerald-400">1</span>
+                            <span id="shieldCount" class="font-mono-custom text-[10px] font-bold text-emerald-400">1/3</span>
                         </button>
                     </div>
 
                     <!-- GAME STATUS MSG -->
-                    <div id="gameStatus" class="text-center text-[10px] font-black my-1 min-h-[16px] text-emerald-400 uppercase tracking-widest font-mono-custom"></div>
+                    <div id="gameStatus" class="text-center text-[10px] font-black my-1 min-h-[16px] text-amber-400 uppercase tracking-widest font-mono-custom relative z-20"></div>
 
                     <!-- ACTION BUTTONS -->
-                    <div class="grid grid-cols-2 gap-2" id="gameControls">
-                        <button onclick="hit()" id="btnHit" class="py-2.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow" disabled>HIT 🃏</button>
-                        <button onclick="stand()" id="btnStand" class="py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow" disabled>STAND ✋</button>
+                    <div class="grid grid-cols-2 gap-2 relative z-20" id="gameControls">
+                        <button onclick="hit()" id="btnHit" class="py-2.5 btn-hit-balatro hover:opacity-90 text-emerald-300 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow" disabled>HIT 🃏</button>
+                        <button onclick="stand()" id="btnStand" class="py-2.5 btn-stand-balatro hover:opacity-90 text-rose-300 text-xs font-black rounded-xl transition active:scale-95 disabled:opacity-20 disabled:pointer-events-none shadow" disabled>STAND ✋</button>
                     </div>
 
-                    <button onclick="startNewGame()" id="btnStart" class="w-full py-3 btn-dopamine text-white text-xs font-black rounded-xl tracking-wider uppercase">
+                    <button onclick="startNewGame()" id="btnStart" class="w-full py-3 btn-dopamine text-black text-xs font-black rounded-xl tracking-wider uppercase relative z-20">
                         DEAL / BAGIKAN KARTU 🎰
                     </button>
                 </div>
@@ -518,7 +600,7 @@
         </div>
     </div>
 
-    <!-- MODAL PEMILIHAN PASIF (DYNAMIC: HILANG JIKA DIPILIH, +5 WIN STREAK / +3 AEGIS KETIKA HABIS) -->
+    <!-- MODAL PEMILIHAN PASIF (DYNAMIC: HILANG JIKA DIPILIH, +$1,000 / +2 AEGIS KETIKA HABIS) -->
     <div id="passiveChoiceModal" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
             <div class="text-3xl mb-1">🎁</div>
@@ -535,21 +617,30 @@
     <div id="bossRewardModal" class="modal-base hidden-modal fixed inset-0 z-[66] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-indigo-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
             <div class="text-3xl mb-1">📦</div>
-            <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider">BOSS REWARD</h3>
-            <p class="text-slate-400 text-[10px] mb-3">Pilih 1 consumable bonus tambahan:</p>
+            <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider">BOSS VICTORY REWARD</h3>
+            <p class="text-slate-400 text-[10px] mb-3">Pilih 1 bonus tactical tambahan:</p>
 
             <div class="space-y-2">
-                <button onclick="chooseBossReward('crystal')" class="w-full p-2 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 text-left rounded-xl transition flex items-center justify-between">
-                    <span class="text-xs font-bold text-indigo-300 font-mono-custom">🔮 Holy Crystal</span>
+                <button onclick="chooseBossReward('discard')" class="w-full p-2 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 text-left rounded-xl transition flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-indigo-300 font-mono-custom">🔄 Tactical Discard</div>
+                        <div class="text-[8px] text-slate-400">Ganti kartu terakhir di tangan</div>
+                    </div>
                     <span class="text-xs font-bold bg-indigo-500/20 px-2 py-0.5 rounded text-indigo-300">+1</span>
                 </button>
-                <button onclick="chooseBossReward('revelio')" class="w-full p-2 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition flex items-center justify-between">
-                    <span class="text-xs font-bold text-rose-300 font-mono-custom">👁️ Revelio</span>
-                    <span class="text-xs font-bold bg-rose-500/20 px-2 py-0.5 rounded text-rose-300">+1</span>
-                </button>
                 <button onclick="chooseBossReward('buster')" class="w-full p-2 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-left rounded-xl transition flex items-center justify-between">
-                    <span class="text-xs font-bold text-red-300 font-mono-custom">💣 Buster</span>
+                    <div>
+                        <div class="text-xs font-bold text-red-300 font-mono-custom">💣 Overcharge Buster</div>
+                        <div class="text-[8px] text-slate-400">Paksa Dealer +1 Hit berisiko</div>
+                    </div>
                     <span class="text-xs font-bold bg-red-500/20 px-2 py-0.5 rounded text-red-300">+1</span>
+                </button>
+                <button onclick="chooseBossReward('cash')" class="w-full p-2 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-left rounded-xl transition flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-amber-300 font-mono-custom">💵 Cash Bounty</div>
+                        <div class="text-[8px] text-slate-400">Bonus instan cash tambahan</div>
+                    </div>
+                    <span class="text-xs font-bold bg-amber-500/20 px-2 py-0.5 rounded text-amber-300">+$500</span>
                 </button>
             </div>
         </div>
@@ -559,7 +650,7 @@
     <div id="dealerEncounterModal" class="modal-base hidden-modal fixed inset-0 z-[66] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-purple-500/50 shadow-2xl text-center bg-[#0d0714] relative overflow-hidden">
             <div class="text-4xl mb-1 animate-pulse">🎰</div>
-            <h3 class="text-sm font-black text-purple-300 uppercase tracking-wider font-mono-custom">GACHA CONSUMABLE ROLL</h3>
+            <h3 class="text-sm font-black text-purple-300 uppercase tracking-wider font-mono-custom">DEALER GACHA ROULETTE</h3>
             <p class="text-slate-400 text-[10px] mb-3">Tekan tombol untuk memutar slot keberuntungan!</p>
 
             <div id="gachaRollBox" class="p-4 bg-purple-950/60 border border-purple-500/40 rounded-2xl mb-3 text-sm font-mono-custom font-black text-amber-300 flex items-center justify-center gap-2 min-h-[50px] shadow-inner">
@@ -572,7 +663,7 @@
         </div>
     </div>
 
-    <!-- Modal Highscore Submission (Dilengkapi END-GAME STATISTICS) -->
+    <!-- Modal Highscore Submission (Dilengkapi BALATRO REKOR $ CASH) -->
     <div id="scoreSubmitModal" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative space-y-3 max-h-[90vh] overflow-y-auto scrollbar-hide">
             
@@ -581,11 +672,12 @@
             </div>
 
             <div>
-                <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider">Streak Terhenti!</h3>
-                <p class="text-slate-400 text-[11px] mt-0.5">Kamu meraih <span id="finalStreak" class="text-emerald-400 font-bold font-mono-custom">0</span> Win-Streak.</p>
+                <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider">Run Berakhir!</h3>
+                <p class="text-slate-400 text-[11px] mt-0.5">Total Hadiah: <span id="finalCash" class="text-amber-400 font-pixel font-bold">$0</span></p>
+                <p class="text-[9px] text-slate-500 font-mono-custom">Mencapai <span id="finalAnteRound" class="text-white font-bold">Ante 1 - Round 1/8</span></p>
             </div>
 
-            <!-- END-GAME STATISTICS BOX (Pariwisata Statistik Game) -->
+            <!-- END-GAME STATISTICS BOX (Statistik Game Balatro) -->
             <div class="bg-black/60 p-3 rounded-2xl border border-white/10 text-left space-y-1.5 font-mono-custom text-[10px]">
                 <div class="text-amber-400 font-black uppercase text-[10px] border-b border-white/10 pb-1 flex justify-between items-center">
                     <span>📊 End-Game Statistics</span>
@@ -594,16 +686,16 @@
                 <div class="grid grid-cols-2 gap-1 text-slate-300 pt-0.5">
                     <div>🛡️ Aegis Used: <b id="statEndAegis" class="text-emerald-400">0</b></div>
                     <div>⚡ Mercy Used: <b id="statEndMercy" class="text-amber-400">0</b></div>
-                    <div>🔮 Crystal Used: <b id="statEndCrystal" class="text-indigo-400">0</b></div>
-                    <div>👁️ Revelio Used: <b id="statEndRevelio" class="text-rose-400">0</b></div>
+                    <div>🔄 Discard Used: <b id="statEndDiscard" class="text-indigo-400">0</b></div>
                     <div>💣 Buster Used: <b id="statEndBuster" class="text-red-400">0</b></div>
-                    <div>🔥 Max Streak: <b id="statEndMaxStreak" class="text-amber-300">0</b></div>
+                    <div>🔥 Max Mult: <b id="statEndMaxMult" class="text-rose-400">×1.0</b></div>
+                    <div>💵 Max Cash: <b id="statEndMaxCash" class="text-amber-300">$0</b></div>
                 </div>
             </div>
 
             <!-- Pesan Minimum Score -->
             <div id="minScoreWarning" class="hidden text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/20 py-2 px-3 rounded-xl">
-                ⚠️ Minimal <b>10 streak</b> untuk mencatat rekor ke Leaderboard.
+                ⚠️ Minimal <b>$500 Cash</b> untuk mencatat rekor ke Leaderboard.
             </div>
 
             <form id="scoreForm" onsubmit="submitHighScore(event)" class="space-y-2.5">
@@ -716,7 +808,7 @@
             }
         }
 
-        // --- CHEAT FUNCTIONS ---
+        // --- BALATRO CHEAT FUNCTIONS ---
         function cheatToggleUnlimitedConsumables() {
             playAdminSound();
             cheatUnlimitedConsumables = !cheatUnlimitedConsumables;
@@ -724,20 +816,36 @@
             document.getElementById('btnCheatConsumables').classList.toggle('bg-emerald-500/30', cheatUnlimitedConsumables);
             
             if (cheatUnlimitedConsumables) {
-                holyCrystalCount = 99;
-                revelioCount = 99;
+                discardCount = 99;
                 busterCount = 99;
             }
             updateConsumableUI();
-            showToast(`🧪 Unlimited Consumables: ${cheatUnlimitedConsumables ? 'ON' : 'OFF'}`);
+            showToast(`🧪 Unlimited Items: ${cheatUnlimitedConsumables ? 'ON' : 'OFF'}`);
         }
 
-        function cheatAddStreak(amt) {
+        function cheatAddCash(amt) {
             playWinSound();
-            streak += amt;
-            if (streak > maxStreakAchieved) maxStreakAchieved = streak;
+            totalCash += amt;
+            if (totalCash > statsTracker.maxCash) statsTracker.maxCash = totalCash;
             updateUIStats();
-            showToast(`🔥 Cheat: +${amt} Streak Added!`);
+            spawnFloatingMultiplier(`+$${amt}`, "CHEAT CASH");
+            showToast(`💵 Cheat: +$${amt} Cash Added!`);
+        }
+
+        function cheatAddMultiplier(amt) {
+            playJackpotSound();
+            activeMultiplier = +(activeMultiplier + amt).toFixed(1);
+            if (activeMultiplier > statsTracker.maxMult) statsTracker.maxMult = activeMultiplier;
+            updateUIStats();
+            spawnFloatingMultiplier(`+${amt}x`, "CHEAT MULT");
+            showToast(`🔥 Cheat: +${amt}x Multiplier!`);
+        }
+
+        function cheatSkipToBoss() {
+            playBossAlertSound();
+            currentRound = 8;
+            startNewGame();
+            showToast(`⚔️ CHEAT: Lompat ke Ronde 8/8 (Boss Battle)!`);
         }
 
         function cheatInstantWin() {
@@ -745,30 +853,12 @@
             endRound('win', '👑 CHEAT: Instant Round Win!');
         }
 
-        function cheatForceBoss() {
-            playBossAlertSound();
-            isBossLevel = true;
-            currentBoss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
-            bossHP = 3;
-            startNewGame();
-            showToast(`⚔️ CHEAT: Spawn Boss ${currentBoss.name}!`);
-        }
-
-        function cheatInstantKillBoss() {
-            if (isBossLevel && currentBoss) {
-                bossHP = 1;
-                endRound('win', `💥 CHEAT: Defeated Boss ${currentBoss.name}!`);
-            } else {
-                showToast("⚠️ Hanya bekerja saat Boss Battle!");
-            }
-        }
-
         function cheatAddShields(amt) {
             playShieldSound();
-            shieldCount += amt;
+            shieldCount = Math.min(MAX_SHIELDS, shieldCount + amt);
             isShieldActive = true;
             updateShieldUI();
-            showToast(`🛡️ CHEAT: +${amt} Shields Added!`);
+            showToast(`🛡️ CHEAT: Max ${shieldCount}/${MAX_SHIELDS} Shields!`);
         }
 
         async function confirmResetLeaderboard() {
@@ -799,7 +889,7 @@
         }
         typeWriter();
 
-        // --- AUDIO ENGINE (WEB AUDIO API) ---
+        // --- BALATRO SYNTH AUDIO ENGINE (WEB AUDIO API) ---
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
@@ -853,20 +943,58 @@
             osc.stop(audioCtx.currentTime + 0.08);
         }
 
+        function playTensionCardSound() {
+            initAudio();
+            // Suspense low glide chord when hitting at 12-16
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc1.type = 'sawtooth';
+            osc2.type = 'square';
+            osc1.frequency.setValueAtTime(220, audioCtx.currentTime);
+            osc1.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.18);
+            osc2.frequency.setValueAtTime(330, audioCtx.currentTime);
+            osc2.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.18);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc1.start();
+            osc2.start();
+            osc1.stop(audioCtx.currentTime + 0.22);
+            osc2.stop(audioCtx.currentTime + 0.22);
+        }
+
+        function playDiscardSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.12);
+        }
+
         function playWinSound() {
             initAudio();
-            const notes = [523.25, 659.25, 783.99, 1046.50];
+            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
             notes.forEach((freq, idx) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.type = 'sine';
+                osc.type = 'triangle';
                 osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.08);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.3);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime + idx * 0.07);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.07 + 0.35);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + idx * 0.08);
-                osc.stop(audioCtx.currentTime + idx * 0.08 + 0.3);
+                osc.start(audioCtx.currentTime + idx * 0.07);
+                osc.stop(audioCtx.currentTime + idx * 0.07 + 0.35);
             });
         }
 
@@ -875,61 +1003,29 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.35);
+            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-        }
-
-        function playHolyCrystalSound() {
-            initAudio();
-            const notes = [1046.50, 1318.51, 1567.98, 2093.00];
-            notes.forEach((freq, i) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.05 + 0.25);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + i * 0.05);
-                osc.stop(audioCtx.currentTime + i * 0.05 + 0.25);
-            });
-        }
-
-        function playRevelioSound() {
-            initAudio();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1800, audioCtx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
+            osc.stop(audioCtx.currentTime + 0.35);
         }
 
         function playBusterSound() {
             initAudio();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.4);
-            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.4);
+            osc.stop(audioCtx.currentTime + 0.3);
         }
 
         function playShieldSound() {
@@ -951,15 +1047,15 @@
             initAudio();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.type = 'square';
+            osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.25);
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+            osc.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.25);
+            osc.stop(audioCtx.currentTime + 0.3);
         }
 
         function playBossAlertSound() {
@@ -1027,23 +1123,23 @@
 
         function playBossDefeatSound() {
             initAudio();
-            const freqs = [300, 200, 150, 100, 600, 900, 1200];
+            const freqs = [300, 200, 150, 100, 600, 900, 1200, 1600];
             freqs.forEach((freq, idx) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.1 + 0.3);
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.09);
+                gain.gain.setValueAtTime(0.35, audioCtx.currentTime + idx * 0.09);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.09 + 0.3);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + idx * 0.1);
-                osc.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+                osc.start(audioCtx.currentTime + idx * 0.09);
+                osc.stop(audioCtx.currentTime + idx * 0.09 + 0.3);
             });
         }
 
         function spawnCoins() {
-            const emojis = ['🪙', '💰', '✨', '🔥', '👑', '🎰'];
+            const emojis = ['💵', '🪙', '✨', '🔥', '👑', '🎰'];
             for (let i = 0; i < 18; i++) {
                 const coin = document.createElement('div');
                 coin.className = 'coin-particle';
@@ -1053,6 +1149,19 @@
                 document.body.appendChild(coin);
                 setTimeout(() => coin.remove(), 1200);
             }
+        }
+
+        function spawnFloatingMultiplier(cashText, multText) {
+            const popup = document.createElement('div');
+            popup.className = 'balatro-popup text-amber-400 font-pixel drop-shadow-[0_0_15px_rgba(245,158,11,0.8)]';
+            popup.innerHTML = `
+                <div class="text-xl sm:text-2xl text-amber-300 font-black">${cashText}</div>
+                <div class="text-xs sm:text-sm text-rose-400 font-mono-custom font-bold">${multText}</div>
+            `;
+            popup.style.left = '50%';
+            popup.style.top = (window.innerHeight / 2 - 20) + 'px';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1400);
         }
 
         function triggerScreenShake() {
@@ -1171,7 +1280,6 @@
             const modal = document.getElementById('scoreSubmitModal');
             modal.classList.remove('show-modal');
             modal.classList.add('hidden-modal');
-            streakToSubmit = 0;
             resetSessionBuffs();
         }
 
@@ -1213,37 +1321,48 @@
         function resetTimer() { clearInterval(slideInterval); startTimer(); }
         startTimer();
 
-        // ================= ARCADE GAMEPLAY LOGIC & BOSSES =================
-        let deck = [];
+        // ================= BALATRO-STYLE BLACKJACK GAMEPLAY LOGIC & 1/8 ANTE CYCLES =================
+        let shoeDeck = [];
         let playerHand = [];
         let dealerHand = [];
         let isGameActive = false;
 
-        let streak = 0;
+        // BALATRO ECONOMY & MULTIPLIERS
+        let currentAnte = 1;
+        let currentRound = 1; // 1 to 8 (8 is BOSS BATTLE)
+        let totalCash = 0;
+        let activeMultiplier = 1.0;
+
         let wins = 0;
         let losses = 0;
         let draws = 0;
+
+        // AEGIS SHIELD REBALANCE
+        const MAX_SHIELDS = 3;
         let shieldCount = 1;
         let isShieldActive = true;
         let isDriansMercyActive = false;
         let totalResets = 0;
 
-        let holyCrystalCount = 1;
-        let revelioCount = 1;
+        // TACTICAL CONSUMABLES REBALANCE
+        const MAX_CONSUMABLES = 2;
+        let discardCount = 1;
         let busterCount = 1;
+        let isBusterActiveThisRound = false;
         let isDealerRevealed = false; 
 
         // STATISTIK END-GAME TRACKER
         let statsTracker = {
             aegisUsed: 0,
             mercyUsed: 0,
-            crystalUsed: 0,
-            revelioUsed: 0,
-            busterUsed: 0
+            discardUsed: 0,
+            busterUsed: 0,
+            maxMult: 1.0,
+            maxCash: 0,
+            highestAnte: 1
         };
-        let maxStreakAchieved = 0;
 
-        // STATE PASIF BOSS (Dinamis: Hilang kalau sudah dipilih, opsi bonus jika 3-3 nya habis)
+        // STATE PASIF BOSS
         let availablePassives = ['golden_boot', 'heartbreaker', 'lifesteal'];
         let activePassives = {
             golden_boot: false,
@@ -1254,10 +1373,7 @@
         let isBossLevel = false;
         let currentBoss = null;
         let bossHP = 3;
-
-        let bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;   
-        let bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;  
-        let bossStreakTarget3 = Math.floor(Math.random() * 6) + 15;  
+        let maxBossHP = 3;
 
         const BOSSES = [
             {
@@ -1280,18 +1396,21 @@
             }
         ];
 
-        let streakToSubmit = 0;
-
-        function createDeck() {
+        // --- DYNAMIC SHOE DECK & SHUFFLING ENGINE ---
+        function createShoeDeck() {
             const suits = ['♠', '♥', '♦', '♣'];
             const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-            const newDeck = [];
-            for (let suit of suits) {
-                for (let val of values) {
-                    newDeck.push({ suit, value: val });
+            const newShoe = [];
+            
+            // 4 Decks Continuous Shoe (208 Cards)
+            for (let d = 0; d < 4; d++) {
+                for (let suit of suits) {
+                    for (let val of values) {
+                        newShoe.push({ suit, value: val });
+                    }
                 }
             }
-            return shuffle(newDeck);
+            return shuffle(newShoe);
         }
 
         function shuffle(array) {
@@ -1300,6 +1419,14 @@
                 [array[i], array[j]] = [array[j], array[i]];
             }
             return array;
+        }
+
+        function drawCardFromShoe() {
+            if (shoeDeck.length < 15) {
+                shoeDeck = createShoeDeck();
+                showToast("🔀 Shoe Deck Diacak Ulang (Reshuffle)!");
+            }
+            return shoeDeck.pop();
         }
 
         function calculateScore(hand) {
@@ -1311,8 +1438,6 @@
                     score += 11;
                 } else if (['K', 'Q', 'J'].includes(card.value)) {
                     score += 10;
-                } else if (card.value === '21') {
-                    score += 21;
                 } else {
                     score += parseInt(card.value) || 0;
                 }
@@ -1322,6 +1447,12 @@
                 aces -= 1;
             }
             return score;
+        }
+
+        function getMaxBossHP(ante) {
+            if (ante >= 3) return 5;
+            if (ante === 2) return 4;
+            return 3;
         }
 
         function renderCards() {
@@ -1402,91 +1533,82 @@
         }
 
         function updateConsumableUI() {
-            document.getElementById('countHolyCrystal').textContent = cheatUnlimitedConsumables ? '∞' : holyCrystalCount;
-            document.getElementById('countRevelio').textContent = cheatUnlimitedConsumables ? '∞' : revelioCount;
-            document.getElementById('countBuster').textContent = cheatUnlimitedConsumables ? '∞' : busterCount;
+            document.getElementById('countDiscard').textContent = cheatUnlimitedConsumables ? '∞' : `${discardCount}/${MAX_CONSUMABLES}`;
+            document.getElementById('countBuster').textContent = cheatUnlimitedConsumables ? '∞' : `${busterCount}/${MAX_CONSUMABLES}`;
 
-            const btnCrystal = document.getElementById('btnHolyCrystal');
-            const btnRevelio = document.getElementById('btnRevelio');
+            const btnDiscard = document.getElementById('btnDiscard');
             const btnBust = document.getElementById('btnBuster');
             const lockTag = document.getElementById('consumablesLockedTag');
 
             if (isBossLevel && !cheatUnlimitedConsumables) {
-                btnCrystal.disabled = true;
-                btnRevelio.disabled = true;
+                btnDiscard.disabled = true;
                 btnBust.disabled = true;
                 lockTag.classList.remove('hidden');
             } else {
                 lockTag.classList.add('hidden');
-                btnCrystal.disabled = !isGameActive || (holyCrystalCount <= 0 && !cheatUnlimitedConsumables) || playerHand.length === 0;
-                btnRevelio.disabled = !isGameActive || (revelioCount <= 0 && !cheatUnlimitedConsumables) || isDealerRevealed;
-                btnBust.disabled = !isGameActive || (busterCount <= 0 && !cheatUnlimitedConsumables);
+                btnDiscard.disabled = !isGameActive || (discardCount <= 0 && !cheatUnlimitedConsumables) || playerHand.length === 0;
+                btnBust.disabled = !isGameActive || (busterCount <= 0 && !cheatUnlimitedConsumables) || isBusterActiveThisRound;
             }
         }
 
-        function useHolyCrystal() {
+        // --- BALATRO CONSUMABLE ACTIONS ---
+        function useDiscard() {
             if (isBossLevel && !cheatUnlimitedConsumables) return;
-            if (!isGameActive || (holyCrystalCount <= 0 && !cheatUnlimitedConsumables) || playerHand.length === 0) return;
+            if (!isGameActive || (discardCount <= 0 && !cheatUnlimitedConsumables) || playerHand.length === 0) return;
             
-            playHolyCrystalSound();
-            triggerHaptic('heavy');
-            if (!cheatUnlimitedConsumables) holyCrystalCount--;
-            statsTracker.crystalUsed++;
-            
-            playerHand[playerHand.length - 1] = { suit: '🔮', value: '21' };
-            showToast("🔮 HOLY CRYSTAL! Kartu berubah jadi 21!");
-            renderCards();
-            stand();
-        }
-
-        function useRevelio() {
-            if (isBossLevel && !cheatUnlimitedConsumables) return;
-            if (!isGameActive || (revelioCount <= 0 && !cheatUnlimitedConsumables) || isDealerRevealed) return;
-            
-            playRevelioSound();
+            playDiscardSound();
             triggerHaptic('medium');
-            if (!cheatUnlimitedConsumables) revelioCount--;
-            statsTracker.revelioUsed++;
-            isDealerRevealed = true;
-            showToast("👁️ REVELIO! Kartu dealer terungkap!");
+            if (!cheatUnlimitedConsumables) discardCount--;
+            statsTracker.discardUsed++;
+            
+            // Discard player's last card and draw a new one
+            playerHand.pop();
+            playerHand.push(drawCardFromShoe());
+            showToast("🔄 DISCARD: Kartu terakhir diganti dari Shoe!");
+            
+            let limitBurst = (isBossLevel && currentBoss && currentBoss.perkType === 'samgong_burst') ? 30 : 21;
+            let score = calculateScore(playerHand);
             renderCards();
+
+            if (score > limitBurst) {
+                endRound('loss_bust', `BUST! Melebihi ${limitBurst} 💥`);
+            }
         }
 
         function useBuster() {
             if (isBossLevel && !cheatUnlimitedConsumables) return;
-            if (!isGameActive || (busterCount <= 0 && !cheatUnlimitedConsumables)) return;
+            if (!isGameActive || (busterCount <= 0 && !cheatUnlimitedConsumables) || isBusterActiveThisRound) return;
             
             playBusterSound();
             triggerHaptic('heavy');
             if (!cheatUnlimitedConsumables) busterCount--;
             statsTracker.busterUsed++;
+            isBusterActiveThisRound = true;
             
-            showToast("💣 BUSTER! Dealer BUST otomatis!");
-
-            dealerHand.push({ suit: '💥', value: '10' });
-            dealerHand.push({ suit: '💥', value: '10' });
-            dealerHand.push({ suit: '💥', value: '10' });
-
-            endRound('win_dealer_bust', "DEALER AUTO-BUST OLEH BUSTER! 🔥");
+            showToast("💣 BUSTER AKTIF! Dealer dipaksa menarik +1 kartu ekstra!");
+            updateConsumableUI();
         }
 
         function startNewGame() {
             triggerHaptic('light');
-            deck = createDeck();
-            playerHand = [deck.pop(), deck.pop()];
-            dealerHand = [deck.pop(), deck.pop()];
+            if (shoeDeck.length < 20) shoeDeck = createShoeDeck();
+
+            playerHand = [drawCardFromShoe(), drawCardFromShoe()];
+            dealerHand = [drawCardFromShoe(), drawCardFromShoe()];
             isGameActive = true;
             isDealerRevealed = false;
+            isBusterActiveThisRound = false;
 
-            if (bossHP < 3 && currentBoss) {
+            // 1/8 ROUND BOSS CYCLE ENGINE
+            if (currentRound === 8) {
                 isBossLevel = true;
-            } else if (streak > 0 && (streak === bossStreakTarget1 || streak === bossStreakTarget2 || streak === bossStreakTarget3)) {
-                isBossLevel = true;
+                maxBossHP = getMaxBossHP(currentAnte);
                 if (!currentBoss || bossHP <= 0) {
                     currentBoss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
-                    bossHP = 3;
+                    bossHP = maxBossHP;
                 }
-            } else if (!isBossLevel) {
+            } else {
+                isBossLevel = false;
                 currentBoss = null;
             }
 
@@ -1505,13 +1627,13 @@
                 
                 document.getElementById('dealerAvatar').textContent = currentBoss.avatar;
                 document.getElementById('dealerTitleText').textContent = currentBoss.name;
-                tableTitle.innerHTML = `<span class="text-red-400 font-bold">⚔️ BOSS BATTLE (${4 - bossHP}/3)</span>`;
+                tableTitle.innerHTML = `<span class="text-rose-400 font-bold">⚔️ ANTE ${currentAnte} • BOSS BATTLE (${maxBossHP - bossHP + 1}/${maxBossHP})</span>`;
             } else {
                 cardUI.classList.remove('boss-card-bg');
                 bossAlert.classList.add('hidden');
                 document.getElementById('dealerAvatar').textContent = "🎩";
                 document.getElementById('dealerTitleText').textContent = "DEALER";
-                tableTitle.innerHTML = `<span>🃏</span> BLACKJACK TABLE`;
+                tableTitle.innerHTML = `<span>🃏</span> ANTE ${currentAnte} • ROUND ${currentRound}/8`;
             }
 
             document.getElementById('gameStatus').textContent = "";
@@ -1532,7 +1654,7 @@
         function updateBossHeartsUI() {
             const container = document.getElementById('bossHeartsContainer');
             let hearts = '';
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < maxBossHP; i++) {
                 hearts += (i < bossHP) ? '❤️' : '🖤';
             }
             container.textContent = hearts;
@@ -1540,15 +1662,27 @@
 
         function hit() {
             if (!isGameActive) return;
-            triggerHaptic('light');
-            playerHand.push(deck.pop());
-            playCardSound();
+            
+            let prevScore = calculateScore(playerHand);
+            playerHand.push(drawCardFromShoe());
+            
+            // TENSION AUDIO & ANIMATION ON 12-16 HIT ZONE
+            if (prevScore >= 12 && prevScore <= 16) {
+                playTensionCardSound();
+                triggerHaptic('heavy');
+            } else {
+                playCardSound();
+                triggerHaptic('light');
+            }
+
             renderCards();
 
             let limitBurst = (isBossLevel && currentBoss && currentBoss.perkType === 'samgong_burst') ? 30 : 21;
             let score = calculateScore(playerHand);
             if (score > limitBurst) {
                 endRound('loss_bust', `BUST! Melebihi ${limitBurst} 💥`);
+            } else if (playerHand.length >= 5 && score <= 21) {
+                endRound('win_charlie', "FIVE-CARD CHARLIE! 🌟");
             }
         }
 
@@ -1568,9 +1702,19 @@
             isDealerRevealed = true;
             let dScore = calculateScore(dealerHand);
 
-            while (dScore < 17) {
-                dealerHand.push(deck.pop());
+            // SCALING DEALER AI (Stand at 18 if Ante >= 3)
+            let dealerStandThreshold = (currentAnte >= 3) ? 18 : 17;
+
+            while (dScore < dealerStandThreshold) {
+                dealerHand.push(drawCardFromShoe());
                 dScore = calculateScore(dealerHand);
+            }
+
+            // REVAMPED BUSTER (OVERCHARGE DEALER FORCES +1 EXTRA HIT)
+            if (isBusterActiveThisRound) {
+                dealerHand.push(drawCardFromShoe());
+                dScore = calculateScore(dealerHand);
+                showToast("💣 BUSTER: Dealer dipaksa menarik 1 kartu ekstra!");
             }
 
             renderCards();
@@ -1599,14 +1743,14 @@
                 isShieldActive = !isShieldActive;
                 updateShieldUI();
             } else {
-                showToast("⚠️ Kuota Shield Habis!");
+                showToast("⚠️ Kuota Shield Habis! (Dapatkan saat skor 21)");
             }
         }
 
         function updateShieldUI() {
             const badge = document.getElementById('shieldBadge');
             const btn = document.getElementById('btnShieldToggle');
-            document.getElementById('shieldCount').textContent = shieldCount;
+            document.getElementById('shieldCount').textContent = `${shieldCount}/${MAX_SHIELDS}`;
 
             if (isShieldActive && shieldCount > 0) {
                 badge.textContent = "ON";
@@ -1640,7 +1784,7 @@
             if (isGameActive) stand();
         }
 
-        // --- SISTEM PEMILIHAN PASIF BOSS (DINAMIS & TERSARING) ---
+        // --- SISTEM PEMILIHAN PASIF BOSS ---
         function triggerPassiveChoiceModal() {
             playModalSound();
             const modal = document.getElementById('passiveChoiceModal');
@@ -1656,7 +1800,7 @@
                     container.innerHTML += `
                         <button onclick="selectPassive('golden_boot')" class="w-full p-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-left rounded-xl transition group">
                             <div class="text-xs font-bold text-yellow-300 font-mono-custom">👢 Golden Boot</div>
-                            <div class="text-[9px] text-slate-400 mt-0.5">+2 Bonus Win-Streak otomatis setiap kali menang.</div>
+                            <div class="text-[9px] text-slate-400 mt-0.5">+0.5x Multiplier permanen setiap kali menang ronde!</div>
                         </button>
                     `;
                 }
@@ -1672,21 +1816,20 @@
                     container.innerHTML += `
                         <button onclick="selectPassive('lifesteal')" class="w-full p-2.5 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition group">
                             <div class="text-xs font-bold text-rose-300 font-mono-custom">🩸 Lifesteal</div>
-                            <div class="text-[9px] text-slate-400 mt-0.5">Menang dengan angka tepat 21 memberikan +1 Aegis Shield.</div>
+                            <div class="text-[9px] text-slate-400 mt-0.5">Menang dengan angka tepat 21 memberikan +1 Aegis Shield (Cap 3).</div>
                         </button>
                     `;
                 }
             } else {
-                // JIKA SEMUA 3 PASIF SUDAH TERPAKAI, MUNCULKAN PILIHAN +5 WIN STREAK ATAU +3 AEGIS
                 subtitle.textContent = "Semua pasif utama sudah aktif! Pilih bonus reward ultimate:";
                 container.innerHTML = `
-                    <button onclick="selectUltimateBonus('streak')" class="w-full p-3 bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-left rounded-xl transition group">
-                        <div class="text-xs font-bold text-amber-300 font-mono-custom">🔥 +5 Win Streak</div>
-                        <div class="text-[9px] text-slate-400 mt-0.5">Tambahan instan 5 Win-Streak ke total saat ini.</div>
+                    <button onclick="selectUltimateBonus('cash')" class="w-full p-3 bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-left rounded-xl transition group">
+                        <div class="text-xs font-bold text-amber-300 font-mono-custom">💵 +$1,000 Cash Bounty</div>
+                        <div class="text-[9px] text-slate-400 mt-0.5">Tambahan instan $1,000 ke total cash run saat ini.</div>
                     </button>
                     <button onclick="selectUltimateBonus('aegis')" class="w-full p-3 bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-left rounded-xl transition group">
-                        <div class="text-xs font-bold text-emerald-300 font-mono-custom">🛡️ +3 Aegis Shields</div>
-                        <div class="text-[9px] text-slate-400 mt-0.5">Tambahan 3 kuota pelindung kekalahan beruntun.</div>
+                        <div class="text-xs font-bold text-emerald-300 font-mono-custom">🛡️ +2 Aegis Shields</div>
+                        <div class="text-[9px] text-slate-400 mt-0.5">Tambahan 2 kuota pelindung kekalahan beruntun.</div>
                     </button>
                 `;
             }
@@ -1703,7 +1846,6 @@
             if (type === 'heartbreaker') activePassives.heartbreaker = true;
             if (type === 'lifesteal') activePassives.lifesteal = true;
 
-            // Hapus dari available passives agar tidak muncul lagi
             availablePassives = availablePassives.filter(p => p !== type);
 
             const modal = document.getElementById('passiveChoiceModal');
@@ -1718,15 +1860,14 @@
             playWinSound();
             triggerHaptic('heavy');
 
-            if (bonusType === 'streak') {
-                streak += 5;
-                if (streak > maxStreakAchieved) maxStreakAchieved = streak;
-                showToast("🔥 +5 Win Streak Berhasil Ditambahkan!");
+            if (bonusType === 'cash') {
+                totalCash += 1000;
+                if (totalCash > statsTracker.maxCash) statsTracker.maxCash = totalCash;
+                showToast("💵 +$1,000 Cash Berhasil Ditambahkan!");
             } else if (bonusType === 'aegis') {
-                shieldCount += 3;
+                shieldCount = Math.min(MAX_SHIELDS, shieldCount + 2);
                 isShieldActive = true;
-                statsTracker.aegisUsed += 0; // Hanya sebagai info tambah kuota
-                showToast("🛡️ +3 Aegis Shields Berhasil Ditambahkan!");
+                showToast("🛡️ +2 Aegis Shields Berhasil Ditambahkan!");
             }
 
             const modal = document.getElementById('passiveChoiceModal');
@@ -1745,15 +1886,23 @@
         function chooseBossReward(itemType) {
             playWinSound();
             triggerHaptic('medium');
-            if (itemType === 'crystal') holyCrystalCount++;
-            if (itemType === 'revelio') revelioCount++;
-            if (itemType === 'buster') busterCount++;
+            if (itemType === 'discard') {
+                discardCount = Math.min(MAX_CONSUMABLES, discardCount + 1);
+                showToast("🔄 +1 Discard Ditambahkan!");
+            } else if (itemType === 'buster') {
+                busterCount = Math.min(MAX_CONSUMABLES, busterCount + 1);
+                showToast("💣 +1 Buster Ditambahkan!");
+            } else if (itemType === 'cash') {
+                totalCash += 500;
+                if (totalCash > statsTracker.maxCash) statsTracker.maxCash = totalCash;
+                showToast("💵 +$500 Cash Bounty Diperoleh!");
+            }
 
-            showToast("🎁 Consumable Ditambahkan!");
             const modal = document.getElementById('bossRewardModal');
             modal.classList.remove('show-modal');
             modal.classList.add('hidden-modal');
             updateConsumableUI();
+            updateUIStats();
         }
 
         function triggerDealerEncounterModal() {
@@ -1774,7 +1923,7 @@
             rollBox.classList.add('gacha-active');
 
             let counter = 0;
-            const items = ["🔮 Holy Crystal", "👁️ Revelio", "💣 Buster"];
+            const items = ["🔄 Discard", "💣 Buster", "💵 +$300 Cash", "🛡️ +1 Shield"];
             
             const spinInterval = setInterval(() => {
                 const randomItem = items[Math.floor(Math.random() * items.length)];
@@ -1788,17 +1937,26 @@
                     rollBox.classList.remove('gacha-active');
 
                     const wonItem = items[Math.floor(Math.random() * items.length)];
-                    rollBox.innerHTML = `✨ JACKPOT! <br><span class="text-emerald-400 text-base">${wonItem}</span>`;
+                    rollBox.innerHTML = `✨ JACKPOT! <br><span class="text-amber-400 text-base font-bold">${wonItem}</span>`;
                     
                     playJackpotSound();
                     triggerHaptic('gacha_win');
                     spawnCoins();
 
-                    if (wonItem.includes("Crystal")) holyCrystalCount++;
-                    else if (wonItem.includes("Revelio")) revelioCount++;
-                    else if (wonItem.includes("Buster")) busterCount++;
+                    if (wonItem.includes("Discard")) discardCount = Math.min(MAX_CONSUMABLES, discardCount + 1);
+                    else if (wonItem.includes("Buster")) busterCount = Math.min(MAX_CONSUMABLES, busterCount + 1);
+                    else if (wonItem.includes("Cash")) {
+                        totalCash += 300;
+                        if (totalCash > statsTracker.maxCash) statsTracker.maxCash = totalCash;
+                    }
+                    else if (wonItem.includes("Shield")) {
+                        shieldCount = Math.min(MAX_SHIELDS, shieldCount + 1);
+                        isShieldActive = true;
+                    }
 
                     updateConsumableUI();
+                    updateUIStats();
+
                     setTimeout(() => {
                         const modal = document.getElementById('dealerEncounterModal');
                         modal.classList.remove('show-modal');
@@ -1808,6 +1966,7 @@
             }, 80);
         }
 
+        // --- BALATRO SCORING & ROUND EVALUATION ENGINE ---
         function endRound(result, message) {
             isGameActive = false;
             document.getElementById('btnHit').disabled = true;
@@ -1825,21 +1984,49 @@
                 spawnCoins();
                 triggerHaptic('medium');
 
-                let addedStreak = 1;
-                if (activePassives.golden_boot) addedStreak += 2;
-                if (isDriansMercyActive) addedStreak *= 2;
+                // 1. Calculate Base Cash Reward
+                let baseReward = 100;
+                let pScore = calculateScore(playerHand);
 
-                streak += addedStreak;
-                if (streak > maxStreakAchieved) maxStreakAchieved = streak;
+                if (result === 'win_bj') baseReward = 400; // Natural BJ
+                else if (result === 'win_charlie') baseReward = 600; // 5-Cards
+                else if (pScore === 21) baseReward = 250; // Exact 21
+                else if (result === 'win_dealer_bust') baseReward = 250; // Dealer Bust
+
+                // 2. Card Combo Multipliers
+                let roundMultiplier = activeMultiplier;
+                
+                // Check Suited Hand (all cards same suit)
+                if (playerHand.length >= 2 && playerHand.every(c => c.suit === playerHand[0].suit)) {
+                    roundMultiplier *= 1.5;
+                }
+                // Check Pocket Pair (first 2 cards same value)
+                if (playerHand.length >= 2 && playerHand[0].value === playerHand[1].value) {
+                    roundMultiplier *= 1.3;
+                }
+                // Golden Boot passive bonus
+                if (activePassives.golden_boot) roundMultiplier += 0.5;
+                // Drian's Mercy active
+                if (isDriansMercyActive) roundMultiplier *= 2.0;
+
+                let finalRoundCash = Math.round(baseReward * roundMultiplier);
+                totalCash += finalRoundCash;
                 wins++;
 
-                if (activePassives.lifesteal && calculateScore(playerHand) === 21) {
+                // Momentum Multiplier Increment
+                activeMultiplier = Math.min(10.0, +(activeMultiplier + 0.2).toFixed(1));
+                if (activeMultiplier > statsTracker.maxMult) statsTracker.maxMult = activeMultiplier;
+                if (totalCash > statsTracker.maxCash) statsTracker.maxCash = totalCash;
+
+                spawnFloatingMultiplier(`+$${finalRoundCash}`, `×${roundMultiplier.toFixed(1)} MULT`);
+
+                // Shield Gain Rule: Win with Score 21 gives +1 Shield (Up to Max 3)
+                if (pScore === 21 && shieldCount < MAX_SHIELDS) {
                     shieldCount++;
-                    showToast("🩸 LIFESTEAL: Score 21 Memberikan +1 Aegis Shield!");
+                    showToast("🛡️ Nilai 21! +1 Aegis Shield Diperoleh!");
                 }
 
-                if (streak % 3 === 0) shieldCount++;
-
+                // 1/8 BOSS ROUND VICTORY HANDLING
                 if (isBossLevel && currentBoss) {
                     bossHP--;
                     updateBossHeartsUI();
@@ -1849,8 +2036,22 @@
                         playBossDefeatSound();
                         triggerScreenShake();
                         triggerHaptic('boss_defeat');
-                        showToast(`💥 VICTORY! BOSS ${currentBoss.name} TUMBANG!`);
                         
+                        let bossBounty = 1500 * currentAnte;
+                        totalCash += bossBounty;
+                        showToast(`💥 VICTORY! BOSS ${currentBoss.name} TUMBANG! (+$${bossBounty})`);
+                        
+                        // BOSS TAX: -1 Shield sacrificed on Boss Defeat
+                        if (shieldCount > 0) {
+                            shieldCount--;
+                            showToast("🛡️ Boss Tax: 1 Shield dikorbankan!");
+                        }
+
+                        // ADVANCE ANTE & RESET TO ROUND 1
+                        currentAnte++;
+                        currentRound = 1;
+                        if (currentAnte > statsTracker.highestAnte) statsTracker.highestAnte = currentAnte;
+
                         isBossLevel = false;
                         currentBoss = null;
 
@@ -1862,7 +2063,10 @@
                         showToast(`⚔️ Ronde Menang! Sisa HP Boss: ${bossHP} Hearts.`);
                     }
                 } else {
-                    if (streak > 0 && streak % 3 === 0) {
+                    // Regular round advances
+                    currentRound++;
+                    // Gacha encounter at Round 4
+                    if (currentRound === 4) {
                         setTimeout(() => {
                             triggerDealerEncounterModal();
                         }, 700);
@@ -1875,24 +2079,29 @@
                 triggerHaptic('bust');
                 losses++;
 
+                // Reset Momentum Multiplier
+                activeMultiplier = 1.0;
+
+                // AEGIS SHIELD USAGE & STREAK FATIGUE
                 if (isShieldActive && shieldCount > 0) {
-                    shieldCount--;
-                    statsTracker.aegisUsed++;
-                    showToast("🛡️ SHIELD DIGUNAKAN! Streak Aman!");
+                    // Streak Fatigue at Ante >= 3 deducts 2 shields
+                    let shieldsToDeduct = (currentAnte >= 3 && shieldCount >= 2) ? 2 : 1;
+                    shieldCount -= shieldsToDeduct;
+                    statsTracker.aegisUsed += shieldsToDeduct;
+
+                    if (shieldsToDeduct === 2) {
+                        showToast("🛡️ ANTE FATIGUE (Ante 3+): 2 Shield Digunakan! Cash Aman!");
+                    } else {
+                        showToast("🛡️ SHIELD DIGUNAKAN! Cash & Run Aman!");
+                    }
+
                     if (shieldCount === 0) isShieldActive = false;
                 } else {
+                    // RUN GAME OVER
                     totalResets++;
                     document.getElementById('totalResetsText').textContent = totalResets;
 
-                    streakToSubmit = streak;
-                    if (streakToSubmit > maxStreakAchieved) maxStreakAchieved = streakToSubmit;
-
-                    streak = 0;
-                    bossHP = 3;
-                    isBossLevel = false;
-                    currentBoss = null;
-                    
-                    showScoreModal(streakToSubmit);
+                    showScoreModal(totalCash, currentAnte, currentRound);
                     resetSessionBuffs();
                 }
             } else {
@@ -1901,31 +2110,41 @@
             }
 
             isDriansMercyActive = false;
+            isBusterActiveThisRound = false;
             renderCards();
             updateUIStats();
         }
 
         function resetSessionBuffs() {
+            currentAnte = 1;
+            currentRound = 1;
+            totalCash = 0;
+            activeMultiplier = 1.0;
             shieldCount = 1;
             isShieldActive = true;
+            
             if (!cheatUnlimitedConsumables) {
-                holyCrystalCount = 1;
-                revelioCount = 1;
+                discardCount = 1;
                 busterCount = 1;
             }
             activePassives = { golden_boot: false, heartbreaker: false, lifesteal: false };
             availablePassives = ['golden_boot', 'heartbreaker', 'lifesteal'];
             
-            bossStreakTarget1 = Math.floor(Math.random() * 6) + 5;
-            bossStreakTarget2 = Math.floor(Math.random() * 6) + 10;
-            bossStreakTarget3 = Math.floor(Math.random() * 6) + 15;
+            shoeDeck = createShoeDeck();
+            isBossLevel = false;
+            currentBoss = null;
+            bossHP = 3;
 
             updateShieldUI();
             updateConsumableUI();
+            updateUIStats();
         }
 
         function updateUIStats() {
-            document.getElementById('currentStreak').textContent = streak;
+            document.getElementById('totalCashText').textContent = `$${totalCash.toLocaleString()}`;
+            document.getElementById('activeMultText').textContent = `×${activeMultiplier.toFixed(1)}`;
+            document.getElementById('roundCounterText').innerHTML = `${currentRound}/8 <span class="text-[8px] text-amber-400">(A${currentAnte})</span>`;
+            
             document.getElementById('statWLD').textContent = `${wins}-${losses}-${draws}`;
             document.getElementById('totalResetsText').textContent = totalResets;
 
@@ -1956,17 +2175,21 @@
             }
         }
 
-        function showScoreModal(finalStreak) {
+        let cashToSubmit = 0;
+
+        function showScoreModal(finalCash, finalAnte, finalRound) {
             playModalSound();
-            document.getElementById('finalStreak').textContent = finalStreak;
+            cashToSubmit = finalCash;
+            document.getElementById('finalCash').textContent = `$${finalCash.toLocaleString()}`;
+            document.getElementById('finalAnteRound').textContent = `Ante ${finalAnte} • Round ${finalRound}/8`;
             
             // ISI DATA END-GAME STATISTICS
             document.getElementById('statEndAegis').textContent = statsTracker.aegisUsed;
             document.getElementById('statEndMercy').textContent = statsTracker.mercyUsed;
-            document.getElementById('statEndCrystal').textContent = statsTracker.crystalUsed;
-            document.getElementById('statEndRevelio').textContent = statsTracker.revelioUsed;
+            document.getElementById('statEndDiscard').textContent = statsTracker.discardUsed;
             document.getElementById('statEndBuster').textContent = statsTracker.busterUsed;
-            document.getElementById('statEndMaxStreak').textContent = maxStreakAchieved;
+            document.getElementById('statEndMaxMult').textContent = `×${statsTracker.maxMult.toFixed(1)}`;
+            document.getElementById('statEndMaxCash').textContent = `$${statsTracker.maxCash.toLocaleString()}`;
 
             const modal = document.getElementById('scoreSubmitModal');
             const nameContainer = document.getElementById('nameInputContainer');
@@ -1974,7 +2197,7 @@
             const warningEl = document.getElementById('minScoreWarning');
             const nameInput = document.getElementById('playerName');
 
-            if (finalStreak < 10) {
+            if (finalCash < 500) {
                 warningEl.classList.remove('hidden');
                 nameContainer.classList.add('hidden');
                 submitBtn.classList.add('hidden');
@@ -1993,7 +2216,7 @@
 
         async function submitHighScore(e) {
             e.preventDefault();
-            if (streakToSubmit < 10) return;
+            if (cashToSubmit < 500) return;
 
             playWinSound();
             triggerHaptic('heavy');
@@ -2003,14 +2226,14 @@
                 try {
                     const payload = {
                         player_name: nameInput,
-                        streak_count: Number(streakToSubmit)
+                        streak_count: Number(cashToSubmit)
                     };
 
                     const { error } = await supabaseClient.from(LEADERBOARD_TABLE).insert([payload]);
                     
                     if (error) throw new Error(error.message);
 
-                    showToast("🏆 Rekor berhasil dicatat!");
+                    showToast("🏆 Rekor Balatro Cash berhasil dicatat!");
                     await fetchLeaderboard();
                 } catch (err) {
                     console.error('Error submitting score:', err);
@@ -2038,7 +2261,7 @@
                         <div class="relative overflow-hidden p-4 rounded-2xl border border-dashed border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-black/40 to-transparent text-center space-y-2">
                             <div class="text-2xl animate-bounce">👑</div>
                             <div class="text-xs font-black text-amber-400 font-mono-custom uppercase">Papan Peringkat Kosong!</div>
-                            <p class="text-[9px] text-slate-400 max-w-xs mx-auto">Jadilah pemain pertama yang mencatatkan rekor *Win-Streak* di Hall of Fame!</p>
+                            <p class="text-[9px] text-slate-400 max-w-xs mx-auto">Jadilah pemain pertama yang mencatatkan rekor *Balatro Cash* di Hall of Fame!</p>
                         </div>
                     `;
                     return;
@@ -2053,7 +2276,7 @@
                                 <span class="text-base">${rankIcons[index] || '🎖️'}</span>
                                 <span class="text-xs font-black ${isTop1 ? 'text-amber-300' : 'text-white'} font-mono-custom">${escapeHtml(item.player_name)}</span>
                             </div>
-                            <span class="text-xs font-black text-emerald-400 font-mono-custom">${item.streak_count} 🔥</span>
+                            <span class="text-xs font-black text-amber-400 font-pixel">$${Number(item.streak_count || 0).toLocaleString()} 💵</span>
                         </div>
                     `;
                 }).join('');
