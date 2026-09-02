@@ -13,7 +13,7 @@
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #040407; 
+            background-color: #030a06; 
             color: #cbd5e1; 
             overflow-x: hidden; 
         }
@@ -22,12 +22,12 @@
         .font-pixel { font-family: 'Silkscreen', 'Space Grotesk', monospace; }
 
         .glass { 
-            background: rgba(18, 18, 26, 0.75); 
+            background: rgba(10, 25, 18, 0.75); 
             backdrop-filter: blur(16px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border: 1px solid rgba(52, 211, 153, 0.15); 
         }
 
-        /* BALATRO RETRO CRT ARENA */
+        /* BALATRO RETRO CRT ARENA WITH FELT GREEN */
         .crt-container {
             position: relative;
             overflow: hidden;
@@ -37,11 +37,11 @@
             display: block;
             position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.04));
             z-index: 15;
             background-size: 100% 3px, 6px 100%;
             pointer-events: none;
-            opacity: 0.65;
+            opacity: 0.7;
             border-radius: inherit;
         }
         .crt-container::after {
@@ -49,21 +49,34 @@
             display: block;
             position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 45px rgba(0,0,0,0.85);
             z-index: 16;
             pointer-events: none;
             border-radius: inherit;
         }
 
-        .casino-card-bg {
-            background: radial-gradient(circle at top, rgba(245, 158, 11, 0.1) 0%, rgba(5, 5, 8, 0.98) 100%);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+        .balatro-felt-bg {
+            background: radial-gradient(circle at 50% 25%, #14472b 0%, #0a2516 65%, #041009 100%);
+            border: 1.5px solid rgba(52, 211, 153, 0.35);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.7), 0 10px 30px rgba(0,0,0,0.6);
             transition: all 0.5s ease;
+        }
+
+        /* JOKER CARD SLOTS */
+        .joker-slot {
+            background: rgba(5, 18, 11, 0.85);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .joker-active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(245, 158, 11, 0.25) 100%) !important;
+            border: 1px solid rgba(245, 158, 11, 0.7) !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);
         }
 
         /* EPIC BOSS BATTLE ARENA */
         .boss-card-bg {
-            background: radial-gradient(circle at top, rgba(225, 29, 72, 0.4) 0%, rgba(15, 5, 8, 0.98) 100%) !important;
+            background: radial-gradient(circle at 50% 25%, rgba(190, 18, 60, 0.45) 0%, rgba(15, 5, 8, 0.98) 100%) !important;
             border: 1.5px solid rgba(225, 29, 72, 0.9) !important;
             box-shadow: 0 0 55px rgba(225, 29, 72, 0.6) !important;
             animation: bossPulse 1.2s infinite alternate;
@@ -84,8 +97,8 @@
         .landing-card { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .landing-card:hover {
             transform: translateY(-4px) scale(1.02);
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 10px 30px -10px rgba(255, 255, 255, 0.1);
+            border-color: rgba(52, 211, 153, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
         }
 
         .typewriter-cursor::after {
@@ -115,7 +128,7 @@
         .tension-card-anim { animation: tensionCardDeal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         .gold-rank {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(20, 20, 30, 0.6) 100%);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(10, 25, 18, 0.7) 100%);
             border: 1px solid rgba(245, 158, 11, 0.4) !important;
             box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
         }
@@ -164,6 +177,24 @@
             100% { opacity: 0; transform: translate(-50%, -60px) scale(0.9); }
         }
 
+        /* TAX POPUP FOR THE GOVERNMENT BOSS */
+        .tax-popup {
+            position: fixed;
+            pointer-events: none;
+            z-index: 115;
+            font-weight: 900;
+            color: #f87171;
+            text-align: center;
+            font-family: 'Silkscreen', monospace;
+            animation: taxPop 1.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes taxPop {
+            0% { opacity: 0; transform: translate(-50%, 0) scale(0.7); }
+            20% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
+            80% { opacity: 1; transform: translate(-50%, -45px) scale(1.0); }
+            100% { opacity: 0; transform: translate(-50%, -70px) scale(0.8); }
+        }
+
         @keyframes slotGlow {
             0%, 100% { border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
             50% { border-color: rgba(236, 72, 153, 1); box-shadow: 0 0 30px rgba(236, 72, 153, 0.8); }
@@ -182,14 +213,21 @@
         .btn-dopamine:active { transform: translateY(1px) scale(0.98); }
 
         .btn-hit-balatro {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.5);
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.45) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.6);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
         }
         .btn-stand-balatro {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.35) 100%);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.35) 0%, rgba(185, 28, 28, 0.45) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.6);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
+        }
+
+        .bgm-btn-active {
+            background: rgba(16, 185, 129, 0.25) !important;
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            color: #6ee7b7 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
         }
     </style>
 </head>
@@ -200,23 +238,31 @@
         ✨ Notifikasi
     </div>
 
-    <!-- TOP HEADER -->
-    <nav class="fixed top-0 w-full z-40 bg-[#050508]/85 backdrop-blur-xl border-b border-white/5 transition-all py-2.5">
+    <!-- TOP HEADER WITH BGM TOGGLE -->
+    <nav class="fixed top-0 w-full z-40 bg-[#030a06]/90 backdrop-blur-xl border-b border-emerald-500/20 transition-all py-2.5">
         <div class="max-w-md mx-auto px-4 flex justify-between items-center">
             <button onclick="switchMode('landing')" class="flex items-center active:scale-95 transition">
                 <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-5 w-auto">
             </button>
-            <div id="adminHeaderContainer">
-                <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 py-1 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
-                    🔒 Admin
+            
+            <div class="flex items-center gap-2">
+                <!-- BGM TOGGLE BUTTON -->
+                <button id="btnBgmToggle" onclick="toggleBGM()" class="text-[10px] font-mono-custom font-bold bg-white/5 hover:bg-white/10 border border-white/15 px-2.5 py-1 rounded-xl text-slate-400 transition active:scale-95 flex items-center gap-1">
+                    <span id="bgmIcon">🎵</span> BGM: <b id="bgmStatusText">OFF</b>
                 </button>
+
+                <div id="adminHeaderContainer">
+                    <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 py-1 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
+                        🔒 Admin
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- BOTTOM NAVBAR -->
     <div class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-4">
-        <div class="glass p-1 rounded-full border border-white/10 flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
+        <div class="glass p-1 rounded-full border border-emerald-500/20 flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
             <button id="tabHome" onclick="switchMode('landing')" class="flex-1 py-1.5 rounded-full text-white bg-white/10 transition-all text-center">
                 HOME
             </button>
@@ -241,7 +287,7 @@
                 <p class="text-slate-500 text-[9px] uppercase tracking-widest font-bold font-mono-custom block">- ZALDNIELSEN</p>
             </header>
 
-            <section class="relative w-full overflow-hidden rounded-2xl glass border border-white/10 shadow-2xl group my-1">
+            <section class="relative w-full overflow-hidden rounded-2xl glass border border-emerald-500/20 shadow-2xl group my-1">
                 <div id="slider" class="flex transition-transform duration-500 ease-out w-full">
                     <div class="min-w-full aspect-[21/9] relative">
                         <img src="assets/slider01_roster.webp" alt="Slider Image 1" class="w-full h-full object-cover">
@@ -278,13 +324,13 @@
                     <p class="text-slate-400 text-[10px] mt-0.5">Ruang anonim tempat berbagi cerita, pengakuan, dan membaca curhatan sesama.</p>
                 </div>
 
-                <div onclick="switchMode('arcade')" class="landing-card glass p-3.5 rounded-2xl border border-amber-500/20 cursor-pointer text-left relative overflow-hidden group bg-gradient-to-br from-amber-500/5 to-transparent">
+                <div onclick="switchMode('arcade')" class="landing-card glass p-3.5 rounded-2xl border border-amber-500/30 cursor-pointer text-left relative overflow-hidden group bg-gradient-to-br from-amber-500/10 via-[#0a2516]/40 to-transparent">
                     <div class="flex items-center justify-between mb-0.5">
                         <span class="text-lg">🎰</span>
-                        <span class="text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full group-hover:border-amber-500/40 transition">MAIN GAME ➔</span>
+                        <span class="text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full group-hover:border-amber-500/50 transition">MAIN GAME ➔</span>
                     </div>
-                    <h2 class="text-xs font-black text-amber-400 tracking-wide">Blackjack Roguelite</h2>
-                    <p class="text-slate-400 text-[10px] mt-0.5">Uji keberuntungan dan strategi, kumpulkan win-streak, serta catat namamu di Hall of Fame.</p>
+                    <h2 class="text-xs font-black text-amber-400 tracking-wide">Balatro-Style Blackjack</h2>
+                    <p class="text-slate-300 text-[10px] mt-0.5">Kumpulkan pundi <b>$ Cash</b>, aktifkan kartu <b>Joker</b>, dan taklukkan Boss tiap 8 Ronde!</p>
                 </div>
             </div>
 
@@ -353,14 +399,14 @@
 
             <!-- LOBBY -->
             <div id="arcadeLobby" class="space-y-4">
-                <div class="relative overflow-hidden rounded-3xl p-5 border border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-[#0a0a12] to-[#050508] shadow-2xl text-center">
-                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-mono-custom font-bold tracking-widest uppercase mb-2">
-                        <span>✨</span> Balatro-Style Experience
+                <div class="relative overflow-hidden rounded-3xl p-5 border border-emerald-500/30 balatro-felt-bg shadow-2xl text-center">
+                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[9px] font-mono-custom font-bold tracking-widest uppercase mb-2">
+                        <span>✨</span> Balatro Casino Edition
                     </div>
 
                     <h1 class="text-xl font-black text-white tracking-tight">BLACKJACK <span class="text-amber-400">ROGUELITE</span></h1>
-                    <p class="text-slate-400 text-[11px] mt-1 max-w-xs mx-auto leading-relaxed">
-                        Kumpulkan pundi <b>$ (Dollar)</b>, ledakkan <b>Multiplier</b> kombo, dan taklukkan Boss setiap <b>8 Ronde</b> per Ante!
+                    <p class="text-slate-300 text-[11px] mt-1 max-w-xs mx-auto leading-relaxed">
+                        Kumpulkan <b>$ (Dollar Cash)</b>, aktifkan kartu <b>Joker Pasif</b>, dan kalahkan Boss setiap <b>8 Ronde</b> per Ante!
                     </p>
 
                     <button onclick="enterCasinoGame()" class="w-full mt-4 py-3.5 rounded-2xl text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 btn-dopamine">
@@ -368,20 +414,20 @@
                     </button>
                 </div>
 
-                <section id="lobbyHallOfFame" class="glass p-4 rounded-3xl border border-white/10 shadow-2xl">
+                <section id="lobbyHallOfFame" class="glass p-4 rounded-3xl border border-emerald-500/20 shadow-2xl">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-1.5">
                             <span class="text-base">🏆</span>
                             <div>
                                 <h3 class="text-[11px] font-black text-white tracking-widest uppercase">Hall of Fame</h3>
-                                <p class="text-[8px] text-slate-500 font-mono-custom">TOP 5 SKOR $ CASH & ANTE</p>
+                                <p class="text-[8px] text-slate-400 font-mono-custom">TOP 5 REKOR $ CASH PER RUN</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5">
                             <button id="adminResetLeaderboardBtn" onclick="confirmResetLeaderboard()" class="hidden text-[8px] font-mono-custom font-bold bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-lg hover:bg-red-500/30 transition">
                                 🔄 RESET
                             </button>
-                            <span class="text-[8px] font-mono-custom text-amber-400/80 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">LIVE RANKING</span>
+                            <span class="text-[8px] font-mono-custom text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/30">LIVE RANKING</span>
                         </div>
                     </div>
                     
@@ -394,8 +440,8 @@
             <!-- GAMEPLAY UI -->
             <div id="arcadeGameUI" class="hidden space-y-2.5">
                 
-                <div class="flex items-center justify-between glass px-3 py-2 rounded-xl border border-white/10">
-                    <button onclick="exitCasinoGame()" class="text-slate-400 hover:text-white text-[11px] font-bold flex items-center gap-1 transition active:scale-95">
+                <div class="flex items-center justify-between glass px-3 py-2 rounded-xl border border-emerald-500/20">
+                    <button onclick="exitCasinoGame()" class="text-slate-300 hover:text-white text-[11px] font-bold flex items-center gap-1 transition active:scale-95">
                         <span>⬅</span> LOBBY
                     </button>
                     <div id="tableHeaderTitle" class="text-[11px] font-black tracking-wider text-amber-400 flex items-center gap-1">
@@ -407,19 +453,19 @@
                 </div>
 
                 <div id="rulesAccordion" class="hidden p-3 rounded-2xl glass border border-amber-500/20 text-[10px] text-slate-300 space-y-1.5">
-                    <div class="font-bold text-amber-400 border-b border-white/10 pb-0.5">📜 Balatro Multiplier, Boss & Consumables:</div>
-                    <p class="text-[9px] text-slate-400 leading-relaxed">Capai 21 tanpa BUST. Kumpulkan <b>$ (Cash)</b> dengan melipatgandakan <b>Multiplier</b> tiap ronde!</p>
+                    <div class="font-bold text-amber-400 border-b border-white/10 pb-0.5">📜 Balatro Jokers, Boss & Consumables:</div>
+                    <p class="text-[9px] text-slate-300 leading-relaxed">Capai 21 tanpa BUST. Kumpulkan <b>$ (Cash)</b> dengan melipatgandakan <b>Multiplier</b> tiap ronde!</p>
                     <div class="grid grid-cols-1 gap-1 text-[9px] pt-0.5">
-                        <div class="text-amber-300">🔥 <b>MULTIPLIER:</b> Menang berturut-turut memberi +0.2x Multiplier. Suited Hand (+1.5x), Pocket Pair (+1.3x).</div>
-                        <div class="text-rose-400">⚔️ <b>BOSS CYCLE 1/8:</b> Ronde 8/8 adalah Boss Battle! Kalahkan bos untuk naik ke Ante berikutnya & dapatkan bonus besar.</div>
+                        <div class="text-amber-300">🔥 <b>MULTIPLIER:</b> Menang berturut-turut memberi +0.2x Mult. Suited Hand (+1.5x), Pocket Pair (+1.3x).</div>
+                        <div class="text-rose-400">⚔️ <b>BOSS CYCLE 1/8:</b> Ronde 8/8 adalah Boss Battle! Kalahkan bos untuk naik Ante & dapatkan Joker baru.</div>
                         <div class="text-indigo-300">🔄 <b>DISCARD (Max 2):</b> Membuang kartu terakhir yang ditarik & menarik kartu baru dari Shoe Deck.</div>
                         <div class="text-red-400">💣 <b>BUSTER (Max 2):</b> <i>Overcharge Dealer</i> - Memaksa Dealer menarik +1 kartu ekstra saat Stand.</div>
                         <div class="text-emerald-300">🛡️ <b>AEGIS SHIELD (Max 3):</b> Menahan loss. Hanya didapat jika menang dengan skor 21. Boss Tax: -1 Shield saat bos kalah.</div>
-                        <div class="text-yellow-300">⚡ <b>DRIAN'S MERCY:</b> Ambil 1 kartu & Stand dengan x2.0 Multiplier instan (Unlock @17 Resets).</div>
+                        <div class="text-rose-300">🏛️ <b>THE GOVERNMENT BOSS:</b> Memotong pajak 5% dari Total Cash setiap kali kamu menekan tombol HIT!</div>
                     </div>
                 </div>
 
-                <!-- BOSS BANNER ALERT (REFINED & MORE IMMERSIVE) -->
+                <!-- BOSS BANNER ALERT -->
                 <div id="bossAlertBanner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-red-950 via-rose-900 to-red-950 border-2 border-red-500 text-center shadow-[0_0_30px_rgba(239,68,68,0.4)] space-y-1">
                     <div class="text-[11px] font-black text-white uppercase tracking-widest font-mono-custom flex items-center justify-center gap-1.5 animate-pulse">
                         <span>⚔️</span> BOSS FIGHT ACTIVE (ROUND 8/8) <span>⚔️</span>
@@ -431,9 +477,37 @@
                     </div>
                 </div>
 
-                <!-- MAIN CARD CASINO CONTAINER (BALATRO CRT CONTAINER) -->
-                <div id="blackjackCard" class="casino-card-bg crt-container p-3.5 rounded-2xl shadow-2xl relative space-y-2.5">
+                <!-- MAIN CARD CASINO CONTAINER (BALATRO FELT ARENA & CRT) -->
+                <div id="blackjackCard" class="balatro-felt-bg crt-container p-3.5 rounded-2xl shadow-2xl relative space-y-2.5">
                     
+                    <!-- BALATRO JOKER DISPLAY SLOTS (3 SLOTS) -->
+                    <div class="bg-black/60 p-2 rounded-xl border border-emerald-500/30 relative z-20 space-y-1">
+                        <div class="flex justify-between items-center text-[8px] font-mono-custom font-bold text-emerald-400 uppercase">
+                            <span>🃏 Active Jokers (Passives)</span>
+                            <span class="text-slate-400 font-normal">Auto-trigger on win</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <!-- JOKER 1: JESTER -->
+                            <div id="jokerSlotJester" class="joker-slot p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]">
+                                <div class="text-xs">🃏</div>
+                                <div class="text-[8px] font-black text-slate-400 leading-tight">The Jester</div>
+                                <div class="text-[7px] text-slate-500 font-mono-custom">+0.5x Mult</div>
+                            </div>
+                            <!-- JOKER 2: GREEDY -->
+                            <div id="jokerSlotGreedy" class="joker-slot p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]">
+                                <div class="text-xs">💰</div>
+                                <div class="text-[8px] font-black text-slate-400 leading-tight">Greedy Joker</div>
+                                <div class="text-[7px] text-slate-500 font-mono-custom">+50% Cash</div>
+                            </div>
+                            <!-- JOKER 3: HEARTBREAKER -->
+                            <div id="jokerSlotHeart" class="joker-slot p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]">
+                                <div class="text-xs">💔</div>
+                                <div class="text-[8px] font-black text-slate-400 leading-tight">Heartbreaker</div>
+                                <div class="text-[7px] text-slate-500 font-mono-custom">Draw = Win</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- BALATRO DUAL SCOREBOARD BAR -->
                     <div class="bg-black/70 p-2.5 rounded-xl border border-white/15 space-y-2 relative z-20">
                         <div class="grid grid-cols-3 gap-1.5 text-center font-mono-custom">
@@ -454,10 +528,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-4 gap-1 text-center font-mono-custom pt-1 border-t border-white/5 text-[8px]">
-                            <div class="bg-white/5 py-0.5 rounded border border-white/5">
-                                <span class="text-slate-400">RESETS:</span> <b id="totalResetsText" class="text-amber-400">0</b>/17
-                            </div>
+                        <div class="grid grid-cols-3 gap-1 text-center font-mono-custom pt-1 border-t border-white/5 text-[8px]">
                             <div class="bg-white/5 py-0.5 rounded border border-white/5">
                                 <span class="text-slate-400">W-L-D:</span> <b id="statWLD" class="text-white">0-0-0</b>
                             </div>
@@ -467,12 +538,6 @@
                             <div class="bg-white/5 py-0.5 rounded border border-white/5">
                                 <span class="text-slate-400">WIN:</span> <b id="statWinrate" class="text-emerald-400">0%</b>
                             </div>
-                        </div>
-
-                        <div id="activePassivesContainer" class="hidden pt-0.5 flex flex-wrap gap-1 justify-center">
-                            <span id="badgeGoldenBoot" class="hidden text-[8px] font-bold font-mono-custom bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2 py-0.5 rounded-full">👢 Golden Boot (+0.5x)</span>
-                            <span id="badgeHeartbreaker" class="hidden text-[8px] font-bold font-mono-custom bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full">💔 Heartbreaker</span>
-                            <span id="badgeLifesteal" class="hidden text-[8px] font-bold font-mono-custom bg-red-500/20 text-red-300 border border-red-500/40 px-2 py-0.5 rounded-full">🩸 Lifesteal</span>
                         </div>
                     </div>
 
@@ -506,13 +571,8 @@
                         </div>
                     </div>
 
-                    <!-- DRIAN'S MERCY -->
-                    <button onclick="toggleDriansMercy()" id="btnDriansMercy" class="w-full py-2 rounded-xl text-[10px] font-black uppercase tracking-wider text-amber-100 flex items-center justify-center gap-1.5 border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 disabled:opacity-30 disabled:pointer-events-none relative z-20" disabled>
-                        <span>⚡</span> DRIAN'S MERCY <span>(2.0X MULTIPLIER)</span>
-                    </button>
-
                     <!-- PLAYING TABLE AREA -->
-                    <div class="space-y-2 bg-black/70 p-3 rounded-xl border border-white/10 relative z-20">
+                    <div class="space-y-2 bg-black/75 p-3 rounded-xl border border-emerald-500/20 relative z-20">
                         <!-- DEALER -->
                         <div>
                             <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
@@ -600,25 +660,25 @@
         </div>
     </div>
 
-    <!-- MODAL PEMILIHAN PASIF (DYNAMIC: HILANG JIKA DIPILIH, +$1,000 / +2 AEGIS KETIKA HABIS) -->
+    <!-- MODAL PEMILIHAN JOKER PASIF BOSS -->
     <div id="passiveChoiceModal" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
-            <div class="text-3xl mb-1">🎁</div>
-            <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider">PILIH 1 PASIF BOSS</h3>
-            <p id="passiveModalSubtitle" class="text-slate-400 text-[10px] mb-3">Pilih 1 pasif permanen untuk run ini:</p>
+        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#07170e] relative">
+            <div class="text-3xl mb-1">🃏</div>
+            <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider font-pixel">PILIH 1 JOKER PASIF</h3>
+            <p id="passiveModalSubtitle" class="text-slate-300 text-[10px] mb-3">Pilih 1 kartu Joker permanen untuk run ini:</p>
 
             <div id="passiveButtonsContainer" class="space-y-2">
-                <!-- Di-render dinamis via JS agar pasif yg sudah dipilih hilang -->
+                <!-- Di-render dinamis via JS -->
             </div>
         </div>
     </div>
 
     <!-- MODAL REWARD CONSUMABLE SETELAH BOSS BATTLE -->
     <div id="bossRewardModal" class="modal-base hidden-modal fixed inset-0 z-[66] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-indigo-500/40 shadow-2xl text-center bg-[#0a0a0d] relative">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-indigo-500/40 shadow-2xl text-center bg-[#07170e] relative">
             <div class="text-3xl mb-1">📦</div>
-            <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider">BOSS VICTORY REWARD</h3>
-            <p class="text-slate-400 text-[10px] mb-3">Pilih 1 bonus tactical tambahan:</p>
+            <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider font-pixel">BOSS VICTORY REWARD</h3>
+            <p class="text-slate-300 text-[10px] mb-3">Pilih 1 bonus tactical tambahan:</p>
 
             <div class="space-y-2">
                 <button onclick="chooseBossReward('discard')" class="w-full p-2 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 text-left rounded-xl transition flex items-center justify-between">
@@ -665,19 +725,19 @@
 
     <!-- Modal Highscore Submission (Dilengkapi BALATRO REKOR $ CASH) -->
     <div id="scoreSubmitModal" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#0a0a0d] relative space-y-3 max-h-[90vh] overflow-y-auto scrollbar-hide">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#07170e] relative space-y-3 max-h-[90vh] overflow-y-auto scrollbar-hide">
             
             <div class="w-10 h-10 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg shadow">
                 👑
             </div>
 
             <div>
-                <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider">Run Berakhir!</h3>
-                <p class="text-slate-400 text-[11px] mt-0.5">Total Hadiah: <span id="finalCash" class="text-amber-400 font-pixel font-bold">$0</span></p>
-                <p class="text-[9px] text-slate-500 font-mono-custom">Mencapai <span id="finalAnteRound" class="text-white font-bold">Ante 1 - Round 1/8</span></p>
+                <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider font-pixel">Run Berakhir!</h3>
+                <p class="text-slate-300 text-[11px] mt-0.5">Total Hadiah: <span id="finalCash" class="text-amber-400 font-pixel font-bold">$0</span></p>
+                <p class="text-[9px] text-slate-400 font-mono-custom">Mencapai <span id="finalAnteRound" class="text-white font-bold">Ante 1 - Round 1/8</span></p>
             </div>
 
-            <!-- END-GAME STATISTICS BOX (Statistik Game Balatro) -->
+            <!-- END-GAME STATISTICS BOX -->
             <div class="bg-black/60 p-3 rounded-2xl border border-white/10 text-left space-y-1.5 font-mono-custom text-[10px]">
                 <div class="text-amber-400 font-black uppercase text-[10px] border-b border-white/10 pb-1 flex justify-between items-center">
                     <span>📊 End-Game Statistics</span>
@@ -685,11 +745,10 @@
                 </div>
                 <div class="grid grid-cols-2 gap-1 text-slate-300 pt-0.5">
                     <div>🛡️ Aegis Used: <b id="statEndAegis" class="text-emerald-400">0</b></div>
-                    <div>⚡ Mercy Used: <b id="statEndMercy" class="text-amber-400">0</b></div>
                     <div>🔄 Discard Used: <b id="statEndDiscard" class="text-indigo-400">0</b></div>
                     <div>💣 Buster Used: <b id="statEndBuster" class="text-red-400">0</b></div>
                     <div>🔥 Max Mult: <b id="statEndMaxMult" class="text-rose-400">×1.0</b></div>
-                    <div>💵 Max Cash: <b id="statEndMaxCash" class="text-amber-300">$0</b></div>
+                    <div class="col-span-2">💵 Max Cash: <b id="statEndMaxCash" class="text-amber-300">$0</b></div>
                 </div>
             </div>
 
@@ -889,13 +948,94 @@
         }
         typeWriter();
 
-        // --- BALATRO SYNTH AUDIO ENGINE (WEB AUDIO API) ---
+        // --- BALATRO SYNTH AUDIO ENGINE & PROCEDURAL CHIPTUNE BGM (WEB AUDIO API) ---
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
 
         function initAudio() {
             if (!audioCtx) audioCtx = new AudioCtx();
             if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // --- PROCEDURAL 8-BIT / LO-FI CASINO BGM ENGINE ---
+        let isBgmPlaying = false;
+        let bgmInterval = null;
+        let bgmStep = 0;
+        
+        // Pentatonic chill casino arpeggio progression (in Hz)
+        const bgmNotes = [
+            [261.63, 329.63, 392.00], // C major
+            [293.66, 349.23, 440.00], // D minor
+            [329.63, 392.00, 493.88], // E minor
+            [349.23, 440.00, 523.25], // F major
+            [392.00, 493.88, 587.33], // G major
+            [440.00, 523.25, 659.25], // A minor
+            [349.23, 440.00, 523.25], // F major
+            [392.00, 493.88, 587.33]  // G major
+        ];
+        const bassNotes = [130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 174.61, 196.00];
+
+        function playBgmBeat() {
+            if (!isBgmPlaying || !audioCtx) return;
+
+            let chordIndex = Math.floor(bgmStep / 4) % bgmNotes.length;
+            let noteInChord = bgmStep % 3;
+            let currentFreq = bgmNotes[chordIndex][noteInChord];
+
+            // 1. Chiptune melody note
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(currentFreq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.18);
+
+            // 2. Warm lo-fi bass on beat 1 & 3 of chord
+            if (bgmStep % 4 === 0 || bgmStep % 4 === 2) {
+                const bassOsc = audioCtx.createOscillator();
+                const bassGain = audioCtx.createGain();
+                bassOsc.type = 'sine';
+                bassOsc.frequency.setValueAtTime(bassNotes[chordIndex], audioCtx.currentTime);
+                bassGain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                bassGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+                bassOsc.connect(bassGain);
+                bassGain.connect(audioCtx.destination);
+                bassOsc.start();
+                bassOsc.stop(audioCtx.currentTime + 0.35);
+            }
+
+            bgmStep++;
+        }
+
+        function toggleBGM() {
+            initAudio();
+            isBgmPlaying = !isBgmPlaying;
+            
+            const btn = document.getElementById('btnBgmToggle');
+            const statusText = document.getElementById('bgmStatusText');
+            const icon = document.getElementById('bgmIcon');
+
+            if (isBgmPlaying) {
+                btn.classList.add('bgm-btn-active');
+                statusText.textContent = "ON";
+                icon.textContent = "🎶";
+                bgmStep = 0;
+                bgmInterval = setInterval(playBgmBeat, 240);
+                showToast("🎵 BGM Chiptune Aktif!");
+            } else {
+                btn.classList.remove('bgm-btn-active');
+                statusText.textContent = "OFF";
+                icon.textContent = "🎵";
+                if (bgmInterval) {
+                    clearInterval(bgmInterval);
+                    bgmInterval = null;
+                }
+                showToast("🔇 BGM Dimatikan.");
+            }
         }
 
         function playClickSound() {
@@ -945,7 +1085,6 @@
 
         function playTensionCardSound() {
             initAudio();
-            // Suspense low glide chord when hitting at 12-16
             const osc1 = audioCtx.createOscillator();
             const osc2 = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -979,6 +1118,21 @@
             gain.connect(audioCtx.destination);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.12);
+        }
+
+        function playTaxSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
         }
 
         function playWinSound() {
@@ -1041,21 +1195,6 @@
             gain.connect(audioCtx.destination);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.12);
-        }
-
-        function playMercySound() {
-            initAudio();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + 0.3);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
         }
 
         function playBossAlertSound() {
@@ -1162,6 +1301,19 @@
             popup.style.top = (window.innerHeight / 2 - 20) + 'px';
             document.body.appendChild(popup);
             setTimeout(() => popup.remove(), 1400);
+        }
+
+        function spawnTaxPopup(taxText) {
+            const popup = document.createElement('div');
+            popup.className = 'tax-popup drop-shadow-[0_0_15px_rgba(239,68,68,0.9)]';
+            popup.innerHTML = `
+                <div class="text-lg sm:text-xl text-rose-400 font-black">${taxText}</div>
+                <div class="text-[9px] text-red-300 font-mono-custom font-bold">GOVERNMENT TAX 5%</div>
+            `;
+            popup.style.left = '50%';
+            popup.style.top = (window.innerHeight / 2 + 10) + 'px';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1300);
         }
 
         function triggerScreenShake() {
@@ -1327,7 +1479,7 @@
         let dealerHand = [];
         let isGameActive = false;
 
-        // BALATRO ECONOMY & MULTIPLIERS
+        // BALATRO RUN ECONOMY & MULTIPLIERS (RESET ON LOSS / REFRESH)
         let currentAnte = 1;
         let currentRound = 1; // 1 to 8 (8 is BOSS BATTLE)
         let totalCash = 0;
@@ -1341,8 +1493,6 @@
         const MAX_SHIELDS = 3;
         let shieldCount = 1;
         let isShieldActive = true;
-        let isDriansMercyActive = false;
-        let totalResets = 0;
 
         // TACTICAL CONSUMABLES REBALANCE
         const MAX_CONSUMABLES = 2;
@@ -1354,7 +1504,6 @@
         // STATISTIK END-GAME TRACKER
         let statsTracker = {
             aegisUsed: 0,
-            mercyUsed: 0,
             discardUsed: 0,
             busterUsed: 0,
             maxMult: 1.0,
@@ -1362,12 +1511,12 @@
             highestAnte: 1
         };
 
-        // STATE PASIF BOSS
-        let availablePassives = ['golden_boot', 'heartbreaker', 'lifesteal'];
-        let activePassives = {
-            golden_boot: false,
-            heartbreaker: false,
-            lifesteal: false
+        // BALATRO JOKER PASSIVES (3 SLOTS)
+        let availableJokers = ['jester', 'greedy', 'heartbreaker'];
+        let activeJokers = {
+            jester: false,       // +0.5x Mult per win
+            greedy: false,       // +50% Cash bounty per win
+            heartbreaker: false  // Draw = Win
         };
 
         let isBossLevel = false;
@@ -1375,7 +1524,14 @@
         let bossHP = 3;
         let maxBossHP = 3;
 
+        // BOSSES INCLUDING "THE GOVERNMENT"
         const BOSSES = [
+            {
+                name: "THE GOVERNMENT",
+                avatar: "🏛️",
+                perkDesc: "Pajak 5% Total Cash setiap kali Player menekan HIT!",
+                perkType: "gov_tax_5pct"
+            },
             {
                 name: "SAMARITAN",
                 avatar: "🥷",
@@ -1455,6 +1611,33 @@
             return 3;
         }
 
+        function renderJokerSlots() {
+            const slotJester = document.getElementById('jokerSlotJester');
+            const slotGreedy = document.getElementById('jokerSlotGreedy');
+            const slotHeart = document.getElementById('jokerSlotHeart');
+
+            if (activeJokers.jester) {
+                slotJester.className = "joker-slot joker-active p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]";
+                slotJester.querySelector('.text-slate-400')?.classList.replace('text-slate-400', 'text-amber-300');
+            } else {
+                slotJester.className = "joker-slot p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]";
+            }
+
+            if (activeJokers.greedy) {
+                slotGreedy.className = "joker-slot joker-active p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]";
+                slotGreedy.querySelector('.text-slate-400')?.classList.replace('text-slate-400', 'text-amber-300');
+            } else {
+                slotGreedy.className = "joker-slot p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]";
+            }
+
+            if (activeJokers.heartbreaker) {
+                slotHeart.className = "joker-slot joker-active p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]";
+                slotHeart.querySelector('.text-slate-400')?.classList.replace('text-slate-400', 'text-purple-300');
+            } else {
+                slotHeart.className = "joker-slot p-1.5 rounded-lg text-center flex flex-col items-center justify-center min-h-[46px]";
+            }
+        }
+
         function renderCards() {
             const pCards = document.getElementById('playerCards');
             const dCards = document.getElementById('dealerCards');
@@ -1530,6 +1713,7 @@
             }
 
             updateConsumableUI();
+            renderJokerSlots();
         }
 
         function updateConsumableUI() {
@@ -1663,6 +1847,15 @@
         function hit() {
             if (!isGameActive) return;
             
+            // THE GOVERNMENT BOSS PERK: 5% CASH TAX PER HIT
+            if (isBossLevel && currentBoss && currentBoss.perkType === 'gov_tax_5pct' && totalCash > 0) {
+                let taxAmount = Math.max(1, Math.round(totalCash * 0.05));
+                totalCash -= taxAmount;
+                spawnTaxPopup(`-$${taxAmount.toLocaleString()} TAX`);
+                playTaxSound();
+                updateUIStats();
+            }
+
             let prevScore = calculateScore(playerHand);
             playerHand.push(drawCardFromShoe());
             
@@ -1728,8 +1921,8 @@
             } else if (pScore < dScore) {
                 endRound('loss', "DEALER MENANG! 🤖");
             } else {
-                if (activePassives.heartbreaker) {
-                    endRound('win_heartbreaker', "SERI! Heartbreaker Aktif (Seri = Menang) 💔");
+                if (activeJokers.heartbreaker) {
+                    endRound('win_heartbreaker', "SERI! Heartbreaker Joker Aktif (Seri = Menang) 💔");
                 } else {
                     endRound('draw', "HASIL SERI! (PUSH) 🤝");
                 }
@@ -1763,28 +1956,7 @@
             }
         }
 
-        function toggleDriansMercy() {
-            if (totalResets < 17 && !isAdminLoggedIn) {
-                playBustSound();
-                triggerHaptic('bust');
-                showToast(`🔒 Membutuhkan 17 Reset! (Saat ini: ${totalResets})`);
-                return;
-            }
-            if (!isGameActive) return;
-
-            playMercySound();
-            triggerHaptic('heavy');
-            isDriansMercyActive = true;
-            statsTracker.mercyUsed++;
-            
-            totalResets = 0;
-            document.getElementById('totalResetsText').textContent = totalResets;
-
-            hit();
-            if (isGameActive) stand();
-        }
-
-        // --- SISTEM PEMILIHAN PASIF BOSS ---
+        // --- SISTEM PEMILIHAN JOKER PASIF BOSS ---
         function triggerPassiveChoiceModal() {
             playModalSound();
             const modal = document.getElementById('passiveChoiceModal');
@@ -1793,43 +1965,43 @@
             
             container.innerHTML = '';
 
-            if (availablePassives.length > 0) {
-                subtitle.textContent = "Selamat! Pilih 1 pasif permanen untuk run ini:";
+            if (availableJokers.length > 0) {
+                subtitle.textContent = "Selamat! Pilih 1 Joker permanen untuk run ini:";
                 
-                if (availablePassives.includes('golden_boot')) {
+                if (availableJokers.includes('jester')) {
                     container.innerHTML += `
-                        <button onclick="selectPassive('golden_boot')" class="w-full p-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-left rounded-xl transition group">
-                            <div class="text-xs font-bold text-yellow-300 font-mono-custom">👢 Golden Boot</div>
-                            <div class="text-[9px] text-slate-400 mt-0.5">+0.5x Multiplier permanen setiap kali menang ronde!</div>
+                        <button onclick="selectJoker('jester')" class="w-full p-2.5 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition group">
+                            <div class="text-xs font-bold text-rose-300 font-mono-custom">🃏 The Jester (Red Joker)</div>
+                            <div class="text-[9px] text-slate-300 mt-0.5">+0.5x Multiplier permanen setiap kali menang ronde!</div>
                         </button>
                     `;
                 }
-                if (availablePassives.includes('heartbreaker')) {
+                if (availableJokers.includes('greedy')) {
                     container.innerHTML += `
-                        <button onclick="selectPassive('heartbreaker')" class="w-full p-2.5 bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 text-left rounded-xl transition group">
-                            <div class="text-xs font-bold text-purple-300 font-mono-custom">💔 Heartbreaker</div>
-                            <div class="text-[9px] text-slate-400 mt-0.5">Hasil Seri (Draw) langsung dianggap sebagai Menang!</div>
+                        <button onclick="selectJoker('greedy')" class="w-full p-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-left rounded-xl transition group">
+                            <div class="text-xs font-bold text-yellow-300 font-mono-custom">💰 Greedy Joker (Gold Joker)</div>
+                            <div class="text-[9px] text-slate-300 mt-0.5">+50% Total Cash Reward setiap kali menang ronde!</div>
                         </button>
                     `;
                 }
-                if (availablePassives.includes('lifesteal')) {
+                if (availableJokers.includes('heartbreaker')) {
                     container.innerHTML += `
-                        <button onclick="selectPassive('lifesteal')" class="w-full p-2.5 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition group">
-                            <div class="text-xs font-bold text-rose-300 font-mono-custom">🩸 Lifesteal</div>
-                            <div class="text-[9px] text-slate-400 mt-0.5">Menang dengan angka tepat 21 memberikan +1 Aegis Shield (Cap 3).</div>
+                        <button onclick="selectJoker('heartbreaker')" class="w-full p-2.5 bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 text-left rounded-xl transition group">
+                            <div class="text-xs font-bold text-purple-300 font-mono-custom">💔 Heartbreaker (Purple Joker)</div>
+                            <div class="text-[9px] text-slate-300 mt-0.5">Hasil Seri (Draw / Push) langsung dianggap sebagai Menang!</div>
                         </button>
                     `;
                 }
             } else {
-                subtitle.textContent = "Semua pasif utama sudah aktif! Pilih bonus reward ultimate:";
+                subtitle.textContent = "Semua Joker utama sudah aktif! Pilih reward bounty ultimate:";
                 container.innerHTML = `
                     <button onclick="selectUltimateBonus('cash')" class="w-full p-3 bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-left rounded-xl transition group">
                         <div class="text-xs font-bold text-amber-300 font-mono-custom">💵 +$1,000 Cash Bounty</div>
-                        <div class="text-[9px] text-slate-400 mt-0.5">Tambahan instan $1,000 ke total cash run saat ini.</div>
+                        <div class="text-[9px] text-slate-300 mt-0.5">Tambahan instan $1,000 ke total cash run saat ini.</div>
                     </button>
                     <button onclick="selectUltimateBonus('aegis')" class="w-full p-3 bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-left rounded-xl transition group">
                         <div class="text-xs font-bold text-emerald-300 font-mono-custom">🛡️ +2 Aegis Shields</div>
-                        <div class="text-[9px] text-slate-400 mt-0.5">Tambahan 2 kuota pelindung kekalahan beruntun.</div>
+                        <div class="text-[9px] text-slate-300 mt-0.5">Tambahan 2 kuota pelindung kekalahan beruntun (Max 3).</div>
                     </button>
                 `;
             }
@@ -1838,21 +2010,21 @@
             modal.classList.add('show-modal');
         }
 
-        function selectPassive(type) {
+        function selectJoker(type) {
             playWinSound();
             triggerHaptic('heavy');
             
-            if (type === 'golden_boot') activePassives.golden_boot = true;
-            if (type === 'heartbreaker') activePassives.heartbreaker = true;
-            if (type === 'lifesteal') activePassives.lifesteal = true;
+            if (type === 'jester') activeJokers.jester = true;
+            if (type === 'greedy') activeJokers.greedy = true;
+            if (type === 'heartbreaker') activeJokers.heartbreaker = true;
 
-            availablePassives = availablePassives.filter(p => p !== type);
+            availableJokers = availableJokers.filter(j => j !== type);
 
             const modal = document.getElementById('passiveChoiceModal');
             modal.classList.remove('show-modal');
             modal.classList.add('hidden-modal');
 
-            showToast("✨ Pasif Baru Diaktifkan!");
+            showToast("✨ Joker Baru Diaktifkan!");
             updateUIStats();
         }
 
@@ -2004,12 +2176,14 @@
                 if (playerHand.length >= 2 && playerHand[0].value === playerHand[1].value) {
                     roundMultiplier *= 1.3;
                 }
-                // Golden Boot passive bonus
-                if (activePassives.golden_boot) roundMultiplier += 0.5;
-                // Drian's Mercy active
-                if (isDriansMercyActive) roundMultiplier *= 2.0;
+                // The Jester (+0.5x Mult)
+                if (activeJokers.jester) roundMultiplier += 0.5;
 
                 let finalRoundCash = Math.round(baseReward * roundMultiplier);
+                
+                // Greedy Joker (+50% Cash Reward)
+                if (activeJokers.greedy) finalRoundCash = Math.round(finalRoundCash * 1.5);
+
                 totalCash += finalRoundCash;
                 wins++;
 
@@ -2097,11 +2271,15 @@
 
                     if (shieldCount === 0) isShieldActive = false;
                 } else {
-                    // RUN GAME OVER
-                    totalResets++;
-                    document.getElementById('totalResetsText').textContent = totalResets;
+                    // RUN GAME OVER - RESET TOTAL CASH TO $0
+                    let endCash = totalCash;
+                    let endAnte = currentAnte;
+                    let endRoundNum = currentRound;
 
-                    showScoreModal(totalCash, currentAnte, currentRound);
+                    totalCash = 0;
+                    activeMultiplier = 1.0;
+
+                    showScoreModal(endCash, endAnte, endRoundNum);
                     resetSessionBuffs();
                 }
             } else {
@@ -2109,7 +2287,6 @@
                 playClickSound();
             }
 
-            isDriansMercyActive = false;
             isBusterActiveThisRound = false;
             renderCards();
             updateUIStats();
@@ -2127,8 +2304,8 @@
                 discardCount = 1;
                 busterCount = 1;
             }
-            activePassives = { golden_boot: false, heartbreaker: false, lifesteal: false };
-            availablePassives = ['golden_boot', 'heartbreaker', 'lifesteal'];
+            activeJokers = { jester: false, greedy: false, heartbreaker: false };
+            availableJokers = ['jester', 'greedy', 'heartbreaker'];
             
             shoeDeck = createShoeDeck();
             isBossLevel = false;
@@ -2146,7 +2323,6 @@
             document.getElementById('roundCounterText').innerHTML = `${currentRound}/8 <span class="text-[8px] text-amber-400">(A${currentAnte})</span>`;
             
             document.getElementById('statWLD').textContent = `${wins}-${losses}-${draws}`;
-            document.getElementById('totalResetsText').textContent = totalResets;
 
             let total = wins + losses + draws;
             document.getElementById('statTotal').textContent = total;
@@ -2155,24 +2331,7 @@
             document.getElementById('statWinrate').textContent = `${winrate}%`;
 
             updateShieldUI();
-
-            const btnMercy = document.getElementById('btnDriansMercy');
-            btnMercy.disabled = (totalResets < 17 && !isAdminLoggedIn) || !isGameActive;
-
-            const passivesContainer = document.getElementById('activePassivesContainer');
-            const bGolden = document.getElementById('badgeGoldenBoot');
-            const bHeart = document.getElementById('badgeHeartbreaker');
-            const bLifesteal = document.getElementById('badgeLifesteal');
-
-            let hasAnyPassive = activePassives.golden_boot || activePassives.heartbreaker || activePassives.lifesteal;
-            if (hasAnyPassive) {
-                passivesContainer.classList.remove('hidden');
-                bGolden.classList.toggle('hidden', !activePassives.golden_boot);
-                bHeart.classList.toggle('hidden', !activePassives.heartbreaker);
-                bLifesteal.classList.toggle('hidden', !activePassives.lifesteal);
-            } else {
-                passivesContainer.classList.add('hidden');
-            }
+            renderJokerSlots();
         }
 
         let cashToSubmit = 0;
@@ -2185,7 +2344,6 @@
             
             // ISI DATA END-GAME STATISTICS
             document.getElementById('statEndAegis').textContent = statsTracker.aegisUsed;
-            document.getElementById('statEndMercy').textContent = statsTracker.mercyUsed;
             document.getElementById('statEndDiscard').textContent = statsTracker.discardUsed;
             document.getElementById('statEndBuster').textContent = statsTracker.busterUsed;
             document.getElementById('statEndMaxMult').textContent = `×${statsTracker.maxMult.toFixed(1)}`;
@@ -2258,7 +2416,7 @@
 
                 if (!data || data.length === 0) {
                     listEl.innerHTML = `
-                        <div class="relative overflow-hidden p-4 rounded-2xl border border-dashed border-amber-500/30 bg-gradient-to-b from-amber-500/10 via-black/40 to-transparent text-center space-y-2">
+                        <div class="relative overflow-hidden p-4 rounded-2xl border border-dashed border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 via-black/40 to-transparent text-center space-y-2">
                             <div class="text-2xl animate-bounce">👑</div>
                             <div class="text-xs font-black text-amber-400 font-mono-custom uppercase">Papan Peringkat Kosong!</div>
                             <p class="text-[9px] text-slate-400 max-w-xs mx-auto">Jadilah pemain pertama yang mencatatkan rekor *Balatro Cash* di Hall of Fame!</p>
