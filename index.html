@@ -346,21 +346,56 @@
             </div>
         </div>
 
-        <!-- MODE 1: FEEDS (MAINTENANCE) -->
-        <div id="viewFeeds" class="hidden pt-16 pb-8 flex flex-col items-center justify-center text-center">
-            <div class="glass p-6 rounded-3xl border border-amber-500/30 max-w-xs w-full space-y-3 shadow-2xl relative overflow-hidden">
-                <div class="text-4xl animate-bounce">🚧</div>
-                <div>
-                    <h2 class="text-lg font-black text-amber-400 tracking-wider font-mono-custom uppercase">UNDER MAINTENANCE</h2>
-                    <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                        Halaman <b>Room of Faith (Feeds)</b> sedang dalam pemeliharaan sistem. Kami akan segera kembali!
-                    </p>
+        <!-- MODE 1: FEEDS (ROOM OF FAITH) -->
+        <div id="viewFeeds" class="hidden space-y-4 pt-14 pb-8">
+            
+            <!-- HEADER FEEDS -->
+            <div class="glass p-4 rounded-3xl border border-emerald-500/20 shadow-2xl relative overflow-hidden bg-gradient-to-br from-emerald-950/40 via-black/60 to-black/80">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-lg shadow-inner">
+                            💬
+                        </div>
+                        <div>
+                            <h1 class="text-sm font-black text-white uppercase tracking-wider font-mono-custom flex items-center gap-2">
+                                Room of Faith
+                            </h1>
+                            <p class="text-[10px] text-slate-400">Dinding Cerita & Pengakuan Anonim</p>
+                        </div>
+                    </div>
+                    <div id="feedSyncBadge" class="text-[8px] font-mono-custom font-bold px-2 py-0.5 rounded-full border bg-emerald-500/20 border-emerald-500/40 text-emerald-300 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> SUPABASE CONNECTED
+                    </div>
                 </div>
-                <div class="pt-1">
-                    <button onclick="switchMode('landing')" class="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white font-mono-custom font-bold text-xs rounded-xl border border-white/10 transition active:scale-95">
-                        KEMBALI KE HOME
-                    </button>
+
+                <!-- FORM INPUT PENGAKUAN BARU -->
+                <form onsubmit="submitConfession(event)" class="mt-3 space-y-2 pt-2 border-t border-white/10">
+                    <div class="flex gap-2">
+                        <input id="feedAliasInput" type="text" placeholder="Alias / Nama Samaran (misal: Ceweknya Yamal)" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition font-mono-custom">
+                    </div>
+                    <textarea id="feedContentInput" required rows="2" placeholder="Tuliskan pengakuan atau cerita anonim kamu di sini..." class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition resize-none"></textarea>
+                    <div class="flex justify-end">
+                        <button type="submit" class="py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-mono-custom font-bold text-xs rounded-xl shadow-lg transition active:scale-95 flex items-center gap-1.5">
+                            <span>Kirim Pengakuan</span>
+                            <span>🚀</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- CONTROLS & FILTER -->
+            <div class="flex items-center justify-between gap-2 px-1">
+                <div class="flex gap-1 bg-black/40 p-1 rounded-2xl border border-white/10 text-[9px] font-mono-custom font-bold uppercase">
+                    <button id="filterBtnLatest" onclick="setFeedFilter('latest')" class="px-2.5 py-1 rounded-xl bg-white/10 text-white transition">⚡ Terbaru</button>
+                    <button id="filterBtnPopular" onclick="setFeedFilter('popular')" class="px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition">🔥 Populer</button>
+                    <button id="filterBtnPinned" onclick="setFeedFilter('pinned')" class="px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition">📌 Pinned</button>
                 </div>
+                <input id="feedSearchInput" type="text" oninput="handleFeedSearch(event)" placeholder="🔍 Cari..." class="w-28 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1 text-[10px] text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition">
+            </div>
+
+            <!-- FEEDS LIST CONTAINER -->
+            <div id="feedsListContainer" class="space-y-3">
+                <!-- Rendered dynamically -->
             </div>
         </div>
 
@@ -1375,6 +1410,7 @@
                 tabArcade.className = inactiveClass;
                 
                 triggerPageAnimation(viewFeeds);
+                fetchFeeds();
             } else if (mode === 'arcade') {
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.add('hidden');
@@ -2448,6 +2484,390 @@
         function escapeHtml(str) {
             if (!str) return '';
             return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // --- ROOM OF FAITH (FEEDS & SUPABASE INTEGRATION) ---
+        const FEEDS_TABLE = 'PDFTV Feeds';
+
+        const INITIAL_FEEDS_DATA = [
+            { id: 1785204330064, alias: "Ceweknya yamal", confession: "Pertamax", upvotes: 2, comments: ["aku yang kedua -mr z", "Ayoo ngentott"], timestamp: 1785204330065, is_pinned: false },
+            { id: 1785204851450, alias: "jancuk", confession: "Jilat anus gw dong", upvotes: 0, comments: ["rujit goblog sia -mr z", "tolol"], timestamp: 1785204851450, is_pinned: false },
+            { id: 1785206445292, alias: "Dreamybull", confession: "Yes, thank you so much, i am about to cum, yes its time, its time, i am about to bluooowwww", upvotes: 0, comments: ["yess yess yessss, amba tuuu buuuusstttttt -mr z"], timestamp: 1785206445292, is_pinned: false },
+            { id: 1785206508909, alias: "Farhan", confession: "Alah miskin sulit susah ripuh busung lapar sifilis homeless hiv aids rumah kardus", upvotes: 0, comments: [], timestamp: 1785206508909, is_pinned: false },
+            { id: 1785207481214, alias: "Si amet", confession: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vestibulum tincidunt erat, id euismod orci ullamcorper lacinia. Sed vitae dapibus metus. Morbi tincidunt sem at ornare viverra. Aenean nisl massa, eleifend sed pharetra et, tempus sit amet justo. Aliquam malesuada lacus felis, non dictum nisl gravida tincidunt. Nam lacinia dignissim erat et convallis. Quisque sit amet fermentum metus.", upvotes: 0, comments: [], timestamp: 1785207481214, is_pinned: false },
+            { id: 1785207659592, alias: "el mama", confession: "mengenang perpisahan the FYI dude", upvotes: 0, comments: ["H+ berapa min? -jamie", "group sudah tenang"], timestamp: 1785207659592, is_pinned: false },
+            { id: 1785207709547, alias: "batak", confession: "pengin di kocokin :(((((", upvotes: 0, comments: ["ini pasti akbar -mr z"], timestamp: 1785207709547, is_pinned: false },
+            { id: 1785208478037, alias: "El maca", confession: "I want my odyssey", upvotes: 0, comments: ["wtf el maca, lmao", "sudah di pastikan ini el maca palsu yah -el loco", "el maca menurut gw stop unjuk kepunyaan yah cik"], timestamp: 1785208478038, is_pinned: false },
+            { id: 1785209442056, alias: "pak cikini", confession: "akbar bau bensin warteg. yang setuju upvote", upvotes: 11, comments: ["Weladalah, pak cikini ke gondangdia loh ya", "sudah di upvote kan, dan mari kita viralkan -el loco", "ni siapa anjinf -akbrv"], timestamp: 1785209442056, is_pinned: true },
+            { id: 1785209830993, alias: "Mas Rusdi", confession: "Jangan sasimok yah mut", upvotes: 0, comments: ["MAS RUSDI aku penggemarmu, agendakan kita ngobar -el loco", "mas rusdi sudah datang loh ya", "Ditunggu kunjungan wisata ke ngawi ya mas -jamie"], timestamp: 1785209830993, is_pinned: false },
+            { id: 1785211877660, alias: "Ijal", confession: "Gw sange", upvotes: 1, comments: [], timestamp: 1785211877660, is_pinned: false },
+            { id: 1785212193986, alias: "Baxtreet", confession: "aku suka anak TK", upvotes: 1, comments: ["FBI OPEN UP!!!!!! -leon", "hey hey siapa ini wakk", "Sianjirrrr"], timestamp: 1785212193986, is_pinned: false },
+            { id: 1785213265194, alias: "Jawir pengocoxx", confession: "Jadi ges lu kenal orang random, at some moment lu ada ketertarikan trus ngewe lah ya long story short. Waktu kejadian jaman kuliah, tpi habis itu lost kontak karna ya udah bosen kali ya. 3 tahun selanjutnya, ada sepupu jauh gue tuh nikahan, ada undangan tuh di grup kluarga besar. Sebagai perwakilan keluarga kan gue dateng ya. Eh taunya si mempelai cwek loh kok kenal, lah trnyata sianjir yg dulu ngewe ma gua. Dah gtu aja sih. Toh gue juga gak akrab ama sepupu ini wkwkwk. Sepupu gue sih sempet ngasih tahu, kata istrinya kaget kalo gue masih sekeluarga ma sepupu gue. Gue sih bilangnya, kenal dari online wkwk", upvotes: 0, comments: ["parah lo, tukang ngews", "emang dasar pengentot handal", "bukan pengentot handal, manipulative mastery. gimana caranya coba lu bayangkan", "males bayangin", "males banget bacanya, cabut cabut lu ah", "awoekwaeawe ngntod ngntodan, gw ewe juga lu el maca", "hytamkan lalu penjarakan"], timestamp: 1785213265196, is_pinned: false },
+            { id: 1785214318460, alias: "x", confession: "eh caca living together yuk", upvotes: 0, comments: ["gue bilangin laki nye", "Eh asw siapa lu"], timestamp: 1785214318460, is_pinned: false },
+            { id: 1785214962084, alias: "Hi Siri", confession: "Matahari terbit di?", upvotes: 0, comments: ["disini bukan tempat AI satttttttttt", "digidaw", "pepek menujut ke silit"], timestamp: 1785214962084, is_pinned: false },
+            { id: 1785218554978, alias: "perut kosong", confession: "mata segede kontol ngaku chindo", upvotes: 1, comments: ["siapa tuh cik kira-kira", "akbar lah siapa lagiii", "Fitur sipit ilang dari anda", "wkwkwk itu fix goblok"], timestamp: 1785218554978, is_pinned: false },
+            { id: 1785223032041, alias: "Mamank Garox", confession: "Terima kasih buat lo semua ngentot, gua masih stay disini", upvotes: 0, comments: ["Ma sama"], timestamp: 1785223032041, is_pinned: false },
+            { id: 1785237408544, alias: "aodion", confession: "Mama aing criminal !!", upvotes: 1, comments: ["tes"], timestamp: 1785237408546, is_pinned: false },
+            { id: 1785241274979, alias: "asu", confession: "tes ajah", upvotes: 0, comments: [], timestamp: 1785241274979, is_pinned: false },
+            { id: 1785291628523, alias: "long P", confession: "siapa aja disini yang pernah vcs", upvotes: 0, comments: ["Video Call Sholat? aku pernah bang", "emang khysuk pas sholat sambil video call?", "Akbar", "alesan aja itu, habis sholad pasti minta liat pepek", "astaghfirullove"], timestamp: 1785291628523, is_pinned: false },
+            { id: 1785316814053, alias: "pelicin rantai", confession: "sayang banget klo g digenit in inimah", upvotes: 0, comments: ["takut gay, kalo salah sasaran"], timestamp: 1785316814053, is_pinned: false },
+            { id: 1785377737660, alias: "tambal ban pojok", confession: "siapa yang sok iye di grup, jujur aje gpp", upvotes: 1, comments: ["Jyujur yg bikin platform ini", "Jyujur yg suka cerita sex", "jujur gw", "mampus", "lo semua pada sok iye"], timestamp: 1785377737660, is_pinned: false },
+            { id: 1785380416553, alias: "KHAM PANKS", confession: "collab caca x el maca dong", upvotes: 0, comments: ["Ayoo ngentod", "Kolab apaan", "udah pasti bokep", "collab unjuk kepunyaan loh ya"], timestamp: 1785380416553, is_pinned: false },
+            { id: 1785381056976, alias: "kang tod", confession: "pengan punya sugar baby", upvotes: 0, comments: ["adakah duitnya daddy?"], timestamp: 1785381056976, is_pinned: false },
+            { id: 1785381100127, alias: "es blewah segar", confession: "Siapa yg disiny gedeg sama wasil", upvotes: 0, comments: ["Gua", "lu doang kali"], timestamp: 1785381100127, is_pinned: false },
+            { id: 1785498252440, alias: "akbar", confession: "nim 24523090 ipk 3.8", upvotes: 0, comments: ["nembak kah bg", "mana buktinya"], timestamp: 1785498252440, is_pinned: false },
+            { id: 1785554170933, alias: "GARRIXERS", confession: "in the name of love, gw akan bertemu martin garrix tahun ini", upvotes: 0, comments: [], timestamp: 1785554170933, is_pinned: false },
+            { id: 1786076706168, alias: "Pak cikini", confession: "Wazil bau arak bali", upvotes: 0, comments: [], timestamp: 1786076706168, is_pinned: false },
+            { id: 1786681285914, alias: "pak cikini", confession: "Icang bau linggis jawa", upvotes: 0, comments: ["caca bau gersang bekasi"], timestamp: 1786681285914, is_pinned: false },
+            { id: 1786688325146, alias: "pak cikini", confession: "jerry dan drian 🤝🥷", upvotes: 0, comments: [], timestamp: 1786688325146, is_pinned: false },
+            { id: 1787035222475, alias: "CEO PASAR GADANG BAWANG ABANG", confession: "Ez game", upvotes: 0, comments: ["ini sp jing"], timestamp: 1787035222475, is_pinned: false },
+            { id: 1787035996108, alias: "trshssh", confession: "i put you on top", upvotes: 0, comments: ["malah the weekend"], timestamp: 1787035996108, is_pinned: false },
+            { id: 1787042451173, alias: "Kontolll", confession: "Kontolll aswww", upvotes: 1, comments: ["Kontol lu semua Bgstt kecuali wazil"], timestamp: 1787042451173, is_pinned: false },
+            { id: 1787042654847, alias: "FINDING NEMO", confession: "Wazil kontol", upvotes: 0, comments: ["mmg ajg wazil kontolllll", "WAZIL ASUUU, MUKA LANJIAO", "LANJIAO PUKIMAK LANGGG", "Wazil anjenggggggggg"], timestamp: 1787042654847, is_pinned: false },
+            { id: 1787051427637, alias: "Kontol lu semua", confession: "Komtol lu semuanya bangsttt aswww pepek", upvotes: 0, comments: [], timestamp: 1787051427637, is_pinned: false }
+        ];
+
+        let feedsData = [];
+        let currentFeedFilter = 'latest';
+        let feedSearchQuery = '';
+
+        async function fetchFeeds() {
+            const container = document.getElementById('feedsListContainer');
+            if (!container) return;
+
+            if (feedsData.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-slate-400 font-mono-custom text-xs animate-pulse">
+                        ⏳ Memuat Room of Faith Feeds...
+                    </div>
+                `;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from(FEEDS_TABLE)
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (!error && data && data.length > 0) {
+                    feedsData = data.map(item => ({
+                        ...item,
+                        upvotes: Number(item.upvotes || 0),
+                        comments: typeof item.comments === 'string' ? JSON.parse(item.comments || '[]') : (item.comments || []),
+                        is_pinned: item.is_pinned === true || item.is_pinned === 'true'
+                    }));
+                    updateFeedSyncBadge(true);
+                } else {
+                    loadLocalFeedsFallback();
+                    updateFeedSyncBadge(false);
+                    if (!error && (!data || data.length === 0)) {
+                        seedInitialFeedsToSupabase();
+                    }
+                }
+            } catch (err) {
+                console.warn("Supabase fetch error, using local fallback:", err);
+                loadLocalFeedsFallback();
+                updateFeedSyncBadge(false);
+            }
+
+            renderFeeds();
+        }
+
+        function loadLocalFeedsFallback() {
+            const stored = localStorage.getItem('pdftv_local_feeds');
+            if (stored) {
+                try {
+                    feedsData = JSON.parse(stored);
+                    return;
+                } catch(e) {}
+            }
+            feedsData = JSON.parse(JSON.stringify(INITIAL_FEEDS_DATA));
+            saveLocalFeeds();
+        }
+
+        function saveLocalFeeds() {
+            localStorage.setItem('pdftv_local_feeds', JSON.stringify(feedsData));
+        }
+
+        async function seedInitialFeedsToSupabase() {
+            try {
+                const payload = INITIAL_FEEDS_DATA.map(item => ({
+                    id: item.id,
+                    alias: item.alias,
+                    confession: item.confession,
+                    upvotes: item.upvotes,
+                    comments: JSON.stringify(item.comments),
+                    timestamp: item.timestamp,
+                    is_pinned: item.is_pinned
+                }));
+                await supabaseClient.from(FEEDS_TABLE).upsert(payload, { onConflict: 'id' });
+                updateFeedSyncBadge(true);
+            } catch(e) {
+                console.warn("Seeding feeds error:", e);
+            }
+        }
+
+        function updateFeedSyncBadge(connected) {
+            const badge = document.getElementById('feedSyncBadge');
+            if (!badge) return;
+            if (connected) {
+                badge.className = "text-[8px] font-mono-custom font-bold px-2 py-0.5 rounded-full border bg-emerald-500/20 border-emerald-500/40 text-emerald-300 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> SUPABASE CONNECTED`;
+            } else {
+                badge.className = "text-[8px] font-mono-custom font-bold px-2 py-0.5 rounded-full border bg-amber-500/20 border-amber-500/40 text-amber-300 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> LOCAL MODE`;
+            }
+        }
+
+        function setFeedFilter(filter) {
+            playClickSound();
+            triggerHaptic('light');
+            currentFeedFilter = filter;
+
+            const btnLatest = document.getElementById('filterBtnLatest');
+            const btnPopular = document.getElementById('filterBtnPopular');
+            const btnPinned = document.getElementById('filterBtnPinned');
+
+            const active = "px-2.5 py-1 rounded-xl bg-white/10 text-white transition";
+            const inactive = "px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition";
+
+            if (btnLatest) btnLatest.className = filter === 'latest' ? active : inactive;
+            if (btnPopular) btnPopular.className = filter === 'popular' ? active : inactive;
+            if (btnPinned) btnPinned.className = filter === 'pinned' ? active : inactive;
+
+            renderFeeds();
+        }
+
+        function handleFeedSearch(e) {
+            feedSearchQuery = (e.target.value || '').toLowerCase().trim();
+            renderFeeds();
+        }
+
+        function renderFeeds() {
+            const container = document.getElementById('feedsListContainer');
+            if (!container) return;
+
+            let filtered = [...feedsData];
+
+            if (feedSearchQuery) {
+                filtered = filtered.filter(item => 
+                    (item.alias || '').toLowerCase().includes(feedSearchQuery) ||
+                    (item.confession || '').toLowerCase().includes(feedSearchQuery)
+                );
+            }
+
+            if (currentFeedFilter === 'popular') {
+                filtered.sort((a, b) => b.upvotes - a.upvotes);
+            } else if (currentFeedFilter === 'pinned') {
+                filtered = filtered.filter(item => item.is_pinned);
+            } else {
+                // Latest: Pinned items stay on top, then sorted by timestamp/id descending
+                filtered.sort((a, b) => {
+                    if (a.is_pinned && !b.is_pinned) return -1;
+                    if (!a.is_pinned && b.is_pinned) return 1;
+                    return (b.timestamp || b.id) - (a.timestamp || a.id);
+                });
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="glass p-6 rounded-2xl text-center border border-white/10 text-slate-400 font-mono-custom text-xs space-y-1">
+                        <div class="text-2xl">📭</div>
+                        <div>Tidak ada pengakuan yang ditemukan.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => {
+                const isPinned = item.is_pinned;
+                const commentsList = Array.isArray(item.comments) ? item.comments : [];
+                const timeAgoStr = formatTimeAgo(item.timestamp || item.id);
+
+                return `
+                    <div class="glass p-3.5 rounded-2xl border ${isPinned ? 'border-amber-500/50 bg-amber-950/10' : 'border-white/10'} shadow-xl space-y-2.5 relative overflow-hidden transition hover:border-white/20">
+                        ${isPinned ? `
+                            <div class="flex items-center gap-1 text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded-full w-fit">
+                                📌 PINNED CONFESSION
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-xl ${isPinned ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'} flex items-center justify-center text-xs font-bold font-mono-custom">
+                                    ${(item.alias || 'A')[0].toUpperCase()}
+                                </div>
+                                <div>
+                                    <h3 class="text-xs font-bold text-white font-mono-custom flex items-center gap-1">
+                                        ${escapeHtml(item.alias || 'Anonim')}
+                                    </h3>
+                                    <span class="text-[9px] text-slate-500 font-mono-custom">${timeAgoStr}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-200 leading-relaxed font-sans whitespace-pre-wrap">
+                            ${escapeHtml(item.confession)}
+                        </p>
+
+                        <div class="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] font-mono-custom font-bold">
+                            <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-amber-400 transition active:scale-95">
+                                <span>🔥</span>
+                                <span>${item.upvotes} Upvote</span>
+                            </button>
+                            <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition active:scale-95">
+                                <span>💬</span>
+                                <span>${commentsList.length} Komentar</span>
+                            </button>
+                        </div>
+
+                        <!-- COMMENTS DRAWER -->
+                        <div id="comments-drawer-${item.id}" class="hidden pt-2 border-t border-white/10 space-y-2">
+                            <div class="space-y-1 max-h-40 overflow-y-auto pr-1">
+                                ${commentsList.length === 0 ? `
+                                    <p class="text-[9px] text-slate-500 italic py-1 text-center font-mono-custom">Belum ada komentar. Jadilah yang pertama!</p>
+                                ` : commentsList.map(c => `
+                                    <div class="bg-white/5 border border-white/5 p-2 rounded-xl text-[10px] text-slate-300 font-mono-custom leading-tight">
+                                        💬 ${escapeHtml(c)}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-1.5 pt-1">
+                                <input id="comment-input-${item.id}" type="text" placeholder="Tulis komentar..." required class="flex-1 bg-black/50 border border-white/10 rounded-xl px-2.5 py-1 text-[10px] text-white placeholder-slate-500 focus:outline-none focus:border-white/30 font-mono-custom">
+                                <button type="submit" class="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border border-emerald-500/40 rounded-xl text-[9px] font-mono-custom font-bold transition active:scale-95">
+                                    Kirim
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function submitConfession(e) {
+            e.preventDefault();
+            const aliasInput = (document.getElementById('feedAliasInput').value || '').trim() || 'Anonim';
+            const contentInput = (document.getElementById('feedContentInput').value || '').trim();
+
+            if (!contentInput) return;
+
+            playWinSound();
+            triggerHaptic('heavy');
+
+            const newPost = {
+                id: Date.now(),
+                alias: aliasInput,
+                confession: contentInput,
+                upvotes: 0,
+                comments: [],
+                timestamp: Date.now(),
+                is_pinned: false
+            };
+
+            feedsData.unshift(newPost);
+            saveLocalFeeds();
+            renderFeeds();
+
+            document.getElementById('feedContentInput').value = '';
+            showToast("✨ Pengakuan berhasil dikirim!");
+
+            try {
+                const { error } = await supabaseClient.from(FEEDS_TABLE).insert([{
+                    id: newPost.id,
+                    alias: newPost.alias,
+                    confession: newPost.confession,
+                    upvotes: newPost.upvotes,
+                    comments: JSON.stringify(newPost.comments),
+                    timestamp: newPost.timestamp,
+                    is_pinned: newPost.is_pinned
+                }]);
+
+                if (!error) {
+                    updateFeedSyncBadge(true);
+                }
+            } catch(err) {
+                console.warn("Supabase insert error:", err);
+            }
+        }
+
+        async function upvoteFeed(id) {
+            playClickSound();
+            triggerHaptic('light');
+
+            const post = feedsData.find(item => item.id == id);
+            if (!post) return;
+
+            post.upvotes = (post.upvotes || 0) + 1;
+            saveLocalFeeds();
+            renderFeeds();
+
+            try {
+                await supabaseClient
+                    .from(FEEDS_TABLE)
+                    .update({ upvotes: post.upvotes })
+                    .eq('id', id);
+            } catch(err) {
+                console.warn("Supabase upvote error:", err);
+            }
+        }
+
+        function toggleCommentsDrawer(id) {
+            playClickSound();
+            triggerHaptic('light');
+            const drawer = document.getElementById(`comments-drawer-${id}`);
+            if (drawer) {
+                drawer.classList.toggle('hidden');
+            }
+        }
+
+        async function addCommentToFeed(id, e) {
+            e.preventDefault();
+            const commentInput = document.getElementById(`comment-input-${id}`);
+            if (!commentInput) return;
+
+            const text = commentInput.value.trim();
+            if (!text) return;
+
+            playClickSound();
+            triggerHaptic('medium');
+
+            const post = feedsData.find(item => item.id == id);
+            if (!post) return;
+
+            if (!Array.isArray(post.comments)) {
+                post.comments = [];
+            }
+
+            post.comments.push(text);
+            commentInput.value = '';
+            saveLocalFeeds();
+            renderFeeds();
+
+            try {
+                await supabaseClient
+                    .from(FEEDS_TABLE)
+                    .update({ comments: JSON.stringify(post.comments) })
+                    .eq('id', id);
+            } catch(err) {
+                console.warn("Supabase comment error:", err);
+            }
+        }
+
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'Baru saja';
+            const num = Number(timestamp);
+            if (isNaN(num)) return String(timestamp);
+
+            const now = Date.now();
+            const diff = Math.floor((now - num) / 1000);
+
+            if (diff < 60) return 'Baru saja';
+            if (diff < 3600) return `${Math.floor(diff / 60)} mnt yang lalu`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} jam yang lalu`;
+            if (diff < 2592000) return `${Math.floor(diff / 86400)} hari yang lalu`;
+
+            const date = new Date(num);
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         }
     </script>
 </body>
