@@ -393,7 +393,7 @@
         </div>
 
         <!-- MODE 1: FEEDS (ROOM OF FAITH) -->
-        <div id="viewFeeds" class="hidden space-y-4 pt-14 pb-8 text-left">
+        <div id="viewFeeds" class="hidden space-y-4 pt-20 pb-8 text-left">
             
             <!-- HEADER FEEDS -->
             <div class="glass p-4 rounded-3xl border border-emerald-500/20 shadow-2xl relative overflow-hidden bg-gradient-to-br from-emerald-950/40 via-black/60 to-black/80 text-left">
@@ -436,7 +436,12 @@
                     <button id="filterBtnPopular" onclick="setFeedFilter('popular')" class="px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition">🔥 Populer</button>
                     <button id="filterBtnPinned" onclick="setFeedFilter('pinned')" class="px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition">📌 Pinned</button>
                 </div>
-                <input id="feedSearchInput" type="text" oninput="handleFeedSearch(event)" placeholder="🔍 Cari..." class="w-28 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1 text-[10px] text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition text-left">
+                <div class="flex items-center gap-1.5">
+                    <input id="feedSearchInput" type="text" oninput="handleFeedSearch(event)" placeholder="🔍 Cari..." class="w-24 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1 text-[10px] text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition text-left">
+                    <button onclick="fetchFeeds(); playClickSound(); triggerHaptic('light'); showToast('🔄 Memuat ulang feeds...');" class="px-2.5 py-1 bg-black/40 hover:bg-white/10 border border-white/10 text-slate-300 rounded-xl text-[10px] font-mono-custom transition active:scale-95" title="Refresh Feeds">
+                        🔄
+                    </button>
+                </div>
             </div>
 
             <!-- FEEDS LIST CONTAINER -->
