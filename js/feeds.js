@@ -14,6 +14,7 @@ let isSubmitting = false;
 function cleanText(str) {
     if (!str) return '';
     return String(str)
+        .replace(/^\s+|\s+$/g, '')
         .replace(/[ \t]+/g, ' ')
         .replace(/\n\s*\n\s*\n+/g, '\n\n')
         .trim();
@@ -231,7 +232,7 @@ function renderFeeds() {
         const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
-            <div class="glass p-3.5 rounded-2xl border ${isPinned ? 'border-amber-500/50 bg-amber-950/10' : 'border-white/10'} shadow-xl space-y-2.5 relative overflow-hidden transition hover:border-white/20 text-left w-full">
+            <div class="glass p-3.5 rounded-2xl border ${isPinned ? 'border-amber-500/50 bg-amber-950/10' : 'border-white/10'} shadow-xl space-y-1.5 relative overflow-hidden transition hover:border-white/20 text-left w-full">
                 ${isPinned ? `
                     <div class="flex items-center gap-1 text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded-full w-fit">
                         📌 PINNED CONFESSION
