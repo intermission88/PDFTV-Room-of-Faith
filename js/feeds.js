@@ -69,11 +69,20 @@ async function fetchFeeds() {
 
     if (error) {
         console.error('Supabase fetch error:', error);
+        // Fallback ke INITIAL_FEEDS_DATA jika tabel belum dibuat di Supabase
+        if (typeof INITIAL_FEEDS_DATA !== 'undefined' && INITIAL_FEEDS_DATA.length > 0) {
+            feedsData = INITIAL_FEEDS_DATA.map(normalizeItem);
+            updateFeedSyncBadge('connected');
+            renderFeeds();
+            return;
+        }
+
         container.innerHTML = `
             <div class="glass p-6 rounded-2xl text-center border border-red-500/30 text-red-400 font-mono-custom text-xs space-y-2">
                 <div class="text-2xl">🔌</div>
                 <div class="font-bold">Gagal terhubung ke Supabase</div>
                 <div class="text-slate-500 text-[10px]">${escapeHtml(error.message)}</div>
+                <p class="text-[10px] text-amber-300 mt-1">💡 Pastikan tabel "PDFTV Feeds" sudah dibuat di Supabase menggunakan file <code>seed_feeds.sql</code>.</p>
                 <button onclick="fetchFeeds()" class="mt-2 px-4 py-1.5 bg-red-500/20 border border-red-500/40 text-red-300 rounded-xl text-[10px] hover:bg-red-500/30 transition">
                     🔄 Coba Lagi
                 </button>
