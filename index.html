@@ -105,6 +105,9 @@
             content: '|';
             animation: blink 0.7s infinite;
             color: #10b981;
+            font-weight: 900;
+            margin-left: 2px;
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
@@ -238,22 +241,63 @@
         ✨ Notifikasi
     </div>
 
-    <!-- TOP HEADER WITH BGM TOGGLE -->
-    <nav class="fixed top-0 w-full z-40 bg-[#030a06]/90 backdrop-blur-xl border-b border-emerald-500/20 transition-all py-2.5">
-        <div class="max-w-md mx-auto px-4 flex justify-between items-center">
-            <button onclick="switchMode('landing')" class="flex items-center active:scale-95 transition">
-                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-5 w-auto">
+    <!-- TOP HEADER WITH BGM TOGGLE & BURGER MENU -->
+    <nav class="fixed top-0 w-full z-40 bg-[#030a06]/95 backdrop-blur-xl border-b border-emerald-500/20 transition-all py-2.5">
+        <div class="max-w-md mx-auto px-4 flex justify-between items-center relative">
+            <!-- BRAND LOGO & TITLE -->
+            <button onclick="switchMode('landing')" class="flex items-center gap-2 active:scale-95 transition">
+                <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-4 sm:h-5 w-auto">
+                <span class="text-[10px] sm:text-xs font-black tracking-wider text-white uppercase font-mono-custom border-l border-white/20 pl-2">Experience</span>
             </button>
             
             <div class="flex items-center gap-2">
-                <!-- BGM TOGGLE BUTTON -->
-                <button id="btnBgmToggle" onclick="toggleBGM()" class="text-[10px] font-mono-custom font-bold bg-white/5 hover:bg-white/10 border border-white/15 px-2.5 py-1 rounded-xl text-slate-400 transition active:scale-95 flex items-center gap-1">
-                    <span id="bgmIcon">🎵</span> BGM: <b id="bgmStatusText">OFF</b>
+                <!-- BGM TOGGLE BUTTON (ICON ONLY) -->
+                <button id="btnBgmToggle" onclick="toggleBGM()" title="Toggle BGM" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-400 hover:text-white transition active:scale-95 flex items-center justify-center">
+                    <span id="bgmIcon" class="text-xs">🎵</span>
                 </button>
 
-                <div id="adminHeaderContainer">
-                    <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 py-1 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
-                        🔒 Admin
+                <!-- BURGER MENU BUTTON -->
+                <button id="btnBurgerMenu" onclick="toggleBurgerMenu()" title="Open Menu" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white transition active:scale-95 flex items-center justify-center">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6C3 5.44772 3.44772 5 4 5H20C20.5523 5 21 5.44772 21 6C21 6.55228 20.5523 7 20 7H4C3.44772 7 3 6.55228 3 6ZM3 12C3 11.4477 3.44772 11 4 11H20C20.5523 11 21 11.4477 21 12C21 12.5523 20.5523 13 20 13H4C3.44772 13 3 12.5523 3 12ZM3 18C3 17.4477 3.44772 17 4 17H20C20.5523 17 21 17.4477 21 18C21 18.5523 20.5523 19 20 19H4C3.44772 19 3 18.5523 3 18Z" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- BURGER MENU DROPDOWN (EXPANDS DOWNWARD) -->
+            <div id="burgerMenuDropdown" class="hidden absolute top-11 right-4 w-60 glass border border-emerald-500/30 rounded-2xl shadow-2xl p-2 space-y-1.5 z-50 bg-[#030a06]/95 backdrop-blur-2xl">
+                <div class="px-2 py-1 text-[9px] font-mono-custom font-bold text-slate-400 uppercase tracking-wider border-b border-white/10 flex items-center justify-between">
+                    <span>⚡ Quick Menu</span>
+                    <span id="burgerAdminBadge" class="text-[8px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300">Guest</span>
+                </div>
+                
+                <button onclick="toggleBurgerMenu(false); toggleAdminModal(true);" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs font-bold text-white font-mono-custom flex items-center justify-between transition">
+                    <span class="flex items-center gap-2">🔒 Admin Panel</span>
+                    <span class="text-[9px] text-amber-400">Login ➔</span>
+                </button>
+
+                <div id="burgerAdminActions" class="hidden space-y-1 pt-1 border-t border-white/10">
+                    <button onclick="toggleBurgerMenu(false); cheatToggleUnlimitedConsumables();" class="w-full text-left p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-xs font-bold text-red-300 font-mono-custom flex items-center justify-between transition border border-red-500/20">
+                        <span>🧪 Cheat Unlimited</span>
+                        <span id="textCheatConsumablesBurger">OFF</span>
+                    </button>
+                    <button onclick="toggleBurgerMenu(false); adminResetLeaderboard();" class="w-full text-left p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-xs font-bold text-red-300 font-mono-custom flex items-center gap-2 transition border border-red-500/20">
+                        <span>💥 Reset Leaderboard</span>
+                    </button>
+                    <button onclick="toggleBurgerMenu(false); handleAdminLogout();" class="w-full text-left p-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-400 font-mono-custom flex items-center gap-2 transition">
+                        <span>🚪 Logout Admin</span>
+                    </button>
+                </div>
+
+                <div class="pt-1 border-t border-white/10 space-y-1">
+                    <button onclick="toggleBurgerMenu(false); switchMode('landing');" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs text-slate-300 font-mono-custom flex items-center gap-2 transition">
+                        <span>🏠 Home</span>
+                    </button>
+                    <button onclick="toggleBurgerMenu(false); handleFeedsClick();" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs text-slate-300 font-mono-custom flex items-center gap-2 transition">
+                        <span>💬 Feeds (Room of Faith)</span>
+                    </button>
+                    <button onclick="toggleBurgerMenu(false); switchMode('arcade');" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs text-slate-300 font-mono-custom flex items-center gap-2 transition">
+                        <span>🎰 Arcade (Balatro)</span>
                     </button>
                 </div>
             </div>
@@ -279,12 +323,12 @@
     <main class="px-3 pb-8 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
         
         <!-- MODE 0: LANDING PAGE -->
-        <div id="viewLanding" class="space-y-4 pt-14 my-auto text-center">
-            <header class="space-y-1 py-1">
-                <p class="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-snug min-h-[48px] flex items-center justify-center">
+        <div id="viewLanding" class="space-y-4 pt-16 my-auto text-center">
+            <header class="space-y-2 py-4">
+                <h1 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-snug min-h-[72px] flex items-center justify-center max-w-sm sm:max-w-md mx-auto px-2 font-sans">
                     <span id="typewriterText" class="typewriter-cursor"></span>
-                </p>
-                <p class="text-slate-500 text-[9px] uppercase tracking-widest font-bold font-mono-custom block">- ZALDNIELSEN</p>
+                </h1>
+                <p class="text-slate-400 text-xs uppercase tracking-widest font-bold font-mono-custom block">- ZALDNIELSEN</p>
             </header>
 
             <section class="relative w-full overflow-hidden rounded-2xl glass border border-emerald-500/20 shadow-2xl group my-1">
@@ -877,26 +921,39 @@
             showToast("🔒 Mode Admin Dikeluarkan.");
         }
 
+        function toggleBurgerMenu(open) {
+            playClickSound();
+            triggerHaptic('light');
+            const dropdown = document.getElementById('burgerMenuDropdown');
+            if (!dropdown) return;
+            if (typeof open === 'boolean') {
+                if (open) dropdown.classList.remove('hidden');
+                else dropdown.classList.add('hidden');
+            } else {
+                dropdown.classList.toggle('hidden');
+            }
+        }
+
         function updateAdminUI() {
-            const adminContainer = document.getElementById('adminHeaderContainer');
             const adminResetBtn = document.getElementById('adminResetLeaderboardBtn');
             const adminCheatPanel = document.getElementById('adminCheatPanel');
+            const burgerAdminBadge = document.getElementById('burgerAdminBadge');
+            const burgerAdminActions = document.getElementById('burgerAdminActions');
 
             if (isAdminLoggedIn) {
-                adminContainer.innerHTML = `
-                    <div class="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-xl">
-                        <span class="text-[8px] font-mono-custom font-bold text-emerald-400 uppercase">ADMIN MODE</span>
-                        <button onclick="handleAdminLogout()" class="text-slate-400 hover:text-white text-xs font-bold ml-1">✕</button>
-                    </div>
-                `;
+                if (burgerAdminBadge) {
+                    burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30";
+                    burgerAdminBadge.textContent = "ADMIN MODE";
+                }
+                if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
                 if (adminResetBtn) adminResetBtn.classList.remove('hidden');
                 if (adminCheatPanel) adminCheatPanel.classList.remove('hidden');
             } else {
-                adminContainer.innerHTML = `
-                    <button id="adminLoginBtn" onclick="toggleAdminModal(true)" class="text-[10px] font-mono-custom font-bold bg-white/10 hover:bg-white/20 border border-white/15 px-2.5 py-1 rounded-xl text-white transition active:scale-95 flex items-center gap-1">
-                        🔒 Admin
-                    </button>
-                `;
+                if (burgerAdminBadge) {
+                    burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300";
+                    burgerAdminBadge.textContent = "Guest";
+                }
+                if (burgerAdminActions) burgerAdminActions.classList.add('hidden');
                 if (adminResetBtn) adminResetBtn.classList.add('hidden');
                 if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
             }
@@ -906,15 +963,22 @@
         function cheatToggleUnlimitedConsumables() {
             playAdminSound();
             cheatUnlimitedConsumables = !cheatUnlimitedConsumables;
-            document.getElementById('textCheatConsumables').textContent = cheatUnlimitedConsumables ? "ON" : "OFF";
-            document.getElementById('btnCheatConsumables').classList.toggle('bg-emerald-500/30', cheatUnlimitedConsumables);
+            const statusStr = cheatUnlimitedConsumables ? "ON" : "OFF";
+            
+            const txt = document.getElementById('textCheatConsumables');
+            const txtBurger = document.getElementById('textCheatConsumablesBurger');
+            if (txt) txt.textContent = statusStr;
+            if (txtBurger) txtBurger.textContent = statusStr;
+
+            const btn = document.getElementById('btnCheatConsumables');
+            if (btn) btn.classList.toggle('bg-emerald-500/30', cheatUnlimitedConsumables);
             
             if (cheatUnlimitedConsumables) {
                 discardCount = 99;
                 busterCount = 99;
             }
             updateConsumableUI();
-            showToast(`🧪 Unlimited Items: ${cheatUnlimitedConsumables ? 'ON' : 'OFF'}`);
+            showToast(`🧪 Unlimited Items: ${statusStr}`);
         }
 
         function cheatAddCash(amt) {
@@ -955,7 +1019,7 @@
             showToast(`🛡️ CHEAT: Max ${shieldCount}/${MAX_SHIELDS} Shields!`);
         }
 
-        async function confirmResetLeaderboard() {
+        async function adminResetLeaderboard() {
             playClickSound();
             if (!isAdminLoggedIn) return;
             if (confirm("⚠️ Yakin ingin menghapus seluruh Leaderboard?")) {
@@ -973,12 +1037,30 @@
         // --- TYPEWRITER ENGINE ---
         const taglineText = '"IF EVERY MOMENT MATTERED, WOULD IT STILL BE LIKE THIS?"';
         let taglineIndex = 0;
+        let isDeleting = false;
         
         function typeWriter() {
-            if (taglineIndex < taglineText.length) {
-                document.getElementById("typewriterText").innerHTML += taglineText.charAt(taglineIndex);
+            const el = document.getElementById("typewriterText");
+            if (!el) return;
+            
+            if (!isDeleting && taglineIndex <= taglineText.length) {
+                el.textContent = taglineText.substring(0, taglineIndex);
                 taglineIndex++;
-                setTimeout(typeWriter, 50);
+                if (taglineIndex > taglineText.length) {
+                    setTimeout(() => { isDeleting = true; typeWriter(); }, 4000);
+                    return;
+                }
+                setTimeout(typeWriter, 45);
+            } else if (isDeleting && taglineIndex >= 0) {
+                el.textContent = taglineText.substring(0, taglineIndex);
+                taglineIndex--;
+                if (taglineIndex < 0) {
+                    isDeleting = false;
+                    taglineIndex = 0;
+                    setTimeout(typeWriter, 500);
+                    return;
+                }
+                setTimeout(typeWriter, 25);
             }
         }
         typeWriter();
@@ -1051,20 +1133,17 @@
             isBgmPlaying = !isBgmPlaying;
             
             const btn = document.getElementById('btnBgmToggle');
-            const statusText = document.getElementById('bgmStatusText');
             const icon = document.getElementById('bgmIcon');
 
             if (isBgmPlaying) {
-                btn.classList.add('bgm-btn-active');
-                statusText.textContent = "ON";
-                icon.textContent = "🎶";
+                if (btn) btn.className = "w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 transition active:scale-95 flex items-center justify-center shadow-lg shadow-emerald-500/10";
+                if (icon) icon.textContent = "🎶";
                 bgmStep = 0;
                 bgmInterval = setInterval(playBgmBeat, 240);
                 showToast("🎵 BGM Chiptune Aktif!");
             } else {
-                btn.classList.remove('bgm-btn-active');
-                statusText.textContent = "OFF";
-                icon.textContent = "🎵";
+                if (btn) btn.className = "w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-400 hover:text-white transition active:scale-95 flex items-center justify-center";
+                if (icon) icon.textContent = "🎵";
                 if (bgmInterval) {
                     clearInterval(bgmInterval);
                     bgmInterval = null;
