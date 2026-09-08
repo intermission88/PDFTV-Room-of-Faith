@@ -230,55 +230,64 @@ function renderFeeds() {
         const timeAgoStr    = formatTimeAgo(item.timestamp || item.id);
         const hasUpvoted    = upvotedFeedIds.includes(String(item.id));
         const drawerOpen    = openDrawers.has(String(item.id));
+        const firstLetter   = (item.alias || 'A').charAt(0).toUpperCase();
 
         return `
-            <div class="glass p-3.5 rounded-2xl border ${isPinned ? 'border-amber-500/50 bg-amber-950/10' : 'border-white/10'} shadow-xl space-y-1.5 relative overflow-hidden transition hover:border-white/20 text-left w-full">
+            <div class="glass p-4 rounded-2xl border ${isPinned ? 'border-amber-500/60 bg-amber-950/20 shadow-amber-500/10' : 'border-white/10 hover:border-emerald-500/30'} shadow-xl space-y-3 relative overflow-hidden transition-all text-left w-full">
                 ${isPinned ? `
-                    <div class="flex items-center gap-1 text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded-full w-fit">
-                        📌 PINNED CONFESSION
+                    <div class="flex items-center gap-1.5 text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/20 border border-amber-500/40 px-2.5 py-1 rounded-full w-fit">
+                        <span>📌</span> PINNED POST
                     </div>
                 ` : ''}
 
-                <div class="flex items-center justify-between text-left">
-                    <div>
-                        <h3 class="text-xs font-bold text-white font-mono-custom flex items-center gap-1 text-left">
-                            ${escapeHtml(item.alias || 'Anonim')}
-                        </h3>
-                        <span class="text-[9px] text-slate-500 font-mono-custom block text-left">${timeAgoStr}</span>
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500/30 to-teal-600/30 border border-emerald-500/40 flex items-center justify-center text-xs font-bold text-emerald-300 font-mono-custom shadow-inner flex-shrink-0">
+                            ${firstLetter}
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-white font-mono-custom flex items-center gap-1.5">
+                                ${escapeHtml(item.alias || 'Anonim')}
+                            </h3>
+                            <span class="text-[10px] text-slate-400 font-mono-custom block">${timeAgoStr}</span>
+                        </div>
                     </div>
                 </div>
 
-                <p class="text-xs text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words">
+                <p class="text-xs text-slate-100 leading-relaxed font-sans whitespace-pre-wrap text-left break-words pl-1">
                     ${escapeHtml(item.confession)}
                 </p>
 
-                <div class="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] font-mono-custom font-bold">
-                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1.5 px-3 py-1 rounded-full ${hasUpvoted ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 cursor-default' : 'bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-amber-400 active:scale-95'} transition text-[11px] font-medium">
+                <div class="flex items-center gap-2 pt-2 border-t border-white/10 text-[11px] font-mono-custom font-bold">
+                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl ${hasUpvoted ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 shadow-sm shadow-amber-500/20' : 'bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-amber-400'} transition active:scale-95">
                         <span>🔥</span>
-                        <span>${item.upvotes} Upvote ${hasUpvoted ? '✓' : ''}</span>
+                        <span>${item.upvotes}</span>
+                        <span class="text-[9px] opacity-75">${hasUpvoted ? 'Liked' : 'Upvote'}</span>
                     </button>
-                    <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition active:scale-95">
+                    <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition active:scale-95">
                         <span>💬</span>
-                        <span>${commentsList.length} Komentar</span>
+                        <span>${commentsList.length}</span>
+                        <span class="text-[9px] opacity-75">Komentar</span>
                     </button>
                 </div>
 
                 <!-- COMMENTS DRAWER -->
-                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-2 border-t border-white/10 space-y-2 text-left">
-                    <div class="space-y-1 max-h-40 overflow-y-auto pr-1">
+                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-3 border-t border-white/10 space-y-2.5 text-left">
+                    <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
                         ${commentsList.length === 0
-                            ? `<p class="text-[9px] text-slate-500 italic py-1 text-left font-mono-custom">Belum ada komentar. Jadilah yang pertama!</p>`
+                            ? `<p class="text-[10px] text-slate-500 italic py-1 text-left font-mono-custom">Belum ada komentar. Jadilah yang pertama menanggapi!</p>`
                             : commentsList.map(c => `
-                                <div class="bg-white/5 border border-white/5 p-2 rounded-xl text-[10px] text-slate-300 font-mono-custom leading-tight text-left">
-                                    💬 ${escapeHtml(c)}
+                                <div class="bg-black/40 border border-white/10 p-2.5 rounded-xl text-[11px] text-slate-200 font-sans leading-relaxed text-left">
+                                    <div class="text-[9px] text-emerald-400 font-mono-custom font-bold mb-0.5">💬 Komentar</div>
+                                    ${escapeHtml(c)}
                                 </div>
                             `).join('')
                         }
                     </div>
-                    <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-1.5 pt-1">
-                        <input id="comment-input-${item.id}" type="text" placeholder="Tulis komentar..." required
-                            class="flex-1 bg-black/50 border border-white/10 rounded-xl px-2.5 py-1 text-[10px] text-white placeholder-slate-500 focus:outline-none focus:border-white/30 font-mono-custom text-left">
-                        <button type="submit" class="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border border-emerald-500/40 rounded-xl text-[9px] font-mono-custom font-bold transition active:scale-95">
+                    <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-2 pt-1">
+                        <input id="comment-input-${item.id}" type="text" placeholder="Tulis tanggapan..." required
+                            class="flex-1 bg-black/60 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 font-sans text-left">
+                        <button type="submit" class="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border border-emerald-500/40 rounded-xl text-[10px] font-mono-custom font-bold transition active:scale-95">
                             Kirim
                         </button>
                     </form>
@@ -350,27 +359,26 @@ async function submitConfession(e) {
 // ── Upvote ────────────────────────────────────────────────────
 async function upvoteFeed(id) {
     const idStr = String(id);
-    if (upvotedFeedIds.includes(idStr)) {
-        playBustSound();
-        triggerHaptic('bust');
-        showToast('⚠️ Kamu sudah memberikan upvote pada pengakuan ini!');
-        return;
-    }
+    const post = feedsData.find(item => String(item.id) === idStr);
+    if (!post) return;
 
     playClickSound();
     triggerHaptic('light');
 
-    const post = feedsData.find(item => String(item.id) === idStr);
-    if (!post) return;
-
-    const newUpvotes = (post.upvotes || 0) + 1;
+    const hasUpvoted = upvotedFeedIds.includes(idStr);
+    const newUpvotes = hasUpvoted ? Math.max(0, (post.upvotes || 0) - 1) : (post.upvotes || 0) + 1;
 
     // Optimistic update
     post.upvotes = newUpvotes;
-    upvotedFeedIds.push(idStr);
+    if (hasUpvoted) {
+        upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
+        showToast('🔥 Upvote dibatalkan.');
+    } else {
+        upvotedFeedIds.push(idStr);
+        showToast('🔥 Upvote ditambahkan!');
+    }
     localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
     renderFeeds();
-    showToast('🔥 Upvote berhasil ditambahkan!');
 
     // Sync ke Supabase
     const { error } = await supabaseClient
@@ -380,12 +388,16 @@ async function upvoteFeed(id) {
 
     if (error) {
         console.warn('Supabase upvote error:', error);
-        // Rollback optimistic update
-        post.upvotes = newUpvotes - 1;
-        upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
+        // Rollback
+        post.upvotes = hasUpvoted ? newUpvotes + 1 : newUpvotes - 1;
+        if (hasUpvoted) {
+            upvotedFeedIds.push(idStr);
+        } else {
+            upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
+        }
         localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
         renderFeeds();
-        showToast(`❌ Upvote gagal: ${error.message || 'Cek RLS policy Supabase'}`);
+        showToast(`❌ Gagal: ${error.message || 'Cek RLS policy Supabase'}`);
     }
 }
 
