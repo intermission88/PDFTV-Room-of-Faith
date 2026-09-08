@@ -336,7 +336,7 @@ async function submitConfession(e) {
 
     } catch (err) {
         console.error('Submit confession error:', err);
-        showToast('❌ Gagal mengirim pengakuan. Periksa koneksi internet.');
+        showToast(`❌ Gagal: ${err.message || 'Periksa koneksi / RLS Supabase'}`);
     } finally {
         isSubmitting = false;
         if (submitBtn) {
@@ -384,7 +384,7 @@ async function upvoteFeed(id) {
         upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
         localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
         renderFeeds();
-        showToast('❌ Upvote gagal disimpan.');
+        showToast(`❌ Upvote gagal: ${error.message || 'Cek RLS policy Supabase'}`);
     }
 }
 
@@ -431,7 +431,7 @@ async function addCommentToFeed(id, e) {
 
     if (error) {
         console.warn('Supabase comment error:', error);
-        showToast('❌ Komentar gagal disimpan.');
+        showToast(`❌ Komentar gagal: ${error.message || 'Cek RLS policy Supabase'}`);
     }
 }
 
