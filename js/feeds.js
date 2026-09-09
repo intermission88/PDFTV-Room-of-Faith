@@ -280,8 +280,10 @@ function renderFeeds() {
             </div>
         `;
     }).join('') + `
-        <div class="py-4 text-center text-slate-500 font-mono-custom text-[10px]">
-            ✨ Kamu sudah di ujung dunia (mentok)! 🏁
+        <div class="py-6 text-center text-slate-400 font-mono-custom text-[11px] space-y-1 border-t border-white/5 mt-4">
+            <div class="inline-block animate-bounce text-base">⚓</div>
+            <div class="font-bold text-slate-300">Semua pengakuan telah dimuat</div>
+            <div class="text-[9px] text-slate-500">Anda telah mencapai akhir dari linimasa.</div>
         </div>
     `;
 }
