@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS public."PDFTV Feeds" (
     id BIGINT PRIMARY KEY,
     alias TEXT NOT NULL,
     confession TEXT NOT NULL,
+    gif_url TEXT,
     upvotes INT DEFAULT 0,
     comments JSONB DEFAULT '[]'::jsonb,
     timestamp BIGINT,

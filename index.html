@@ -439,11 +439,14 @@
                     <div class="flex gap-2 text-left">
                         <input id="feedAliasInput" type="text" placeholder="Alias / Nama Samaran (misal: Ceweknya Yamal)" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition font-mono-custom text-left">
                     </div>
-                    <textarea id="feedContentInput" required rows="2" placeholder="Tuliskan pengakuan atau cerita anonim kamu di sini..." class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition resize-none text-left"></textarea>
+                    <textarea id="feedContentInput" rows="2" placeholder="Tuliskan pengakuan, caption, atau cerita anonim kamu di sini..." class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition resize-none text-left"></textarea>
+                    <div class="flex gap-2 text-left">
+                        <input id="feedGifInput" type="url" placeholder="🎬 Link GIF / Image URL (opsional, misal: https://...gif)" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition font-mono-custom text-left">
+                    </div>
                     <div class="flex items-center justify-between pt-1">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="feedNsfwCheckbox" class="rounded bg-black border-white/20 text-red-500 focus:ring-0 w-3.5 h-3.5">
-                            <span class="text-[10px] text-slate-400 font-mono-custom">🔞 Tandai sebagai NSFW (Konten Sensitif)</span>
+                            <span class="text-[10px] text-slate-400 font-mono-custom">🔞 Tandai sebagai NSFW</span>
                         </label>
                         <button type="submit" class="py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-mono-custom font-bold text-xs rounded-xl shadow-lg transition active:scale-95 flex items-center gap-1.5">
                             <span>Kirim Pengakuan</span>

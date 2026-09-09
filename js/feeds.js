@@ -25,11 +25,13 @@ function normalizeItem(item) {
         ...item,
         alias: cleanText(item.alias),
         confession: cleanText(item.confession),
+        gif_url: (item.gif_url || '').trim(),
         upvotes: Number(item.upvotes || 0),
         comments: Array.isArray(item.comments)
             ? item.comments.map(c => cleanText(String(c)))
             : [],
-        is_pinned: item.is_pinned === true || item.is_pinned === 'true'
+        is_pinned: item.is_pinned === true || item.is_pinned === 'true',
+        is_nsfw: item.is_nsfw === true || item.is_nsfw === 'true'
     };
 }
 
@@ -254,6 +256,11 @@ function renderFeeds() {
                         </div>
 
                         <p class="text-xs text-slate-200 font-sans whitespace-pre-wrap text-left break-words m-0">${escapeHtml(item.confession)}</p>
+                        ${item.gif_url ? `
+                            <div class="mt-1.5 rounded-xl overflow-hidden border border-white/10 bg-black/40 max-h-72 flex items-center justify-center">
+                                <img src="${escapeHtml(item.gif_url)}" alt="Attached GIF" class="w-full max-h-72 object-contain rounded-xl" loading="lazy" onerror="this.parentNode.style.display='none'">
+                            </div>
+                        ` : ''}
                     </div>
 
                     ${showNsfwBlur ? `
@@ -326,8 +333,13 @@ async function submitConfession(e) {
 
     const aliasInput   = cleanText(document.getElementById('feedAliasInput').value) || 'Anonim';
     const contentInput = cleanText(document.getElementById('feedContentInput').value);
+    const gifUrlInput  = cleanText(document.getElementById('feedGifInput')?.value || '');
     const isNsfwInput  = document.getElementById('feedNsfwCheckbox')?.checked || false;
-    if (!contentInput) return;
+
+    if (!contentInput && !gifUrlInput) {
+        showToast('⚠️ Masukkan teks pengakuan atau link GIF terlebih dahulu.');
+        return;
+    }
 
     isSubmitting = true;
     const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -344,6 +356,7 @@ async function submitConfession(e) {
                 id:        newId,
                 alias:     aliasInput,
                 confession: contentInput,
+                gif_url:   gifUrlInput,
                 upvotes:   0,
                 comments:  [],
                 timestamp: newId,
@@ -364,6 +377,8 @@ async function submitConfession(e) {
 
         document.getElementById('feedContentInput').value = '';
         document.getElementById('feedAliasInput').value   = '';
+        const gifInput = document.getElementById('feedGifInput');
+        if (gifInput) gifInput.value = '';
         const nsfwBox = document.getElementById('feedNsfwCheckbox');
         if (nsfwBox) nsfwBox.checked = false;
         showToast('✨ Pengakuan berhasil dikirim!');
