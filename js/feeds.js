@@ -289,7 +289,7 @@ function renderFeeds() {
                         ` : ''}
                         ${item.gif_url ? `
                             <div class="rounded-xl overflow-hidden border border-white/10 bg-black/30 max-h-80 flex items-center justify-center">
-                                <img src="${escapeHtml(item.gif_url)}" alt="GIF" class="w-full max-h-80 object-contain rounded-xl" loading="lazy" onerror="this.parentNode.style.display='none'">
+                                <img src="${escapeHtml(item.gif_url)}" alt="GIF" class="w-full max-h-80 object-contain rounded-xl cursor-zoom-in" loading="lazy" onclick="openLightbox(this.src)" onerror="this.parentNode.style.display='none'">
                             </div>
                         ` : ''}
                     </div>
@@ -416,7 +416,8 @@ async function submitConfession(e) {
         if (gifInput) gifInput.value = '';
         const nsfwBox = document.getElementById('feedNsfwCheckbox');
         if (nsfwBox) nsfwBox.checked = false;
-        showToast('✨ Pengakuan berhasil dikirim!');
+        clearFeedDraft();
+        showToast('✨ Pengakuan berhasil dikirim!', 'success');
         playWinSound();
         triggerHaptic('heavy');
 
@@ -645,4 +646,112 @@ async function moderatorDeleteFeed(id) {
         fetchFeeds();
     }
 }
+
+// ── Draft Auto-Save & Lightbox ─────────────────────────────────
+const FEED_DRAFT_KEY = 'pdftv_feed_draft';
+
+function initFeedDraft() {
+    const aliasInput = document.getElementById('feedAliasInput');
+    const contentInput = document.getElementById('feedContentInput');
+    const gifInput = document.getElementById('feedGifInput');
+    if (!aliasInput || !contentInput) return;
+
+    try {
+        const draft = JSON.parse(localStorage.getItem(FEED_DRAFT_KEY) || '{}');
+        if (draft.alias) aliasInput.value = draft.alias;
+        if (draft.content) contentInput.value = draft.content;
+        if (draft.gif && gifInput) gifInput.value = draft.gif;
+    } catch (e) { /* draft korup, abaikan */ }
+
+    const saveDraft = () => {
+        localStorage.setItem(FEED_DRAFT_KEY, JSON.stringify({
+            alias: aliasInput.value,
+            content: contentInput.value,
+            gif: gifInput ? gifInput.value : ''
+        }));
+    };
+    aliasInput.addEventListener('input', saveDraft);
+    contentInput.addEventListener('input', saveDraft);
+    if (gifInput) gifInput.addEventListener('input', saveDraft);
+}
+
+function clearFeedDraft() {
+    localStorage.removeItem(FEED_DRAFT_KEY);
+}
+
+function openLightbox(src) {
+    let lb = document.getElementById('gifLightbox');
+    if (!lb) {
+        lb = document.createElement('div');
+        lb.id = 'gifLightbox';
+        lb.className = 'fixed inset-0 z-[90] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out opacity-0 transition-opacity duration-200';
+        lb.innerHTML = '<img src="" alt="GIF" class="max-w-full max-h-[85vh] rounded-xl shadow-2xl">';
+        lb.addEventListener('click', () => closeLightbox());
+        document.body.appendChild(lb);
+    }
+    const img = lb.querySelector('img');
+    img.src = src;
+    requestAnimationFrame(() => lb.style.opacity = '1');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lb = document.getElementById('gifLightbox');
+    if (!lb) return;
+    lb.style.opacity = '0';
+    document.body.style.overflow = '';
+    setTimeout(() => lb.remove(), 200);
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+});
+
+window.addEventListener('DOMContentLoaded', initFeedDraft);
+
+// ── Pull-to-Refresh (Feeds) ─────────────────────────────────────
+(function initPullToRefresh() {
+    let touchStartY = null;
+    let pulling = false;
+
+    const getIndicator = () => {
+        let el = document.getElementById('pullIndicator');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'pullIndicator';
+            el.className = 'fixed top-14 left-1/2 -translate-x-1/2 z-40 text-emerald-300 text-lg transition-opacity duration-200 opacity-0 pointer-events-none';
+            el.textContent = '⬇️';
+            document.body.appendChild(el);
+        }
+        return el;
+    };
+
+    window.addEventListener('touchstart', (e) => {
+        if (window.scrollY <= 0) {
+            touchStartY = e.touches[0].clientY;
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+        if (touchStartY === null) return;
+        const delta = e.touches[0].clientY - touchStartY;
+        const indicator = getIndicator();
+        if (delta > 70 && !pulling) {
+            pulling = true;
+            indicator.style.opacity = '1';
+            indicator.style.transform = 'translate(-50%, 0) rotate(180deg)';
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+        const indicator = getIndicator();
+        if (pulling) {
+            pulling = false;
+            indicator.style.opacity = '0';
+            fetchFeeds();
+            showToast('🔄 Feeds dimuat ulang');
+        }
+        touchStartY = null;
+    });
+})();
 

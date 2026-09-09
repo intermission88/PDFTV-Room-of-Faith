@@ -1668,12 +1668,19 @@
             resetSessionBuffs();
         }
 
-        function showToast(message) {
+        function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
+            const styles = {
+                success: 'bg-emerald-500 text-black border-emerald-300/30',
+                error:   'bg-red-500 text-white border-red-300/30',
+                info:    'bg-white text-black border-white/20'
+            };
+            toast.className = toast.className.replace(/bg-\S+ text-\S+ border-\S+/, styles[type]);
             toast.textContent = message;
             toast.style.opacity = '1';
             toast.style.transform = 'translate(-50%, 10px)';
-            setTimeout(() => {
+            clearTimeout(toast._hideTimer);
+            toast._hideTimer = setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translate(-50%, 0)';
             }, 2500);
