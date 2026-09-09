@@ -279,7 +279,11 @@ function renderFeeds() {
                 </div>
             </div>
         `;
-    }).join('');
+    }).join('') + `
+        <div class="py-4 text-center text-slate-500 font-mono-custom text-[10px]">
+            ✨ Kamu sudah di ujung dunia (mentok)! 🏁
+        </div>
+    `;
 }
 
 // ── Submit Confession ─────────────────────────────────────────
