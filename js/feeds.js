@@ -536,8 +536,8 @@ function updateHomeStatsUI() {
 
     const countEl = document.getElementById('statFeedsCount');
     const engEl = document.getElementById('statFeedsEngagement');
-    if (countEl) countEl.innerText = `${totalPosts} Submissions`;
-    if (engEl) engEl.innerText = `${totalUpvotes} Upvotes • ${totalComments} Comments`;
+    if (countEl) countEl.innerText = `${totalPosts} Pengakuan`;
+    if (engEl) engEl.innerText = `${totalUpvotes} Upvote · ${totalComments} Komentar`;
 }
 
 async function updateBlackjackTop5Stats() {
