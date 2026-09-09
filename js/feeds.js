@@ -76,11 +76,17 @@ async function fetchFeeds() {
     if (!container) return;
 
     // Tampilkan loading state
-    container.innerHTML = `
-        <div class="p-10 text-center text-slate-400 text-xs animate-pulse">
-            Memuat pengakuan...
+    container.innerHTML = [0, 1, 2].map(() => `
+        <div class="skeleton-card p-4 space-y-2.5">
+            <div class="flex items-center gap-2">
+                <div class="skeleton-bar w-20 h-3"></div>
+                <div class="skeleton-bar w-10 h-3"></div>
+            </div>
+            <div class="skeleton-bar w-full h-3"></div>
+            <div class="skeleton-bar w-4/5 h-3"></div>
+            <div class="skeleton-bar w-2/3 h-3"></div>
         </div>
-    `;
+    `).join('');
     updateFeedSyncBadge('loading');
 
     // Fetch semua data dari Supabase
@@ -227,9 +233,19 @@ function renderFeeds() {
     }
 
     if (filtered.length === 0) {
+        const isSearching = !!feedSearchQuery;
         container.innerHTML = `
-            <div class="rounded-xl border border-white/[0.06] bg-white/[0.02] p-8 text-center text-slate-500 text-sm">
-                Belum ada pengakuan. Jadilah yang pertama!
+            <div class="rounded-2xl border border-dashed border-emerald-500/25 bg-gradient-to-b from-emerald-500/[0.06] via-transparent to-transparent p-8 text-center space-y-3">
+                <div class="text-3xl ${isSearching ? '' : 'animate-bounce'}">${isSearching ? '🔍' : '🕊️'}</div>
+                <div class="text-sm font-bold text-white">${isSearching ? 'Tidak ditemukan' : 'Room masih sepi'}</div>
+                <p class="text-xs text-slate-400 max-w-xs mx-auto">${isSearching
+                    ? `Tidak ada pengakuan yang cocok dengan "<b class="text-slate-200">${escapeHtml(feedSearchQuery)}</b>". Coba kata kunci lain.`
+                    : 'Jadilah yang pertama berbagi cerita atau pengakuan di sini.'}</p>
+                ${!isSearching ? `
+                    <button onclick="document.getElementById('feedContentInput').focus()" class="mt-1 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-bold transition active:scale-95">
+                        ✍️ Tulis Pengakuan
+                    </button>
+                ` : ''}
             </div>
         `;
         return;
@@ -253,7 +269,7 @@ function renderFeeds() {
         const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
-            <div class="rounded-2xl border ${isPinned ? 'border-amber-400/30 bg-amber-400/[0.04]' : isNsfw ? 'border-red-300/[0.15]' : 'border-white/[0.07]'} bg-white/[0.03] p-4 text-left w-full transition">
+            <div class="feed-card rounded-2xl border ${isPinned ? 'border-amber-400/30 bg-amber-400/[0.04]' : isNsfw ? 'border-red-300/[0.15]' : 'border-white/[0.07]'} bg-white/[0.03] p-4 text-left w-full transition">
                 ${isPinned ? `
                     <div class="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-amber-300/90 mb-2.5">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 011 1v13a1 1 0 01-1.4.9L12 15.9l-5.6 3A1 1 0 015 18V5a1 1 0 011-1z"/></svg>

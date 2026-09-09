@@ -234,6 +234,46 @@
             color: #6ee7b7 !important;
             box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
         }
+
+        @keyframes viewIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .view-enter { animation: viewIn 0.35s ease-out; }
+
+        @keyframes shimmer {
+            0%   { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+        .skeleton-card {
+            border-radius: 1rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 800px 100%;
+            animation: shimmer 1.4s infinite linear;
+        }
+        .skeleton-bar { border-radius: 0.5rem; background: rgba(255,255,255,0.07); }
+
+        .feed-card { transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+        .feed-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(16, 185, 129, 0.35);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.08);
+        }
+        .feed-card:active { transform: translateY(0) scale(0.995); }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.3); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.5); }
+
+        #scrollTopBtn {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        #scrollTopBtn.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
     </style>
 </head>
 <body class="scrollbar-hide min-h-screen flex flex-col justify-between pb-20">
@@ -488,6 +528,10 @@
             <div id="feedsListContainer" class="space-y-3 text-left w-full">
                 <!-- Rendered dynamically -->
             </div>
+
+            <button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Kembali ke atas" class="fixed bottom-24 right-4 z-40 w-10 h-10 rounded-full glass border border-emerald-500/30 bg-[#030a06]/90 backdrop-blur-xl text-emerald-300 text-sm shadow-2xl active:scale-90 transition">
+                ▲
+            </button>
         </div>
 
         <!-- MODE 2: ARCADE -->
@@ -558,7 +602,9 @@
                     </div>
                     
                     <div id="leaderboardList" class="space-y-1.5">
-                        <div class="text-center text-slate-500 text-[11px] py-4 italic">Memuat papan peringkat...</div>
+                        <div class="space-y-1.5">
+                            ${[0,1,2,3,4].map(() => `<div class="skeleton-card p-2 flex items-center justify-between"><div class="flex items-center gap-2"><div class="skeleton-bar w-5 h-5 rounded-full"></div><div class="skeleton-bar w-24 h-3"></div></div><div class="skeleton-bar w-16 h-3"></div></div>`).join('')}
+                        </div>
                     </div>
                 </section>
             </div>
@@ -1522,6 +1568,12 @@
             targetEl.classList.add('page-transition');
         }
 
+        function animateViewIn(el) {
+            el.classList.remove('view-enter');
+            void el.offsetWidth;
+            el.classList.add('view-enter');
+        }
+
         function switchMode(mode) {
             playClickSound();
             triggerHaptic('light');
@@ -1539,7 +1591,7 @@
                 viewLanding.classList.remove('hidden');
                 viewFeeds.classList.add('hidden');
                 viewArcade.classList.add('hidden');
-                
+                animateViewIn(viewLanding);
                 tabHome.className = activeClass;
                 tabFeeds.className = inactiveClass;
                 tabArcade.className = inactiveClass;
@@ -1549,7 +1601,7 @@
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.remove('hidden');
                 viewArcade.classList.add('hidden');
-                
+                animateViewIn(viewFeeds);
                 tabHome.className = inactiveClass;
                 tabFeeds.className = activeClass;
                 tabArcade.className = inactiveClass;
@@ -1560,7 +1612,7 @@
                 viewLanding.classList.add('hidden');
                 viewFeeds.classList.add('hidden');
                 viewArcade.classList.remove('hidden');
-                
+                animateViewIn(viewArcade);
                 exitCasinoGame();
 
                 tabHome.className = inactiveClass;
@@ -2634,6 +2686,13 @@
         window.addEventListener('DOMContentLoaded', () => {
             if (typeof fetchFeeds === 'function') fetchFeeds();
             if (typeof updateBlackjackTop5Stats === 'function') updateBlackjackTop5Stats();
+
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            if (scrollTopBtn) {
+                window.addEventListener('scroll', () => {
+                    scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+                }, { passive: true });
+            }
         });
 
     </script>
