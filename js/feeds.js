@@ -9,6 +9,25 @@ let feedSearchQuery = '';
 let upvotedFeedIds = JSON.parse(localStorage.getItem('pdftv_upvoted_feeds') || '[]');
 let feedsRealtimeChannel = null;
 let isSubmitting = false;
+let gifInputVisible = false;
+
+// ── GIF Toggle ───────────────────────────────────────────────
+function toggleGifInput() {
+    gifInputVisible = !gifInputVisible;
+    const container = document.getElementById('gifInputContainer');
+    const toggleIcon = document.getElementById('gifToggleIcon');
+    const toggleText = document.getElementById('gifToggleText');
+    
+    if (gifInputVisible) {
+        container.classList.remove('hidden');
+        toggleIcon.textContent = '−';
+        toggleText.textContent = 'Sembunyikan GIF';
+    } else {
+        container.classList.add('hidden');
+        toggleIcon.textContent = '+';
+        toggleText.textContent = 'Tambah GIF';
+    }
+}
 
 // ── Utility ──────────────────────────────────────────────────
 function cleanText(str) {
@@ -25,11 +44,13 @@ function normalizeItem(item) {
         ...item,
         alias: cleanText(item.alias),
         confession: cleanText(item.confession),
+        gif_url: (item.gif_url || '').trim(),
         upvotes: Number(item.upvotes || 0),
         comments: Array.isArray(item.comments)
             ? item.comments.map(c => cleanText(String(c)))
             : [],
-        is_pinned: item.is_pinned === true || item.is_pinned === 'true'
+        is_pinned: item.is_pinned === true || item.is_pinned === 'true',
+        is_nsfw: item.is_nsfw === true || item.is_nsfw === 'true'
     };
 }
 
@@ -56,8 +77,8 @@ async function fetchFeeds() {
 
     // Tampilkan loading state
     container.innerHTML = `
-        <div class="p-8 text-center text-slate-400 font-mono-custom text-xs animate-pulse">
-            ⏳ Menyambungkan ke Supabase...
+        <div class="p-10 text-center text-slate-400 text-xs animate-pulse">
+            Memuat pengakuan...
         </div>
     `;
     updateFeedSyncBadge('loading');
@@ -79,13 +100,13 @@ async function fetchFeeds() {
         }
 
         container.innerHTML = `
-            <div class="glass p-6 rounded-2xl text-center border border-red-500/30 text-red-400 font-mono-custom text-xs space-y-2">
-                <div class="text-2xl">🔌</div>
-                <div class="font-bold">Gagal terhubung ke Supabase</div>
-                <div class="text-slate-500 text-[10px]">${escapeHtml(error.message)}</div>
-                <p class="text-[10px] text-amber-300 mt-1">💡 Pastikan tabel "PDFTV Feeds" sudah dibuat di Supabase menggunakan file <code>seed_feeds.sql</code>.</p>
-                <button onclick="fetchFeeds()" class="mt-2 px-4 py-1.5 bg-red-500/20 border border-red-500/40 text-red-300 rounded-xl text-[10px] hover:bg-red-500/30 transition">
-                    🔄 Coba Lagi
+            <div class="rounded-xl border border-red-400/20 bg-white/[0.02] p-6 text-center text-red-300 text-xs space-y-2">
+                <div class="text-xl">🔌</div>
+                <div class="font-medium">Gagal memuat pengakuan</div>
+                <div class="text-slate-500 text-[11px]">${escapeHtml(error.message)}</div>
+                <p class="text-[11px] text-slate-400 mt-1">💡 Pastikan tabel "PDFTV Feeds" sudah dibuat di Supabase menggunakan <code>seed_feeds.sql</code>.</p>
+                <button onclick="fetchFeeds()" class="mt-2 px-4 py-1.5 bg-white/10 hover:bg-white/15 border border-white/10 text-white rounded-lg text-xs transition">
+                    Coba Lagi
                 </button>
             </div>
         `;
@@ -96,6 +117,7 @@ async function fetchFeeds() {
     feedsData = (data || []).map(normalizeItem);
     updateFeedSyncBadge('connected');
     renderFeeds();
+    updateBlackjackTop5Stats();
 
     // Pasang Realtime Subscription (hanya sekali)
     subscribeToRealtimeFeeds();
@@ -163,14 +185,12 @@ function setFeedFilter(filter) {
 
     const btnLatest  = document.getElementById('filterBtnLatest');
     const btnPopular = document.getElementById('filterBtnPopular');
-    const btnPinned  = document.getElementById('filterBtnPinned');
 
-    const active   = 'px-2.5 py-1 rounded-xl bg-white/10 text-white transition';
-    const inactive = 'px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition';
+    const active   = 'px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-lg border border-white/10 transition';
+    const inactive = 'px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg border border-white/10 transition';
 
     if (btnLatest)  btnLatest.className  = filter === 'latest'  ? active : inactive;
     if (btnPopular) btnPopular.className = filter === 'popular' ? active : inactive;
-    if (btnPinned)  btnPinned.className  = filter === 'pinned'  ? active : inactive;
 
     renderFeeds();
 }
@@ -182,6 +202,7 @@ function handleFeedSearch(e) {
 
 // ── Render ────────────────────────────────────────────────────
 function renderFeeds() {
+    updateHomeStatsUI();
     const container = document.getElementById('feedsListContainer');
     if (!container) return;
 
@@ -196,8 +217,6 @@ function renderFeeds() {
 
     if (currentFeedFilter === 'popular') {
         filtered.sort((a, b) => b.upvotes - a.upvotes);
-    } else if (currentFeedFilter === 'pinned') {
-        filtered = filtered.filter(item => item.is_pinned);
     } else {
         // Latest: pinned di atas, lalu urutkan by timestamp desc
         filtered.sort((a, b) => {
@@ -209,9 +228,8 @@ function renderFeeds() {
 
     if (filtered.length === 0) {
         container.innerHTML = `
-            <div class="glass p-6 rounded-2xl text-center border border-white/10 text-slate-400 font-mono-custom text-xs space-y-1">
-                <div class="text-2xl">📭</div>
-                <div>Tidak ada pengakuan yang ditemukan.</div>
+            <div class="rounded-xl border border-white/[0.06] bg-white/[0.02] p-8 text-center text-slate-500 text-sm">
+                Belum ada pengakuan. Jadilah yang pertama!
             </div>
         `;
         return;
@@ -226,60 +244,105 @@ function renderFeeds() {
 
     container.innerHTML = filtered.map(item => {
         const isPinned      = item.is_pinned;
+        const isNsfw        = item.is_nsfw === true || item.is_nsfw === 'true';
+        const isRevealed    = revealedNsfwIds.includes(String(item.id));
+        const showNsfwBlur  = isNsfw && !isRevealed;
         const commentsList  = Array.isArray(item.comments) ? item.comments : [];
         const timeAgoStr    = formatTimeAgo(item.timestamp || item.id);
         const hasUpvoted    = upvotedFeedIds.includes(String(item.id));
         const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
-            <div class="glass p-3 rounded-2xl border ${isPinned ? 'border-amber-500/60 bg-amber-950/20' : 'border-white/10'} shadow-md space-y-1.5 text-left w-full">
+            <div class="rounded-2xl border ${isPinned ? 'border-amber-400/30 bg-amber-400/[0.04]' : isNsfw ? 'border-red-300/[0.15]' : 'border-white/[0.07]'} bg-white/[0.03] p-4 text-left w-full transition">
                 ${isPinned ? `
-                    <div class="text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded-full w-fit">
-                        📌 PINNED
+                    <div class="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-amber-300/90 mb-2.5">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 011 1v13a1 1 0 01-1.4.9L12 15.9l-5.6 3A1 1 0 015 18V5a1 1 0 011-1z"/></svg>
+                        Disematkan
                     </div>
                 ` : ''}
 
-                <div class="flex items-center justify-between text-left">
-                    <div class="text-left">
-                        <h3 class="text-xs font-bold text-white font-mono-custom text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
-                        <span class="text-[9px] text-slate-400 font-mono-custom block text-left">${timeAgoStr}</span>
+                <div class="relative">
+                    <div class="${showNsfwBlur ? 'blur-md select-none pointer-events-none' : ''} space-y-1">
+                        <div class="flex items-baseline gap-2 text-left">
+                            <h3 class="text-sm font-semibold text-white text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
+                            ${isNsfw ? `<span class="text-[9px] uppercase tracking-wide text-red-300/80 border border-red-300/20 bg-red-300/[0.06] px-1.5 py-0.5 rounded self-center">18+</span>` : ''}
+                            <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
+                        </div>
+                        ${item.confession ? `
+                            <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
+                        ` : ''}
+                        ${item.gif_url ? `
+                            <div class="rounded-xl overflow-hidden border border-white/10 bg-black/30 max-h-80 flex items-center justify-center">
+                                <img src="${escapeHtml(item.gif_url)}" alt="GIF" class="w-full max-h-80 object-contain rounded-xl" loading="lazy" onerror="this.parentNode.style.display='none'">
+                            </div>
+                        ` : ''}
                     </div>
+
+                    ${showNsfwBlur ? `
+                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/50 hover:bg-black/60 rounded-xl flex flex-col items-center justify-center gap-2 p-3 text-center cursor-pointer transition z-10">
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-slate-300">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
+                                <span class="text-xs font-medium">Konten sensitif</span>
+                            </div>
+                            <span class="text-[11px] text-slate-500">Klik untuk menampilkan</span>
+                        </div>
+                    ` : ''}
                 </div>
 
-                <p class="text-xs text-slate-200 font-sans whitespace-pre-wrap text-left break-words m-0">${escapeHtml(item.confession)}</p>
+                ${isModeratorLoggedIn ? `
+                    <div class="flex items-center gap-1 pt-3 mt-3 border-t border-white/[0.06] text-xs">
+                        <button onclick="moderatorTogglePin('${item.id}', ${isPinned})" class="px-2 py-1 rounded-md text-slate-400 hover:text-amber-300 hover:bg-white/5 transition">
+                            ${isPinned ? '📌 Lepas Pin' : '📌 Pin'}
+                        </button>
+                        <button onclick="moderatorToggleNsfw('${item.id}', ${isNsfw})" class="px-2 py-1 rounded-md text-slate-400 hover:text-white hover:bg-white/5 transition">
+                            ${isNsfw ? '✅ SFW' : '🔞 NSFW'}
+                        </button>
+                        <button onclick="moderatorDeleteFeed('${item.id}')" class="px-2 py-1 rounded-md text-slate-400 hover:text-red-300 hover:bg-white/5 transition">
+                            🗑️ Hapus
+                        </button>
+                    </div>
+                ` : ''}
 
-                <div class="flex items-center gap-2 pt-1 border-t border-white/10 text-[11px] font-mono-custom font-bold text-left">
-                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1 px-2.5 py-1 rounded-xl ${hasUpvoted ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300'} transition active:scale-95">
-                        <span>🔥</span>
-                        <span>${item.upvotes}</span>
+                <div class="flex items-center justify-between pt-3 mt-3 border-t border-white/[0.06] text-[13px] text-left">
+                    <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.42-4.03 8-9 8a9.9 9.9 0 01-4.2-.9L3 20l1.05-3.3A7.9 7.9 0 013 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
+                        <span class="font-medium">${commentsList.length}</span>
+                        <span class="text-xs text-slate-500 font-normal">Komentar</span>
                     </button>
-                    <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition active:scale-95">
-                        <span>💬</span>
-                        <span>${commentsList.length}</span>
+                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1.5 ${hasUpvoted ? 'text-amber-400' : 'text-slate-400 hover:text-amber-300'} transition">
+                        <span class="text-xs text-slate-500 font-normal">${hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
+                        <span class="font-medium">${item.upvotes}</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
                     </button>
                 </div>
 
                 <!-- COMMENTS DRAWER -->
-                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-2 border-t border-white/10 space-y-1.5 text-left">
-                    <div class="space-y-1 max-h-40 overflow-y-auto pr-1 text-left">
+                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-3 mt-1 border-t border-white/[0.06] space-y-2 text-left">
+                    <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1 text-left">
                         ${commentsList.length === 0
-                            ? `<p class="text-[9px] text-slate-500 italic text-left font-mono-custom">Belum ada komentar.</p>`
+                            ? `<p class="text-[11px] text-slate-500 italic text-left">Belum ada komentar.</p>`
                             : commentsList.map(c => `
-                                <div class="bg-black/40 border border-white/10 p-2 rounded-xl text-[11px] text-slate-200 font-sans text-left">${escapeHtml(c)}</div>
+                                <div class="bg-white/[0.04] border border-white/[0.06] p-2.5 rounded-lg text-[12px] text-slate-300 font-sans text-left">${escapeHtml(c)}</div>
                             `).join('')
                         }
                     </div>
-                    <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-1.5 pt-1 text-left">
+                    <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-2 pt-0.5 text-left">
                         <input id="comment-input-${item.id}" type="text" placeholder="Tulis komentar..." required
-                            class="flex-1 bg-black/60 border border-white/10 rounded-xl px-2.5 py-1 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 font-sans text-left">
-                        <button type="submit" class="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border border-emerald-500/40 rounded-xl text-[10px] font-mono-custom font-bold">
+                            class="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 font-sans text-left">
+                        <button type="submit" class="px-3.5 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg text-xs font-medium transition">
                             Kirim
                         </button>
                     </form>
                 </div>
             </div>
         `;
-    }).join('');
+    }).join('') + `
+        <div class="py-8 text-center text-slate-500 text-xs space-y-1 border-t border-white/[0.04] mt-4">
+            <div class="inline-block animate-bounce text-sm">⚓</div>
+            <div class="text-slate-400">Semua pengakuan telah dimuat</div>
+            <div class="text-[11px] text-slate-600">Anda telah mencapai akhir dari linimasa.</div>
+        </div>
+    `;
 }
 
 // ── Submit Confession ─────────────────────────────────────────
@@ -289,13 +352,19 @@ async function submitConfession(e) {
 
     const aliasInput   = cleanText(document.getElementById('feedAliasInput').value) || 'Anonim';
     const contentInput = cleanText(document.getElementById('feedContentInput').value);
-    if (!contentInput) return;
+    const gifUrlInput  = cleanText(document.getElementById('feedGifInput')?.value || '');
+    const isNsfwInput  = document.getElementById('feedNsfwCheckbox')?.checked || false;
+
+    if (!contentInput && !gifUrlInput) {
+        showToast('⚠️ Masukkan teks pengakuan atau link GIF terlebih dahulu.');
+        return;
+    }
 
     isSubmitting = true;
     const submitBtn = e.target.querySelector('button[type="submit"]');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Mengirim...';
+        submitBtn.innerHTML = 'Mengirim...';
     }
 
     try {
@@ -306,10 +375,12 @@ async function submitConfession(e) {
                 id:        newId,
                 alias:     aliasInput,
                 confession: contentInput,
+                gif_url:   gifUrlInput,
                 upvotes:   0,
                 comments:  [],
                 timestamp: newId,
-                is_pinned: false
+                is_pinned: false,
+                is_nsfw:   isNsfwInput
             }])
             .select()
             .single();
@@ -325,6 +396,10 @@ async function submitConfession(e) {
 
         document.getElementById('feedContentInput').value = '';
         document.getElementById('feedAliasInput').value   = '';
+        const gifInput = document.getElementById('feedGifInput');
+        if (gifInput) gifInput.value = '';
+        const nsfwBox = document.getElementById('feedNsfwCheckbox');
+        if (nsfwBox) nsfwBox.checked = false;
         showToast('✨ Pengakuan berhasil dikirim!');
         playWinSound();
         triggerHaptic('heavy');
@@ -336,7 +411,7 @@ async function submitConfession(e) {
         isSubmitting = false;
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>Kirim Pengakuan</span><span>🚀</span>';
+            submitBtn.innerHTML = 'Kirim';
         }
     }
 }
@@ -447,5 +522,111 @@ function formatTimeAgo(timestamp) {
     if (diff < 2592000) return `${Math.floor(diff / 86400)} hari yang lalu`;
 
     return new Date(num).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ── Platform Stats ────────────────────────────────────────────
+function updateHomeStatsUI() {
+    const totalPosts = feedsData.length;
+    let totalUpvotes = 0;
+    let totalComments = 0;
+    feedsData.forEach(item => {
+        totalUpvotes += Number(item.upvotes || 0);
+        totalComments += Array.isArray(item.comments) ? item.comments.length : 0;
+    });
+
+    const countEl = document.getElementById('statFeedsCount');
+    const engEl = document.getElementById('statFeedsEngagement');
+    if (countEl) countEl.innerText = `${totalPosts} Pengakuan`;
+    if (engEl) engEl.innerText = `${totalUpvotes} Upvote · ${totalComments} Komentar`;
+}
+
+async function updateBlackjackTop5Stats() {
+    const statEl = document.getElementById('statBlackjackTop5');
+    if (!statEl) return;
+    try {
+        const { data, error } = await supabaseClient
+            .from('PDFTV Blackjack Leaderboard')
+            .select('streak_count')
+            .order('streak_count', { ascending: false })
+            .limit(5);
+
+        if (error) throw error;
+        let sum = 0;
+        if (data && data.length > 0) {
+            sum = data.reduce((acc, curr) => acc + Number(curr.streak_count || 0), 0);
+        }
+        statEl.innerText = `$${sum.toLocaleString()} 💵`;
+    } catch (err) {
+        console.warn('Failed to load blackjack top 5 stats:', err);
+        statEl.innerText = '$0 💵';
+    }
+}
+
+// ── Feeds Moderator & NSFW System ──────────────────────────────
+let isModeratorLoggedIn = false;
+let revealedNsfwIds = [];
+
+function revealNsfw(id) {
+    playClickSound();
+    triggerHaptic('light');
+    revealedNsfwIds.push(String(id));
+    renderFeeds();
+}
+
+async function moderatorTogglePin(id, currentPinned) {
+    if (!isModeratorLoggedIn) {
+        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        return;
+    }
+    const newVal = !currentPinned;
+    const { error } = await supabaseClient
+        .from(FEEDS_TABLE)
+        .update({ is_pinned: newVal })
+        .eq('id', id);
+
+    if (error) {
+        showToast(`❌ Gagal pin: ${error.message}`);
+    } else {
+        showToast(newVal ? "📌 Postingan berhasil di-pin!" : "📌 Pin postingan dilepas.");
+        fetchFeeds();
+    }
+}
+
+async function moderatorToggleNsfw(id, currentNsfw) {
+    if (!isModeratorLoggedIn) {
+        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        return;
+    }
+    const newVal = !currentNsfw;
+    const { error } = await supabaseClient
+        .from(FEEDS_TABLE)
+        .update({ is_nsfw: newVal })
+        .eq('id', id);
+
+    if (error) {
+        showToast(`❌ Gagal update NSFW: ${error.message}`);
+    } else {
+        showToast(newVal ? "🔞 Postingan ditandai NSFW." : "✅ Postingan dikembalikan normal (SFW).");
+        fetchFeeds();
+    }
+}
+
+async function moderatorDeleteFeed(id) {
+    if (!isModeratorLoggedIn) {
+        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        return;
+    }
+    if (!confirm("Yakin ingin menghapus pengakuan ini?")) return;
+    const { error } = await supabaseClient
+        .from(FEEDS_TABLE)
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        showToast(`❌ Gagal menghapus: ${error.message}`);
+    } else {
+        showToast("🗑️ Postingan berhasil dihapus.");
+        fetchFeeds();
+    }
 }
 
