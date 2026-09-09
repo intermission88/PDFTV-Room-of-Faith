@@ -96,6 +96,7 @@ async function fetchFeeds() {
     feedsData = (data || []).map(normalizeItem);
     updateFeedSyncBadge('connected');
     renderFeeds();
+    updateBlackjackTop5Stats();
 
     // Pasang Realtime Subscription (hanya sekali)
     subscribeToRealtimeFeeds();
@@ -182,6 +183,7 @@ function handleFeedSearch(e) {
 
 // ── Render ────────────────────────────────────────────────────
 function renderFeeds() {
+    updateHomeStatsUI();
     const container = document.getElementById('feedsListContainer');
     if (!container) return;
 
@@ -453,5 +455,43 @@ function formatTimeAgo(timestamp) {
     if (diff < 2592000) return `${Math.floor(diff / 86400)} hari yang lalu`;
 
     return new Date(num).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ── Platform Stats ────────────────────────────────────────────
+function updateHomeStatsUI() {
+    const totalPosts = feedsData.length;
+    let totalUpvotes = 0;
+    let totalComments = 0;
+    feedsData.forEach(item => {
+        totalUpvotes += Number(item.upvotes || 0);
+        totalComments += Array.isArray(item.comments) ? item.comments.length : 0;
+    });
+
+    const countEl = document.getElementById('statFeedsCount');
+    const engEl = document.getElementById('statFeedsEngagement');
+    if (countEl) countEl.innerText = `${totalPosts} Submissions`;
+    if (engEl) engEl.innerText = `${totalUpvotes} Upvotes • ${totalComments} Comments`;
+}
+
+async function updateBlackjackTop5Stats() {
+    const statEl = document.getElementById('statBlackjackTop5');
+    if (!statEl) return;
+    try {
+        const { data, error } = await supabaseClient
+            .from('PDFTV Blackjack Leaderboard')
+            .select('streak_count')
+            .order('streak_count', { ascending: false })
+            .limit(5);
+
+        if (error) throw error;
+        let sum = 0;
+        if (data && data.length > 0) {
+            sum = data.reduce((acc, curr) => acc + Number(curr.streak_count || 0), 0);
+        }
+        statEl.innerText = `$${sum.toLocaleString()} 💵`;
+    } catch (err) {
+        console.warn('Failed to load blackjack top 5 stats:', err);
+        statEl.innerText = '$0 💵';
+    }
 }
 
