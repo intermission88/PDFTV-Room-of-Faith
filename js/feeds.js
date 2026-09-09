@@ -237,26 +237,29 @@ function renderFeeds() {
         const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
-            <div class="glass p-3 rounded-2xl border ${isPinned ? 'border-amber-500/60 bg-amber-950/20' : 'border-white/10'} shadow-md space-y-1.5 text-left w-full">
+            <div class="glass p-3 rounded-2xl border ${isPinned ? 'border-amber-500/60 bg-amber-950/20' : isNsfw ? 'border-red-500/40' : 'border-white/10'} shadow-md space-y-1.5 text-left w-full">
                 ${isPinned ? `
                     <div class="text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded-full w-fit">
                         📌 PINNED
                     </div>
                 ` : ''}
 
-                <div class="flex items-center justify-between text-left">
-                    <div class="text-left">
-                        <h3 class="text-xs font-bold text-white font-mono-custom text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
-                        <span class="text-[9px] text-slate-400 font-mono-custom block text-left">${timeAgoStr}</span>
-                    </div>
-                </div>
-
                 <div class="relative">
-                    <p class="text-xs text-slate-200 font-sans whitespace-pre-wrap text-left break-words m-0 ${showNsfwBlur ? 'filter blur-sm select-none pointer-events-none' : ''}">${escapeHtml(item.confession)}</p>
+                    <div class="${showNsfwBlur ? 'filter blur-sm select-none pointer-events-none' : ''} space-y-1.5">
+                        <div class="flex items-center justify-between text-left">
+                            <div class="text-left">
+                                <h3 class="text-xs font-bold text-white font-mono-custom text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
+                                <span class="text-[9px] text-slate-400 font-mono-custom block text-left">${timeAgoStr}</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-200 font-sans whitespace-pre-wrap text-left break-words m-0">${escapeHtml(item.confession)}</p>
+                    </div>
+
                     ${showNsfwBlur ? `
-                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/80 hover:bg-black/75 rounded-xl border border-red-500/40 flex flex-col items-center justify-center p-2 text-center cursor-pointer transition">
+                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/85 hover:bg-black/75 rounded-xl border border-red-500/40 flex flex-col items-center justify-center p-3 text-center cursor-pointer transition z-10">
                             <span class="text-xs font-bold text-red-400 font-mono-custom">🔞 KONTEN SENSITIF (NSFW)</span>
-                            <span class="text-[9px] text-slate-300 mt-0.5 underline font-mono-custom">Klik untuk melihat konten</span>
+                            <span class="text-[9px] text-slate-300 mt-0.5 underline font-mono-custom">Klik untuk melihat nama & pengakuan</span>
                         </div>
                     ` : ''}
                 </div>
