@@ -185,14 +185,12 @@ function setFeedFilter(filter) {
 
     const btnLatest  = document.getElementById('filterBtnLatest');
     const btnPopular = document.getElementById('filterBtnPopular');
-    const btnPinned  = document.getElementById('filterBtnPinned');
 
     const active   = 'px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-lg border border-white/10 transition';
     const inactive = 'px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg border border-white/10 transition';
 
     if (btnLatest)  btnLatest.className  = filter === 'latest'  ? active : inactive;
     if (btnPopular) btnPopular.className = filter === 'popular' ? active : inactive;
-    if (btnPinned)  btnPinned.className  = filter === 'pinned'  ? active : inactive;
 
     renderFeeds();
 }
@@ -219,8 +217,6 @@ function renderFeeds() {
 
     if (currentFeedFilter === 'popular') {
         filtered.sort((a, b) => b.upvotes - a.upvotes);
-    } else if (currentFeedFilter === 'pinned') {
-        filtered = filtered.filter(item => item.is_pinned);
     } else {
         // Latest: pinned di atas, lalu urutkan by timestamp desc
         filtered.sort((a, b) => {
@@ -272,13 +268,13 @@ function renderFeeds() {
                             ${isNsfw ? `<span class="text-[9px] uppercase tracking-wide text-red-300/80 border border-red-300/20 bg-red-300/[0.06] px-1.5 py-0.5 rounded self-center">18+</span>` : ''}
                             <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
                         </div>
+                        ${item.confession ? `
+                            <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
+                        ` : ''}
                         ${item.gif_url ? `
                             <div class="rounded-xl overflow-hidden border border-white/10 bg-black/30 max-h-80 flex items-center justify-center">
                                 <img src="${escapeHtml(item.gif_url)}" alt="GIF" class="w-full max-h-80 object-contain rounded-xl" loading="lazy" onerror="this.parentNode.style.display='none'">
                             </div>
-                        ` : ''}
-                        ${item.confession ? `
-                            <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
                         ` : ''}
                     </div>
 
@@ -307,16 +303,16 @@ function renderFeeds() {
                     </div>
                 ` : ''}
 
-                <div class="flex items-center gap-6 pt-3 mt-3 border-t border-white/[0.06] text-[13px] text-left">
-                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1.5 ${hasUpvoted ? 'text-amber-400' : 'text-slate-400 hover:text-amber-300'} transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
-                        <span class="font-medium">${item.upvotes}</span>
-                        <span class="text-xs text-slate-500 font-normal">${hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
-                    </button>
+                <div class="flex items-center justify-between pt-3 mt-3 border-t border-white/[0.06] text-[13px] text-left">
                     <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.42-4.03 8-9 8a9.9 9.9 0 01-4.2-.9L3 20l1.05-3.3A7.9 7.9 0 013 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
                         <span class="font-medium">${commentsList.length}</span>
                         <span class="text-xs text-slate-500 font-normal">Komentar</span>
+                    </button>
+                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1.5 ${hasUpvoted ? 'text-amber-400' : 'text-slate-400 hover:text-amber-300'} transition">
+                        <span class="text-xs text-slate-500 font-normal">${hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
+                        <span class="font-medium">${item.upvotes}</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
                     </button>
                 </div>
 
