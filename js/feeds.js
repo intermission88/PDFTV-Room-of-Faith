@@ -257,7 +257,7 @@ function renderFeeds() {
         const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
-            <div class="rounded-2xl border ${isPinned ? 'border-amber-400/30 bg-amber-400/[0.04]' : isNsfw ? 'border-red-400/30' : 'border-white/[0.07]'} bg-white/[0.03] p-4 text-left w-full transition">
+            <div class="rounded-2xl border ${isPinned ? 'border-amber-400/30 bg-amber-400/[0.04]' : isNsfw ? 'border-red-300/[0.15]' : 'border-white/[0.07]'} bg-white/[0.03] p-4 text-left w-full transition">
                 ${isPinned ? `
                     <div class="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-amber-300/90 mb-2.5">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 011 1v13a1 1 0 01-1.4.9L12 15.9l-5.6 3A1 1 0 015 18V5a1 1 0 011-1z"/></svg>
@@ -266,9 +266,10 @@ function renderFeeds() {
                 ` : ''}
 
                 <div class="relative">
-                    <div class="${showNsfwBlur ? 'filter blur-sm select-none pointer-events-none' : ''} space-y-1">
+                    <div class="${showNsfwBlur ? 'blur-md select-none pointer-events-none' : ''} space-y-1">
                         <div class="flex items-baseline gap-2 text-left">
                             <h3 class="text-sm font-semibold text-white text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
+                            ${isNsfw ? `<span class="text-[9px] uppercase tracking-wide text-red-300/80 border border-red-300/20 bg-red-300/[0.06] px-1.5 py-0.5 rounded self-center">18+</span>` : ''}
                             <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
                         </div>
                         ${item.gif_url ? `
@@ -282,9 +283,12 @@ function renderFeeds() {
                     </div>
 
                     ${showNsfwBlur ? `
-                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/85 hover:bg-black/75 rounded-xl border border-red-400/40 flex flex-col items-center justify-center p-3 text-center cursor-pointer transition z-10">
-                            <span class="text-xs font-semibold text-red-300">🔞 Konten Sensitif (NSFW)</span>
-                            <span class="text-[10px] text-slate-300 mt-1 underline">Klik untuk melihat</span>
+                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/50 hover:bg-black/60 rounded-xl flex flex-col items-center justify-center gap-2 p-3 text-center cursor-pointer transition z-10">
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-slate-300">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
+                                <span class="text-xs font-medium">Konten sensitif</span>
+                            </div>
+                            <span class="text-[11px] text-slate-500">Klik untuk menampilkan</span>
                         </div>
                     ` : ''}
                 </div>
