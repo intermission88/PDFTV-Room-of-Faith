@@ -9,6 +9,25 @@ let feedSearchQuery = '';
 let upvotedFeedIds = JSON.parse(localStorage.getItem('pdftv_upvoted_feeds') || '[]');
 let feedsRealtimeChannel = null;
 let isSubmitting = false;
+let gifInputVisible = false;
+
+// ── GIF Toggle ───────────────────────────────────────────────
+function toggleGifInput() {
+    gifInputVisible = !gifInputVisible;
+    const container = document.getElementById('gifInputContainer');
+    const toggleIcon = document.getElementById('gifToggleIcon');
+    const toggleText = document.getElementById('gifToggleText');
+    
+    if (gifInputVisible) {
+        container.classList.remove('hidden');
+        toggleIcon.textContent = '−';
+        toggleText.textContent = 'Sembunyikan GIF';
+    } else {
+        container.classList.add('hidden');
+        toggleIcon.textContent = '+';
+        toggleText.textContent = 'Tambah GIF';
+    }
+}
 
 // ── Utility ──────────────────────────────────────────────────
 function cleanText(str) {
@@ -58,8 +77,8 @@ async function fetchFeeds() {
 
     // Tampilkan loading state
     container.innerHTML = `
-        <div class="p-8 text-center text-slate-400 font-mono-custom text-xs animate-pulse">
-            ⏳ Menyambungkan ke Supabase...
+        <div class="p-10 text-center text-slate-400 text-xs animate-pulse">
+            Memuat pengakuan...
         </div>
     `;
     updateFeedSyncBadge('loading');
@@ -81,13 +100,13 @@ async function fetchFeeds() {
         }
 
         container.innerHTML = `
-            <div class="glass p-6 rounded-2xl text-center border border-red-500/30 text-red-400 font-mono-custom text-xs space-y-2">
-                <div class="text-2xl">🔌</div>
-                <div class="font-bold">Gagal terhubung ke Supabase</div>
-                <div class="text-slate-500 text-[10px]">${escapeHtml(error.message)}</div>
-                <p class="text-[10px] text-amber-300 mt-1">💡 Pastikan tabel "PDFTV Feeds" sudah dibuat di Supabase menggunakan file <code>seed_feeds.sql</code>.</p>
-                <button onclick="fetchFeeds()" class="mt-2 px-4 py-1.5 bg-red-500/20 border border-red-500/40 text-red-300 rounded-xl text-[10px] hover:bg-red-500/30 transition">
-                    🔄 Coba Lagi
+            <div class="rounded-xl border border-red-400/20 bg-white/[0.02] p-6 text-center text-red-300 text-xs space-y-2">
+                <div class="text-xl">🔌</div>
+                <div class="font-medium">Gagal memuat pengakuan</div>
+                <div class="text-slate-500 text-[11px]">${escapeHtml(error.message)}</div>
+                <p class="text-[11px] text-slate-400 mt-1">💡 Pastikan tabel "PDFTV Feeds" sudah dibuat di Supabase menggunakan <code>seed_feeds.sql</code>.</p>
+                <button onclick="fetchFeeds()" class="mt-2 px-4 py-1.5 bg-white/10 hover:bg-white/15 border border-white/10 text-white rounded-lg text-xs transition">
+                    Coba Lagi
                 </button>
             </div>
         `;
@@ -168,8 +187,8 @@ function setFeedFilter(filter) {
     const btnPopular = document.getElementById('filterBtnPopular');
     const btnPinned  = document.getElementById('filterBtnPinned');
 
-    const active   = 'px-2.5 py-1 rounded-xl bg-white/10 text-white transition';
-    const inactive = 'px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition';
+    const active   = 'px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-lg border border-white/10 transition';
+    const inactive = 'px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg border border-white/10 transition';
 
     if (btnLatest)  btnLatest.className  = filter === 'latest'  ? active : inactive;
     if (btnPopular) btnPopular.className = filter === 'popular' ? active : inactive;
@@ -213,9 +232,8 @@ function renderFeeds() {
 
     if (filtered.length === 0) {
         container.innerHTML = `
-            <div class="glass p-6 rounded-2xl text-center border border-white/10 text-slate-400 font-mono-custom text-xs space-y-1">
-                <div class="text-2xl">📭</div>
-                <div>Tidak ada pengakuan yang ditemukan.</div>
+            <div class="rounded-xl border border-white/[0.06] bg-white/[0.02] p-8 text-center text-slate-500 text-sm">
+                Belum ada pengakuan. Jadilah yang pertama!
             </div>
         `;
         return;
@@ -239,78 +257,79 @@ function renderFeeds() {
         const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
-            <div class="glass p-3 rounded-2xl border ${isPinned ? 'border-amber-500/60 bg-amber-950/20' : isNsfw ? 'border-red-500/40' : 'border-white/10'} shadow-md space-y-1.5 text-left w-full">
+            <div class="rounded-2xl border ${isPinned ? 'border-amber-400/30 bg-amber-400/[0.04]' : isNsfw ? 'border-red-400/30' : 'border-white/[0.07]'} bg-white/[0.03] p-4 text-left w-full transition">
                 ${isPinned ? `
-                    <div class="text-[9px] font-mono-custom font-bold text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded-full w-fit">
-                        📌 PINNED
+                    <div class="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-amber-300/90 mb-2.5">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 011 1v13a1 1 0 01-1.4.9L12 15.9l-5.6 3A1 1 0 015 18V5a1 1 0 011-1z"/></svg>
+                        Disematkan
                     </div>
                 ` : ''}
 
                 <div class="relative">
-                    <div class="${showNsfwBlur ? 'filter blur-sm select-none pointer-events-none' : ''} space-y-1.5">
-                        <div class="flex items-center justify-between text-left">
-                            <div class="text-left">
-                                <h3 class="text-xs font-bold text-white font-mono-custom text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
-                                <span class="text-[9px] text-slate-400 font-mono-custom block text-left">${timeAgoStr}</span>
-                            </div>
+                    <div class="${showNsfwBlur ? 'filter blur-sm select-none pointer-events-none' : ''} space-y-1">
+                        <div class="flex items-baseline gap-2 text-left">
+                            <h3 class="text-sm font-semibold text-white text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
+                            <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
                         </div>
-
-                        <p class="text-xs text-slate-200 font-sans whitespace-pre-wrap text-left break-words m-0">${escapeHtml(item.confession)}</p>
                         ${item.gif_url ? `
-                            <div class="mt-1.5 rounded-xl overflow-hidden border border-white/10 bg-black/40 max-h-72 flex items-center justify-center">
-                                <img src="${escapeHtml(item.gif_url)}" alt="Attached GIF" class="w-full max-h-72 object-contain rounded-xl" loading="lazy" onerror="this.parentNode.style.display='none'">
+                            <div class="rounded-xl overflow-hidden border border-white/10 bg-black/30 max-h-80 flex items-center justify-center">
+                                <img src="${escapeHtml(item.gif_url)}" alt="GIF" class="w-full max-h-80 object-contain rounded-xl" loading="lazy" onerror="this.parentNode.style.display='none'">
                             </div>
+                        ` : ''}
+                        ${item.confession ? `
+                            <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
                         ` : ''}
                     </div>
 
                     ${showNsfwBlur ? `
-                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/85 hover:bg-black/75 rounded-xl border border-red-500/40 flex flex-col items-center justify-center p-3 text-center cursor-pointer transition z-10">
-                            <span class="text-xs font-bold text-red-400 font-mono-custom">🔞 KONTEN SENSITIF (NSFW)</span>
-                            <span class="text-[9px] text-slate-300 mt-0.5 underline font-mono-custom">Klik untuk melihat nama & pengakuan</span>
+                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/85 hover:bg-black/75 rounded-xl border border-red-400/40 flex flex-col items-center justify-center p-3 text-center cursor-pointer transition z-10">
+                            <span class="text-xs font-semibold text-red-300">🔞 Konten Sensitif (NSFW)</span>
+                            <span class="text-[10px] text-slate-300 mt-1 underline">Klik untuk melihat</span>
                         </div>
                     ` : ''}
                 </div>
 
                 ${isModeratorLoggedIn ? `
-                    <div class="flex items-center gap-1.5 pt-1.5 border-t border-purple-500/30 bg-purple-950/20 p-2 rounded-xl text-[10px] font-mono-custom">
-                        <span class="text-purple-400 font-bold">🛡️ MOD:</span>
-                        <button onclick="moderatorTogglePin('${item.id}', ${isPinned})" class="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition">
-                            ${isPinned ? 'Unpin' : 'Pin'}
+                    <div class="flex items-center gap-1 pt-3 mt-3 border-t border-white/[0.06] text-xs">
+                        <button onclick="moderatorTogglePin('${item.id}', ${isPinned})" class="px-2 py-1 rounded-md text-slate-400 hover:text-amber-300 hover:bg-white/5 transition">
+                            ${isPinned ? '📌 Lepas Pin' : '📌 Pin'}
                         </button>
-                        <button onclick="moderatorToggleNsfw('${item.id}', ${isNsfw})" class="px-2 py-0.5 bg-red-500/20 text-red-300 border border-red-500/40 rounded-lg hover:bg-red-500/30 transition">
-                            ${isNsfw ? 'Set SFW' : 'Set NSFW'}
+                        <button onclick="moderatorToggleNsfw('${item.id}', ${isNsfw})" class="px-2 py-1 rounded-md text-slate-400 hover:text-white hover:bg-white/5 transition">
+                            ${isNsfw ? '✅ SFW' : '🔞 NSFW'}
                         </button>
-                        <button onclick="moderatorDeleteFeed('${item.id}')" class="px-2 py-0.5 bg-rose-500/20 text-rose-300 border border-rose-500/40 rounded-lg hover:bg-rose-500/30 transition">
-                            Hapus
+                        <button onclick="moderatorDeleteFeed('${item.id}')" class="px-2 py-1 rounded-md text-slate-400 hover:text-red-300 hover:bg-white/5 transition">
+                            🗑️ Hapus
                         </button>
                     </div>
                 ` : ''}
 
-                <div class="flex items-center gap-2 pt-1 border-t border-white/10 text-[11px] font-mono-custom font-bold text-left">
-                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1 px-2.5 py-1 rounded-xl ${hasUpvoted ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300'} transition active:scale-95">
-                        <span>🔥</span>
-                        <span>${item.upvotes}</span>
+                <div class="flex items-center gap-6 pt-3 mt-3 border-t border-white/[0.06] text-[13px] text-left">
+                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1.5 ${hasUpvoted ? 'text-amber-400' : 'text-slate-400 hover:text-amber-300'} transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+                        <span class="font-medium">${item.upvotes}</span>
+                        <span class="text-xs text-slate-500 font-normal">${hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
                     </button>
-                    <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition active:scale-95">
-                        <span>💬</span>
-                        <span>${commentsList.length}</span>
+                    <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.42-4.03 8-9 8a9.9 9.9 0 01-4.2-.9L3 20l1.05-3.3A7.9 7.9 0 013 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
+                        <span class="font-medium">${commentsList.length}</span>
+                        <span class="text-xs text-slate-500 font-normal">Komentar</span>
                     </button>
                 </div>
 
                 <!-- COMMENTS DRAWER -->
-                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-2 border-t border-white/10 space-y-1.5 text-left">
-                    <div class="space-y-1 max-h-40 overflow-y-auto pr-1 text-left">
+                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-3 mt-1 border-t border-white/[0.06] space-y-2 text-left">
+                    <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1 text-left">
                         ${commentsList.length === 0
-                            ? `<p class="text-[9px] text-slate-500 italic text-left font-mono-custom">Belum ada komentar.</p>`
+                            ? `<p class="text-[11px] text-slate-500 italic text-left">Belum ada komentar.</p>`
                             : commentsList.map(c => `
-                                <div class="bg-black/40 border border-white/10 p-2 rounded-xl text-[11px] text-slate-200 font-sans text-left">${escapeHtml(c)}</div>
+                                <div class="bg-white/[0.04] border border-white/[0.06] p-2.5 rounded-lg text-[12px] text-slate-300 font-sans text-left">${escapeHtml(c)}</div>
                             `).join('')
                         }
                     </div>
-                    <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-1.5 pt-1 text-left">
+                    <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-2 pt-0.5 text-left">
                         <input id="comment-input-${item.id}" type="text" placeholder="Tulis komentar..." required
-                            class="flex-1 bg-black/60 border border-white/10 rounded-xl px-2.5 py-1 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 font-sans text-left">
-                        <button type="submit" class="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border border-emerald-500/40 rounded-xl text-[10px] font-mono-custom font-bold">
+                            class="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 font-sans text-left">
+                        <button type="submit" class="px-3.5 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg text-xs font-medium transition">
                             Kirim
                         </button>
                     </form>
@@ -318,10 +337,10 @@ function renderFeeds() {
             </div>
         `;
     }).join('') + `
-        <div class="py-6 text-center text-slate-400 font-mono-custom text-[11px] space-y-1 border-t border-white/5 mt-4">
-            <div class="inline-block animate-bounce text-base">⚓</div>
-            <div class="font-bold text-slate-300">Semua pengakuan telah dimuat</div>
-            <div class="text-[9px] text-slate-500">Anda telah mencapai akhir dari linimasa.</div>
+        <div class="py-8 text-center text-slate-500 text-xs space-y-1 border-t border-white/[0.04] mt-4">
+            <div class="inline-block animate-bounce text-sm">⚓</div>
+            <div class="text-slate-400">Semua pengakuan telah dimuat</div>
+            <div class="text-[11px] text-slate-600">Anda telah mencapai akhir dari linimasa.</div>
         </div>
     `;
 }
@@ -345,7 +364,7 @@ async function submitConfession(e) {
     const submitBtn = e.target.querySelector('button[type="submit"]');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Mengirim...';
+        submitBtn.innerHTML = 'Mengirim...';
     }
 
     try {
@@ -392,7 +411,7 @@ async function submitConfession(e) {
         isSubmitting = false;
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>Kirim Pengakuan</span><span>🚀</span>';
+            submitBtn.innerHTML = 'Kirim';
         }
     }
 }

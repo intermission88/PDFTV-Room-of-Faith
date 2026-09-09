@@ -409,56 +409,53 @@
         <div id="viewFeeds" class="hidden space-y-4 pt-20 pb-8 text-left">
             
             <!-- HEADER FEEDS -->
-            <div class="glass p-4 rounded-3xl border border-emerald-500/20 shadow-2xl relative overflow-hidden bg-gradient-to-br from-emerald-950/40 via-black/60 to-black/80 text-left">
-                <div class="flex items-center justify-between text-left">
-                    <div class="flex items-center gap-2.5 text-left">
-                        <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-lg shadow-inner">
-                            💬
-                        </div>
-                        <div class="text-left">
-                            <h1 class="text-sm font-black text-white uppercase tracking-wider font-mono-custom flex items-center gap-2 text-left">
-                                Room of Faith
-                            </h1>
-                            <p class="text-[10px] text-slate-400 text-left">Dinding Cerita & Pengakuan Anonim</p>
-                        </div>
-                    </div>
-                    <div id="feedSyncBadge" class="text-[8px] font-mono-custom font-bold px-2 py-0.5 rounded-full border bg-emerald-500/20 border-emerald-500/40 text-emerald-300 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> SUPABASE CONNECTED
+            <div class="p-4 rounded-lg border border-white/10 bg-white/5 text-left">
+                <div class="flex items-center gap-3 text-left">
+                    <div class="text-lg">💬</div>
+                    <div class="text-left">
+                        <h1 class="text-base font-bold text-white text-left">Room of Faith</h1>
+                        <p class="text-[11px] text-slate-400 text-left">Ruang anonim untuk berbagi cerita dan pengakuan</p>
                     </div>
                 </div>
 
                 <!-- FORM INPUT PENGAKUAN BARU -->
-                <form onsubmit="submitConfession(event)" class="mt-3 space-y-2 pt-2 border-t border-white/10 text-left">
-                    <div class="flex gap-2 text-left">
-                        <input id="feedAliasInput" type="text" placeholder="Alias / Nama Samaran (misal: Ceweknya Yamal)" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition font-mono-custom text-left">
+                <form onsubmit="submitConfession(event)" class="mt-4 space-y-3 pt-4 border-t border-white/10 text-left">
+                    <div class="text-left">
+                        <input id="feedAliasInput" type="text" placeholder="Nama / Alias (opsional)" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition text-left">
                     </div>
-                    <textarea id="feedContentInput" rows="2" placeholder="Tuliskan pengakuan, caption, atau cerita anonim kamu di sini..." class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition resize-none text-left"></textarea>
-                    <div class="flex gap-2 text-left">
-                        <input id="feedGifInput" type="url" placeholder="🎬 Link GIF / Image URL (opsional, misal: https://...gif)" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition font-mono-custom text-left">
+                    <textarea id="feedContentInput" rows="3" placeholder="Tuliskan pengakuan atau cerita Anda..." class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition resize-none text-left"></textarea>
+                    
+                    <div class="text-left">
+                        <button type="button" onclick="toggleGifInput()" class="text-[11px] text-slate-400 hover:text-white transition font-medium flex items-center gap-1">
+                            <span id="gifToggleIcon">+</span> <span id="gifToggleText">Tambah GIF</span>
+                        </button>
+                        <div id="gifInputContainer" class="hidden mt-2">
+                            <input id="feedGifInput" type="url" placeholder="Link GIF / Image (https://...)" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition text-left">
+                        </div>
                     </div>
-                    <div class="flex items-center justify-between pt-1">
+
+                    <div class="flex items-center justify-between pt-2">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="feedNsfwCheckbox" class="rounded bg-black border-white/20 text-red-500 focus:ring-0 w-3.5 h-3.5">
-                            <span class="text-[10px] text-slate-400 font-mono-custom">🔞 Tandai sebagai NSFW</span>
+                            <input type="checkbox" id="feedNsfwCheckbox" class="rounded bg-white/10 border border-white/20 text-red-500 focus:ring-0 w-4 h-4">
+                            <span class="text-xs text-slate-400">NSFW</span>
                         </label>
-                        <button type="submit" class="py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-mono-custom font-bold text-xs rounded-xl shadow-lg transition active:scale-95 flex items-center gap-1.5">
-                            <span>Kirim Pengakuan</span>
-                            <span>🚀</span>
+                        <button type="submit" class="py-2 px-4 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition border border-white/10 flex items-center gap-1.5">
+                            <span>Kirim</span>
                         </button>
                     </div>
                 </form>
             </div>
 
             <!-- CONTROLS & FILTER -->
-            <div class="flex items-center justify-between gap-2 px-1 text-left">
-                <div class="flex gap-1 bg-black/40 p-1 rounded-2xl border border-white/10 text-[9px] font-mono-custom font-bold uppercase">
-                    <button id="filterBtnLatest" onclick="setFeedFilter('latest')" class="px-2.5 py-1 rounded-xl bg-white/10 text-white transition">⚡ Terbaru</button>
-                    <button id="filterBtnPopular" onclick="setFeedFilter('popular')" class="px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition">🔥 Populer</button>
-                    <button id="filterBtnPinned" onclick="setFeedFilter('pinned')" class="px-2.5 py-1 rounded-xl text-slate-400 hover:text-white transition">📌 Pinned</button>
+            <div class="flex items-center justify-between gap-2 text-left">
+                <div class="flex gap-2">
+                    <button id="filterBtnLatest" onclick="setFeedFilter('latest')" class="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition border border-white/10">Terbaru</button>
+                    <button id="filterBtnPopular" onclick="setFeedFilter('popular')" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg transition border border-white/10">Populer</button>
+                    <button id="filterBtnPinned" onclick="setFeedFilter('pinned')" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg transition border border-white/10">Pinned</button>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <input id="feedSearchInput" type="text" oninput="handleFeedSearch(event)" placeholder="🔍 Cari..." class="w-24 bg-black/40 border border-white/10 rounded-xl px-2.5 py-1 text-[10px] text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition text-left">
-                    <button onclick="fetchFeeds(); playClickSound(); triggerHaptic('light'); showToast('🔄 Memuat ulang feeds...');" class="px-2.5 py-1 bg-black/40 hover:bg-white/10 border border-white/10 text-slate-300 rounded-xl text-[10px] font-mono-custom transition active:scale-95" title="Refresh Feeds">
+                <div class="flex items-center gap-2">
+                    <input id="feedSearchInput" type="text" oninput="handleFeedSearch(event)" placeholder="Cari..." class="w-32 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition text-left">
+                    <button onclick="fetchFeeds(); playClickSound(); triggerHaptic('light'); showToast('Feeds dimuat ulang');" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 rounded-lg text-xs transition" title="Refresh">
                         🔄
                     </button>
                 </div>
