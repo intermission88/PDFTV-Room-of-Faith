@@ -247,18 +247,17 @@
         }
         .skeleton-card {
             border-radius: 1rem;
-            border: 1px solid rgba(255,255,255,0.06);
             background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
             background-size: 800px 100%;
             animation: shimmer 1.4s infinite linear;
         }
         .skeleton-bar { border-radius: 0.5rem; background: rgba(255,255,255,0.07); }
 
-        .feed-card { transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+        .feed-card { transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; }
         .feed-card:hover {
+            background-color: rgba(16, 185, 129, 0.08);
             transform: translateY(-2px);
-            border-color: rgba(16, 185, 129, 0.35);
-            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.08);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.1);
         }
         .feed-card:active { transform: translateY(0) scale(0.995); }
 
@@ -473,7 +472,7 @@
         <div id="viewFeeds" class="hidden space-y-4 pt-20 pb-8 text-left">
             
             <!-- HEADER FEEDS -->
-            <div class="p-4 rounded-lg border border-white/10 bg-white/5 text-left">
+            <div class="p-4 rounded-lg bg-white/5 text-left">
                 <div class="flex items-center gap-3 text-left">
                     <div class="text-lg">💬</div>
                     <div class="text-left">
@@ -483,27 +482,27 @@
                 </div>
 
                 <!-- FORM INPUT PENGAKUAN BARU -->
-                <form onsubmit="submitConfession(event)" class="mt-4 space-y-3 pt-4 border-t border-white/10 text-left">
+                <form onsubmit="submitConfession(event)" class="mt-4 space-y-3 pt-4 text-left">
                     <div class="text-left">
-                        <input id="feedAliasInput" type="text" placeholder="Nama / Alias (opsional)" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition text-left">
+                        <input id="feedAliasInput" type="text" placeholder="Nama / Alias (opsional)" class="w-full bg-white/5 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:bg-white/10 transition text-left">
                     </div>
-                    <textarea id="feedContentInput" rows="3" placeholder="Tuliskan pengakuan atau cerita Anda..." class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition resize-none text-left"></textarea>
+                    <textarea id="feedContentInput" rows="3" placeholder="Tuliskan pengakuan atau cerita Anda..." class="w-full bg-white/5 rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:bg-white/10 transition resize-none text-left"></textarea>
                     
                     <div class="text-left">
                         <button type="button" onclick="toggleGifInput()" class="text-[11px] text-slate-400 hover:text-white transition font-medium flex items-center gap-1">
                             <span id="gifToggleIcon">+</span> <span id="gifToggleText">Tambah GIF</span>
                         </button>
                         <div id="gifInputContainer" class="hidden mt-2">
-                            <input id="feedGifInput" type="url" placeholder="Link GIF / Image (https://...)" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition text-left">
+                            <input id="feedGifInput" type="url" placeholder="Link GIF / Image (https://...)" class="w-full bg-white/5 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:bg-white/10 transition text-left">
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-2">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="feedNsfwCheckbox" class="rounded bg-white/10 border border-white/20 text-red-500 focus:ring-0 w-4 h-4">
+                            <input type="checkbox" id="feedNsfwCheckbox" class="rounded bg-white/10 text-red-500 focus:ring-0 w-4 h-4 accent-red-500">
                             <span class="text-xs text-slate-400">NSFW</span>
                         </label>
-                        <button type="submit" class="py-2 px-4 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition border border-white/10 flex items-center gap-1.5">
+                        <button type="submit" class="py-2 px-4 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition flex items-center gap-1.5">
                             <span>Kirim</span>
                         </button>
                     </div>
@@ -513,12 +512,12 @@
             <!-- CONTROLS & FILTER -->
             <div class="flex items-center justify-between gap-2 text-left">
                 <div class="flex gap-2">
-                    <button id="filterBtnLatest" onclick="setFeedFilter('latest')" class="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition border border-white/10">Terbaru</button>
-                    <button id="filterBtnPopular" onclick="setFeedFilter('popular')" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg transition border border-white/10">Populer</button>
+                    <button id="filterBtnLatest" onclick="setFeedFilter('latest')" class="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-white text-xs font-medium rounded-lg transition">Terbaru</button>
+                    <button id="filterBtnPopular" onclick="setFeedFilter('popular')" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg transition">Populer</button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <input id="feedSearchInput" type="text" oninput="handleFeedSearch(event)" placeholder="Cari..." class="w-32 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 transition text-left">
-                    <button onclick="fetchFeeds(); playClickSound(); triggerHaptic('light'); showToast('Feeds dimuat ulang');" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 rounded-lg text-xs transition" title="Refresh">
+                    <input id="feedSearchInput" type="text" oninput="handleFeedSearch(event)" placeholder="Cari..." class="w-32 bg-white/5 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:bg-white/10 transition text-left">
+                    <button onclick="fetchFeeds(); playClickSound(); triggerHaptic('light'); showToast('Feeds dimuat ulang');" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg text-xs transition" title="Refresh">
                         🔄
                     </button>
                 </div>

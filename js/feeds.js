@@ -106,12 +106,12 @@ async function fetchFeeds() {
         }
 
         container.innerHTML = `
-            <div class="rounded-xl border border-red-400/20 bg-white/[0.02] p-6 text-center text-red-300 text-xs space-y-2">
+            <div class="rounded-xl bg-red-500/[0.06] p-6 text-center text-red-300 text-xs space-y-2">
                 <div class="text-xl">🔌</div>
                 <div class="font-medium">Gagal memuat pengakuan</div>
                 <div class="text-slate-500 text-[11px]">${escapeHtml(error.message)}</div>
                 <p class="text-[11px] text-slate-400 mt-1">💡 Pastikan tabel "PDFTV Feeds" sudah dibuat di Supabase menggunakan <code>seed_feeds.sql</code>.</p>
-                <button onclick="fetchFeeds()" class="mt-2 px-4 py-1.5 bg-white/10 hover:bg-white/15 border border-white/10 text-white rounded-lg text-xs transition">
+                <button onclick="fetchFeeds()" class="mt-2 px-4 py-1.5 bg-white/10 hover:bg-white/15 text-white rounded-lg text-xs transition">
                     Coba Lagi
                 </button>
             </div>
@@ -192,8 +192,8 @@ function setFeedFilter(filter) {
     const btnLatest  = document.getElementById('filterBtnLatest');
     const btnPopular = document.getElementById('filterBtnPopular');
 
-    const active   = 'px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-lg border border-white/10 transition';
-    const inactive = 'px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg border border-white/10 transition';
+    const active   = 'px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-lg transition';
+    const inactive = 'px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg transition';
 
     if (btnLatest)  btnLatest.className  = filter === 'latest'  ? active : inactive;
     if (btnPopular) btnPopular.className = filter === 'popular' ? active : inactive;
@@ -235,14 +235,14 @@ function renderFeeds() {
     if (filtered.length === 0) {
         const isSearching = !!feedSearchQuery;
         container.innerHTML = `
-            <div class="rounded-2xl border border-dashed border-emerald-500/25 bg-gradient-to-b from-emerald-500/[0.06] via-transparent to-transparent p-8 text-center space-y-3">
+            <div class="rounded-2xl bg-gradient-to-b from-emerald-500/[0.06] via-transparent to-transparent p-8 text-center space-y-3">
                 <div class="text-3xl ${isSearching ? '' : 'animate-bounce'}">${isSearching ? '🔍' : '🕊️'}</div>
                 <div class="text-sm font-bold text-white">${isSearching ? 'Tidak ditemukan' : 'Room masih sepi'}</div>
                 <p class="text-xs text-slate-400 max-w-xs mx-auto">${isSearching
                     ? `Tidak ada pengakuan yang cocok dengan "<b class="text-slate-200">${escapeHtml(feedSearchQuery)}</b>". Coba kata kunci lain.`
                     : 'Jadilah yang pertama berbagi cerita atau pengakuan di sini.'}</p>
                 ${!isSearching ? `
-                    <button onclick="document.getElementById('feedContentInput').focus()" class="mt-1 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-bold transition active:scale-95">
+                    <button onclick="document.getElementById('feedContentInput').focus()" class="mt-1 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold transition active:scale-95">
                         ✍️ Tulis Pengakuan
                     </button>
                 ` : ''}
@@ -269,7 +269,7 @@ function renderFeeds() {
         const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
-            <div class="feed-card rounded-2xl border ${isPinned ? 'border-amber-400/30 bg-amber-400/[0.04]' : isNsfw ? 'border-red-300/[0.15]' : 'border-white/[0.07]'} bg-white/[0.03] p-4 text-left w-full transition">
+            <div class="feed-card rounded-2xl ${isPinned ? 'bg-amber-400/[0.06]' : isNsfw ? 'bg-red-300/[0.04]' : 'bg-white/[0.04]'} p-4 text-left w-full transition">
                 ${isPinned ? `
                     <div class="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-amber-300/90 mb-2.5">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 011 1v13a1 1 0 01-1.4.9L12 15.9l-5.6 3A1 1 0 015 18V5a1 1 0 011-1z"/></svg>
@@ -279,7 +279,7 @@ function renderFeeds() {
 
                 <div class="flex items-baseline gap-2 text-left">
                     <h3 class="text-sm font-semibold text-white text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
-                    ${isNsfw ? `<span class="text-[8px] uppercase tracking-wide text-red-300/80 border border-red-300/20 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
+                    ${isNsfw ? `<span class="text-[8px] uppercase tracking-wide text-red-300/80 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
                     <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
                 </div>
 
@@ -289,7 +289,7 @@ function renderFeeds() {
                             <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
                         ` : ''}
                         ${item.gif_url ? `
-                            <div class="rounded-xl overflow-hidden border border-white/10 bg-black/30 max-h-80 flex items-center justify-center">
+                            <div class="rounded-xl overflow-hidden bg-black/30 max-h-80 flex items-center justify-center">
                                 <img src="${escapeHtml(item.gif_url)}" alt="GIF" class="w-full max-h-80 object-contain rounded-xl cursor-zoom-in" loading="lazy" onclick="openLightbox(this.src)" onerror="this.parentNode.style.display='none'">
                             </div>
                         ` : ''}
@@ -297,7 +297,7 @@ function renderFeeds() {
 
                     ${showNsfwBlur ? `
                         <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 flex items-center justify-center cursor-pointer z-10">
-                            <span class="flex items-center gap-1.5 text-[10px] font-medium text-slate-300 bg-black/70 backdrop-blur-sm border border-white/[0.08] rounded-full px-3 py-1.5">
+                            <span class="flex items-center gap-1.5 text-[10px] font-medium text-slate-300 bg-black/70 backdrop-blur-sm rounded-full px-3 py-1.5">
                                 🔒 Konten sensitif · Klik untuk lihat
                             </span>
                         </div>
@@ -305,7 +305,7 @@ function renderFeeds() {
                 </div>
 
                 ${isModeratorLoggedIn ? `
-                    <div class="flex items-center gap-1 pt-3 mt-3 border-t border-white/[0.06] text-xs">
+                    <div class="flex items-center gap-1 pt-3 mt-3 text-xs">
                         <button onclick="moderatorTogglePin('${item.id}', ${isPinned})" class="px-2 py-1 rounded-md text-slate-400 hover:text-amber-300 hover:bg-white/5 transition">
                             ${isPinned ? '📌 Lepas Pin' : '📌 Pin'}
                         </button>
@@ -318,7 +318,7 @@ function renderFeeds() {
                     </div>
                 ` : ''}
 
-                <div class="flex items-center justify-between pt-3 mt-3 border-t border-white/[0.06] text-[13px] text-left">
+                <div class="flex items-center justify-between pt-3 mt-3 text-[13px] text-left">
                     <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.42-4.03 8-9 8a9.9 9.9 0 01-4.2-.9L3 20l1.05-3.3A7.9 7.9 0 013 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
                         <span class="font-medium">${commentsList.length}</span>
@@ -332,18 +332,18 @@ function renderFeeds() {
                 </div>
 
                 <!-- COMMENTS DRAWER -->
-                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-3 mt-1 border-t border-white/[0.06] space-y-2 text-left">
+                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-3 mt-1 space-y-2 text-left">
                     <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1 text-left">
                         ${commentsList.length === 0
                             ? `<p class="text-[11px] text-slate-500 italic text-left">Belum ada komentar.</p>`
                             : commentsList.map(c => `
-                                <div class="bg-white/[0.04] border border-white/[0.06] p-2.5 rounded-lg text-[12px] text-slate-300 font-sans text-left">${escapeHtml(c)}</div>
+                                <div class="bg-white/[0.06] p-2.5 rounded-lg text-[12px] text-slate-300 font-sans text-left">${escapeHtml(c)}</div>
                             `).join('')
                         }
                     </div>
                     <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-2 pt-0.5 text-left">
                         <input id="comment-input-${item.id}" type="text" placeholder="Tulis komentar..." required
-                            class="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-white/20 font-sans text-left">
+                            class="flex-1 bg-white/[0.07] rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:bg-white/[0.12] font-sans text-left">
                         <button type="submit" class="px-3.5 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg text-xs font-medium transition">
                             Kirim
                         </button>
@@ -352,7 +352,7 @@ function renderFeeds() {
             </div>
         `;
     }).join('') + `
-        <div class="py-8 text-center text-slate-500 text-xs space-y-1 border-t border-white/[0.04] mt-4">
+        <div class="py-8 text-center text-slate-500 text-xs space-y-1 mt-4">
             <div class="inline-block animate-bounce text-sm">⚓</div>
             <div class="text-slate-400">Semua pengakuan telah dimuat</div>
             <div class="text-[11px] text-slate-600">Anda telah mencapai akhir dari linimasa.</div>
