@@ -228,6 +228,9 @@ function renderFeeds() {
 
     container.innerHTML = filtered.map(item => {
         const isPinned      = item.is_pinned;
+        const isNsfw        = item.is_nsfw === true || item.is_nsfw === 'true';
+        const isRevealed    = revealedNsfwIds.includes(String(item.id));
+        const showNsfwBlur  = isNsfw && !isRevealed;
         const commentsList  = Array.isArray(item.comments) ? item.comments : [];
         const timeAgoStr    = formatTimeAgo(item.timestamp || item.id);
         const hasUpvoted    = upvotedFeedIds.includes(String(item.id));
@@ -248,7 +251,30 @@ function renderFeeds() {
                     </div>
                 </div>
 
-                <p class="text-xs text-slate-200 font-sans whitespace-pre-wrap text-left break-words m-0">${escapeHtml(item.confession)}</p>
+                <div class="relative">
+                    <p class="text-xs text-slate-200 font-sans whitespace-pre-wrap text-left break-words m-0 ${showNsfwBlur ? 'filter blur-sm select-none pointer-events-none' : ''}">${escapeHtml(item.confession)}</p>
+                    ${showNsfwBlur ? `
+                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/80 hover:bg-black/75 rounded-xl border border-red-500/40 flex flex-col items-center justify-center p-2 text-center cursor-pointer transition">
+                            <span class="text-xs font-bold text-red-400 font-mono-custom">🔞 KONTEN SENSITIF (NSFW)</span>
+                            <span class="text-[9px] text-slate-300 mt-0.5 underline font-mono-custom">Klik untuk melihat konten</span>
+                        </div>
+                    ` : ''}
+                </div>
+
+                ${isModeratorLoggedIn ? `
+                    <div class="flex items-center gap-1.5 pt-1.5 border-t border-purple-500/30 bg-purple-950/20 p-2 rounded-xl text-[10px] font-mono-custom">
+                        <span class="text-purple-400 font-bold">🛡️ MOD:</span>
+                        <button onclick="moderatorTogglePin('${item.id}', ${isPinned})" class="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition">
+                            ${isPinned ? 'Unpin' : 'Pin'}
+                        </button>
+                        <button onclick="moderatorToggleNsfw('${item.id}', ${isNsfw})" class="px-2 py-0.5 bg-red-500/20 text-red-300 border border-red-500/40 rounded-lg hover:bg-red-500/30 transition">
+                            ${isNsfw ? 'Set SFW' : 'Set NSFW'}
+                        </button>
+                        <button onclick="moderatorDeleteFeed('${item.id}')" class="px-2 py-0.5 bg-rose-500/20 text-rose-300 border border-rose-500/40 rounded-lg hover:bg-rose-500/30 transition">
+                            Hapus
+                        </button>
+                    </div>
+                ` : ''}
 
                 <div class="flex items-center gap-2 pt-1 border-t border-white/10 text-[11px] font-mono-custom font-bold text-left">
                     <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1 px-2.5 py-1 rounded-xl ${hasUpvoted ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50' : 'bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300'} transition active:scale-95">
@@ -297,6 +323,7 @@ async function submitConfession(e) {
 
     const aliasInput   = cleanText(document.getElementById('feedAliasInput').value) || 'Anonim';
     const contentInput = cleanText(document.getElementById('feedContentInput').value);
+    const isNsfwInput  = document.getElementById('feedNsfwCheckbox')?.checked || false;
     if (!contentInput) return;
 
     isSubmitting = true;
@@ -317,7 +344,8 @@ async function submitConfession(e) {
                 upvotes:   0,
                 comments:  [],
                 timestamp: newId,
-                is_pinned: false
+                is_pinned: false,
+                is_nsfw:   isNsfwInput
             }])
             .select()
             .single();
@@ -333,6 +361,8 @@ async function submitConfession(e) {
 
         document.getElementById('feedContentInput').value = '';
         document.getElementById('feedAliasInput').value   = '';
+        const nsfwBox = document.getElementById('feedNsfwCheckbox');
+        if (nsfwBox) nsfwBox.checked = false;
         showToast('✨ Pengakuan berhasil dikirim!');
         playWinSound();
         triggerHaptic('heavy');
@@ -492,6 +522,74 @@ async function updateBlackjackTop5Stats() {
     } catch (err) {
         console.warn('Failed to load blackjack top 5 stats:', err);
         statEl.innerText = '$0 💵';
+    }
+}
+
+// ── Feeds Moderator & NSFW System ──────────────────────────────
+let isModeratorLoggedIn = false;
+let revealedNsfwIds = [];
+
+function revealNsfw(id) {
+    playClickSound();
+    triggerHaptic('light');
+    revealedNsfwIds.push(String(id));
+    renderFeeds();
+}
+
+async function moderatorTogglePin(id, currentPinned) {
+    if (!isModeratorLoggedIn) {
+        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        return;
+    }
+    const newVal = !currentPinned;
+    const { error } = await supabaseClient
+        .from(FEEDS_TABLE)
+        .update({ is_pinned: newVal })
+        .eq('id', id);
+
+    if (error) {
+        showToast(`❌ Gagal pin: ${error.message}`);
+    } else {
+        showToast(newVal ? "📌 Postingan berhasil di-pin!" : "📌 Pin postingan dilepas.");
+        fetchFeeds();
+    }
+}
+
+async function moderatorToggleNsfw(id, currentNsfw) {
+    if (!isModeratorLoggedIn) {
+        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        return;
+    }
+    const newVal = !currentNsfw;
+    const { error } = await supabaseClient
+        .from(FEEDS_TABLE)
+        .update({ is_nsfw: newVal })
+        .eq('id', id);
+
+    if (error) {
+        showToast(`❌ Gagal update NSFW: ${error.message}`);
+    } else {
+        showToast(newVal ? "🔞 Postingan ditandai NSFW." : "✅ Postingan dikembalikan normal (SFW).");
+        fetchFeeds();
+    }
+}
+
+async function moderatorDeleteFeed(id) {
+    if (!isModeratorLoggedIn) {
+        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        return;
+    }
+    if (!confirm("Yakin ingin menghapus pengakuan ini?")) return;
+    const { error } = await supabaseClient
+        .from(FEEDS_TABLE)
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        showToast(`❌ Gagal menghapus: ${error.message}`);
+    } else {
+        showToast("🗑️ Postingan berhasil dihapus.");
+        fetchFeeds();
     }
 }
 

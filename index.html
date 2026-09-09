@@ -440,7 +440,11 @@
                         <input id="feedAliasInput" type="text" placeholder="Alias / Nama Samaran (misal: Ceweknya Yamal)" class="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition font-mono-custom text-left">
                     </div>
                     <textarea id="feedContentInput" required rows="2" placeholder="Tuliskan pengakuan atau cerita anonim kamu di sini..." class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition resize-none text-left"></textarea>
-                    <div class="flex justify-end">
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="feedNsfwCheckbox" class="rounded bg-black border-white/20 text-red-500 focus:ring-0 w-3.5 h-3.5">
+                            <span class="text-[10px] text-slate-400 font-mono-custom">🔞 Tandai sebagai NSFW (Konten Sensitif)</span>
+                        </label>
                         <button type="submit" class="py-2 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-mono-custom font-bold text-xs rounded-xl shadow-lg transition active:scale-95 flex items-center gap-1.5">
                             <span>Kirim Pengakuan</span>
                             <span>🚀</span>
@@ -927,15 +931,24 @@
             const passwordInput = document.getElementById('adminPasswordInput').value;
             if (passwordInput === 'cikini123') {
                 isAdminLoggedIn = true;
+                isModeratorLoggedIn = false;
                 toggleAdminModal(false);
                 updateAdminUI();
                 playAdminSound();
                 triggerHaptic('heavy');
-                showToast("🔓 Akses Admin & Cheat Panel Aktif!");
+                showToast("🔓 Akses Admin Blackjack (Cheat Panel) Aktif!");
+            } else if (passwordInput === 'rusdi123') {
+                isModeratorLoggedIn = true;
+                isAdminLoggedIn = false;
+                toggleAdminModal(false);
+                updateAdminUI();
+                playAdminSound();
+                triggerHaptic('heavy');
+                showToast("🛡️ Akses Moderator Feeds (Pin & NSFW) Aktif!");
             } else {
                 playBustSound();
                 triggerHaptic('bust');
-                alert("Password Admin Salah!");
+                alert("Password Admin / Moderator Salah!");
             }
         }
 
@@ -943,9 +956,10 @@
             playClickSound();
             triggerHaptic('light');
             isAdminLoggedIn = false;
+            isModeratorLoggedIn = false;
             cheatUnlimitedConsumables = false;
             updateAdminUI();
-            showToast("🔒 Mode Admin Dikeluarkan.");
+            showToast("🔒 Sesi Admin / Moderator Berakhir.");
         }
 
         function toggleBurgerMenu(open) {
@@ -970,11 +984,19 @@
             if (isAdminLoggedIn) {
                 if (burgerAdminBadge) {
                     burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30";
-                    burgerAdminBadge.textContent = "ADMIN MODE";
+                    burgerAdminBadge.textContent = "ADMIN (BLACKJACK)";
                 }
                 if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
                 if (adminResetBtn) adminResetBtn.classList.remove('hidden');
                 if (adminCheatPanel) adminCheatPanel.classList.remove('hidden');
+            } else if (isModeratorLoggedIn) {
+                if (burgerAdminBadge) {
+                    burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30";
+                    burgerAdminBadge.textContent = "MODERATOR (FEEDS)";
+                }
+                if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
+                if (adminResetBtn) adminResetBtn.classList.add('hidden');
+                if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
             } else {
                 if (burgerAdminBadge) {
                     burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300";
@@ -984,6 +1006,7 @@
                 if (adminResetBtn) adminResetBtn.classList.add('hidden');
                 if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
             }
+            if (typeof renderFeeds === 'function') renderFeeds();
         }
 
         // --- BALATRO CHEAT FUNCTIONS ---

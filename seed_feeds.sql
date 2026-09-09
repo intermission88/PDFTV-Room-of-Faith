@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public."PDFTV Feeds" (
     comments JSONB DEFAULT '[]'::jsonb,
     timestamp BIGINT,
     is_pinned BOOLEAN DEFAULT false,
+    is_nsfw BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
