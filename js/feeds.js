@@ -277,13 +277,14 @@ function renderFeeds() {
                     </div>
                 ` : ''}
 
+                <div class="flex items-baseline gap-2 text-left">
+                    <h3 class="text-sm font-semibold text-white text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
+                    ${isNsfw ? `<span class="text-[8px] uppercase tracking-wide text-red-300/80 border border-red-300/20 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
+                    <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
+                </div>
+
                 <div class="relative">
-                    <div class="${showNsfwBlur ? 'blur-md select-none pointer-events-none' : ''} space-y-1">
-                        <div class="flex items-baseline gap-2 text-left">
-                            <h3 class="text-sm font-semibold text-white text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
-                            ${isNsfw ? `<span class="text-[9px] uppercase tracking-wide text-red-300/80 border border-red-300/20 bg-red-300/[0.06] px-1.5 py-0.5 rounded self-center">18+</span>` : ''}
-                            <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
-                        </div>
+                    <div class="space-y-1 ${showNsfwBlur ? 'max-h-16 overflow-hidden blur-sm select-none pointer-events-none transition-all duration-300' : ''}">
                         ${item.confession ? `
                             <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
                         ` : ''}
@@ -295,12 +296,10 @@ function renderFeeds() {
                     </div>
 
                     ${showNsfwBlur ? `
-                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 bg-black/50 hover:bg-black/60 rounded-xl flex flex-col items-center justify-center gap-2 p-3 text-center cursor-pointer transition z-10">
-                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-slate-300">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>
-                                <span class="text-xs font-medium">Konten sensitif</span>
-                            </div>
-                            <span class="text-[11px] text-slate-500">Klik untuk menampilkan</span>
+                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 flex items-center justify-center cursor-pointer z-10">
+                            <span class="flex items-center gap-1.5 text-[10px] font-medium text-slate-300 bg-black/70 backdrop-blur-sm border border-white/[0.08] rounded-full px-3 py-1.5">
+                                🔒 Konten sensitif · Klik untuk lihat
+                            </span>
                         </div>
                     ` : ''}
                 </div>
