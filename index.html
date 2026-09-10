@@ -23,10 +23,9 @@
         .font-mono-custom { font-family: 'Space Grotesk', monospace; }
         .font-pixel { font-family: 'Silkscreen', 'Space Grotesk', monospace; }
 
-        .glass { 
-            background: rgba(10, 25, 18, 0.75); 
-            backdrop-filter: blur(16px); 
-            border: 1px solid rgba(52, 211, 153, 0.15); 
+        .glass {
+            background: rgba(10, 25, 18, 0.75);
+            backdrop-filter: blur(16px);
         }
 
         /* BALATRO RETRO CRT ARENA WITH FELT GREEN */
@@ -59,7 +58,6 @@
 
         .balatro-felt-bg {
             background: radial-gradient(circle at 50% 25%, #14472b 0%, #0a2516 65%, #041009 100%);
-            border: 1.5px solid rgba(52, 211, 153, 0.35);
             box-shadow: inset 0 0 50px rgba(0,0,0,0.7), 0 10px 30px rgba(0,0,0,0.6);
             transition: all 0.5s ease;
         }
@@ -99,7 +97,7 @@
         .landing-card { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .landing-card:hover {
             transform: translateY(-4px) scale(1.02);
-            border-color: rgba(52, 211, 153, 0.3);
+            background-color: rgba(255, 255, 255, 0.06);
             box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
         }
 
@@ -134,7 +132,6 @@
 
         .gold-rank {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(10, 25, 18, 0.7) 100%);
-            border: 1px solid rgba(245, 158, 11, 0.4) !important;
             box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
         }
 
@@ -219,18 +216,15 @@
 
         .btn-hit-balatro {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.45) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.6);
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
         }
         .btn-stand-balatro {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.35) 0%, rgba(185, 28, 28, 0.45) 100%);
-            border: 1px solid rgba(239, 68, 68, 0.6);
             box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
         }
 
         .bgm-btn-active {
             background: rgba(16, 185, 129, 0.25) !important;
-            border-color: rgba(16, 185, 129, 0.5) !important;
             color: #6ee7b7 !important;
             box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
         }
@@ -278,27 +272,27 @@
 <body class="scrollbar-hide min-h-screen flex flex-col justify-between pb-20">
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl opacity-0 pointer-events-none border border-white/20 whitespace-nowrap">
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl opacity-0 pointer-events-none   whitespace-nowrap">
         ✨ Notifikasi
     </div>
 
     <!-- TOP HEADER WITH BGM TOGGLE & BURGER MENU -->
-    <nav class="fixed top-0 w-full z-40 bg-[#030a06]/95 backdrop-blur-xl border-b border-emerald-500/20 transition-all py-2.5">
+    <nav class="fixed top-0 w-full z-40 bg-[#030a06]/95 backdrop-blur-xl   transition-all py-2.5">
         <div class="max-w-md mx-auto px-4 flex justify-between items-center relative">
             <!-- BRAND LOGO & TITLE -->
             <button onclick="switchMode('landing')" class="flex items-center gap-2 active:scale-95 transition">
                 <img src="assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-4 sm:h-5 w-auto">
-                <span class="text-[10px] sm:text-xs font-black tracking-wider text-white uppercase font-mono-custom border-l border-white/20 pl-2">Experience</span>
+                <span class="text-[10px] sm:text-xs font-black tracking-wider text-white uppercase font-mono-custom   pl-2">Experience</span>
             </button>
             
             <div class="flex items-center gap-2">
                 <!-- BGM TOGGLE BUTTON (ICON ONLY) -->
-                <button id="btnBgmToggle" onclick="toggleBGM()" title="Toggle BGM" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-400 hover:text-white transition active:scale-95 flex items-center justify-center">
+                <button id="btnBgmToggle" onclick="toggleBGM()" title="Toggle BGM" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10   text-slate-400 hover:text-white transition active:scale-95 flex items-center justify-center">
                     <span id="bgmIcon" class="text-xs">🎵</span>
                 </button>
 
                 <!-- BURGER MENU BUTTON -->
-                <button id="btnBurgerMenu" onclick="toggleBurgerMenu()" title="Open Menu" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white transition active:scale-95 flex items-center justify-center">
+                <button id="btnBurgerMenu" onclick="toggleBurgerMenu()" title="Open Menu" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20   text-white transition active:scale-95 flex items-center justify-center">
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6C3 5.44772 3.44772 5 4 5H20C20.5523 5 21 5.44772 21 6C21 6.55228 20.5523 7 20 7H4C3.44772 7 3 6.55228 3 6ZM3 12C3 11.4477 3.44772 11 4 11H20C20.5523 11 21 11.4477 21 12C21 12.5523 20.5523 13 20 13H4C3.44772 13 3 12.5523 3 12ZM3 18C3 17.4477 3.44772 17 4 17H20C20.5523 17 21 17.4477 21 18C21 18.5523 20.5523 19 20 19H4C3.44772 19 3 18.5523 3 18Z" />
                     </svg>
@@ -306,8 +300,8 @@
             </div>
 
             <!-- BURGER MENU DROPDOWN (EXPANDS DOWNWARD) -->
-            <div id="burgerMenuDropdown" class="hidden absolute top-11 right-4 w-60 glass border border-emerald-500/30 rounded-2xl shadow-2xl p-2 space-y-1.5 z-50 bg-[#030a06]/95 backdrop-blur-2xl">
-                <div class="px-2 py-1 text-[9px] font-mono-custom font-bold text-slate-400 uppercase tracking-wider border-b border-white/10 flex items-center justify-between">
+            <div id="burgerMenuDropdown" class="hidden absolute top-11 right-4 w-60 glass   rounded-2xl shadow-2xl p-2 space-y-1.5 z-50 bg-[#030a06]/95 backdrop-blur-2xl">
+                <div class="px-2 py-1 text-[9px] font-mono-custom font-bold text-slate-400 uppercase tracking-wider   flex items-center justify-between">
                     <span>⚡ Quick Menu</span>
                     <span id="burgerAdminBadge" class="text-[8px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300">Guest</span>
                 </div>
@@ -317,13 +311,13 @@
                     <span class="text-[9px] text-amber-400">Login ➔</span>
                 </button>
 
-                <div id="burgerAdminActions" class="hidden space-y-1 pt-1 border-t border-white/10">
+                <div id="burgerAdminActions" class="hidden space-y-1 pt-1  ">
                     <button onclick="toggleBurgerMenu(false); handleAdminLogout();" class="w-full text-left p-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-400 font-mono-custom flex items-center gap-2 transition">
                         <span>🚪 Logout Admin / Mod</span>
                     </button>
                 </div>
 
-                <div class="pt-1 border-t border-white/10 space-y-1">
+                <div class="pt-1   space-y-1">
                     <button onclick="toggleBurgerMenu(false); switchMode('landing');" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs text-slate-300 font-mono-custom flex items-center gap-2 transition">
                         <span>🏠 Home</span>
                     </button>
@@ -340,7 +334,7 @@
 
     <!-- BOTTOM NAVBAR -->
     <div class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-4">
-        <div class="glass p-1 rounded-full border border-emerald-500/20 flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
+        <div class="glass p-1 rounded-full   flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
             <button id="tabHome" onclick="switchMode('landing')" class="flex-1 py-1.5 rounded-full text-white bg-white/10 transition-all text-center">
                 HOME
             </button>
@@ -365,7 +359,7 @@
                 <p class="text-slate-400 text-xs uppercase tracking-widest font-bold font-mono-custom block">- ZALDNIELSEN</p>
             </header>
 
-            <section class="relative w-full overflow-hidden rounded-2xl glass border border-emerald-500/20 shadow-2xl group my-1">
+            <section class="relative w-full overflow-hidden rounded-2xl glass   shadow-2xl group my-1">
                 <div id="slider" class="flex transition-transform duration-500 ease-out w-full">
                     <div class="min-w-full aspect-[21/9] relative">
                         <img src="assets/slider01_roster.webp" alt="Slider Image 1" class="w-full h-full object-cover">
@@ -393,13 +387,13 @@
             </section>
 
             <div class="grid grid-cols-1 gap-2.5 pt-1">
-                <div onclick="handleFeedsClick()" class="landing-card rounded-2xl bg-white/[0.03] border border-white/[0.07] hover:border-white/[0.15] hover:bg-white/[0.05] p-4 cursor-pointer text-left transition">
+                <div onclick="handleFeedsClick()" class="landing-card rounded-2xl bg-white/[0.03]    hover:bg-white/[0.05] p-4 cursor-pointer text-left transition">
                     <div class="flex items-start justify-between">
                         <div class="text-left">
                             <h2 class="text-sm font-semibold text-white">Room of Faith</h2>
                             <p class="text-slate-400 text-xs mt-1 leading-relaxed">Ruang anonim untuk berbagi cerita, pengakuan, dan curhatan.</p>
                         </div>
-                        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] text-slate-300 text-base shrink-0">
+                        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white/[0.05]   text-slate-300 text-base shrink-0">
                             💬
                         </div>
                     </div>
@@ -409,13 +403,13 @@
                     </div>
                 </div>
 
-                <div onclick="switchMode('arcade')" class="landing-card rounded-2xl bg-white/[0.03] border border-white/[0.07] hover:border-white/[0.15] hover:bg-white/[0.05] p-4 cursor-pointer text-left transition">
+                <div onclick="switchMode('arcade')" class="landing-card rounded-2xl bg-white/[0.03]    hover:bg-white/[0.05] p-4 cursor-pointer text-left transition">
                     <div class="flex items-start justify-between">
                         <div class="text-left">
                             <h2 class="text-sm font-semibold text-white">Blackjack Arcade</h2>
                             <p class="text-slate-400 text-xs mt-1 leading-relaxed">Kumpulkan $ Cash, aktifkan kartu Joker, dan taklukkan Boss tiap 8 Ronde.</p>
                         </div>
-                        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] text-slate-300 text-base shrink-0">
+                        <div class="flex items-center justify-center w-9 h-9 rounded-xl bg-white/[0.05]   text-slate-300 text-base shrink-0">
                             🎰
                         </div>
                     </div>
@@ -427,7 +421,7 @@
             </div>
 
             <!-- STATS WIDGET -->
-            <div class="rounded-2xl bg-white/[0.03] border border-white/[0.07] p-4 space-y-3 text-left">
+            <div class="rounded-2xl bg-white/[0.03]   p-4 space-y-3 text-left">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-medium text-slate-300">Statistik Platform</span>
                     <span class="flex items-center gap-1.5 text-[11px] text-slate-500">
@@ -439,12 +433,12 @@
                     </span>
                 </div>
                 <div class="grid grid-cols-2 gap-2.5 text-left">
-                    <div class="bg-white/[0.03] border border-white/[0.05] p-3 rounded-xl">
+                    <div class="bg-white/[0.03]   p-3 rounded-xl">
                         <div class="text-[10px] text-slate-500 uppercase tracking-wide">Room of Faith</div>
                         <div id="statFeedsCount" class="text-sm font-semibold text-white mt-1">—</div>
                         <div id="statFeedsEngagement" class="text-[11px] text-slate-400 mt-0.5">—</div>
                     </div>
-                    <div class="bg-white/[0.03] border border-white/[0.05] p-3 rounded-xl">
+                    <div class="bg-white/[0.03]   p-3 rounded-xl">
                         <div class="text-[10px] text-slate-500 uppercase tracking-wide">Blackjack</div>
                         <div id="statBlackjackTop5" class="text-sm font-semibold text-amber-300/90 mt-1">—</div>
                         <div class="text-[11px] text-slate-400 mt-0.5">Total Top 5 Skor</div>
@@ -528,7 +522,7 @@
                 <!-- Rendered dynamically -->
             </div>
 
-            <button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Kembali ke atas" class="fixed bottom-24 right-4 z-40 w-10 h-10 rounded-full glass border border-emerald-500/30 bg-[#030a06]/90 backdrop-blur-xl text-emerald-300 text-sm shadow-2xl active:scale-90 transition">
+            <button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Kembali ke atas" class="fixed bottom-24 right-4 z-40 w-10 h-10 rounded-full glass   bg-[#030a06]/90 backdrop-blur-xl text-emerald-300 text-sm shadow-2xl active:scale-90 transition">
                 ▲
             </button>
         </div>
@@ -537,30 +531,30 @@
         <div id="viewArcade" class="hidden space-y-3 pt-14">
 
             <!-- ADMIN CHEAT PANEL -->
-            <div id="adminCheatPanel" class="hidden glass p-3.5 rounded-2xl border border-red-500/50 bg-red-950/20 space-y-2 text-xs font-mono-custom shadow-2xl">
-                <div class="flex items-center justify-between border-b border-red-500/30 pb-1.5">
+            <div id="adminCheatPanel" class="hidden glass p-3.5 rounded-2xl   bg-red-950/20 space-y-2 text-xs font-mono-custom shadow-2xl">
+                <div class="flex items-center justify-between   pb-1.5">
                     <span class="font-black text-red-400 flex items-center gap-1">
                         🛠️ CHEAT PANEL (BALATRO ADMIN)
                     </span>
-                    <span id="cheatStatusBadge" class="text-[8px] bg-red-500/20 border border-red-500/40 text-red-300 px-2 py-0.5 rounded-full font-bold">READY</span>
+                    <span id="cheatStatusBadge" class="text-[8px] bg-red-500/20   text-red-300 px-2 py-0.5 rounded-full font-bold">READY</span>
                 </div>
                 <div class="grid grid-cols-2 gap-1.5 pt-1">
-                    <button onclick="cheatToggleUnlimitedConsumables()" id="btnCheatConsumables" class="py-1.5 px-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 border border-red-500/40 rounded-xl text-[9px] font-bold transition active:scale-95 flex items-center justify-center gap-1">
+                    <button onclick="cheatToggleUnlimitedConsumables()" id="btnCheatConsumables" class="py-1.5 px-2 bg-red-500/20 hover:bg-red-500/40 text-red-200   rounded-xl text-[9px] font-bold transition active:scale-95 flex items-center justify-center gap-1">
                         🧪 Unlimited Items: <b id="textCheatConsumables">OFF</b>
                     </button>
-                    <button onclick="cheatAddCash(1000)" class="py-1.5 px-2 bg-amber-500/20 hover:bg-amber-500/40 text-amber-200 border border-amber-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                    <button onclick="cheatAddCash(1000)" class="py-1.5 px-2 bg-amber-500/20 hover:bg-amber-500/40 text-amber-200   rounded-xl text-[9px] font-bold transition active:scale-95">
                         💵 +$1,000 Cash
                     </button>
-                    <button onclick="cheatAddMultiplier(1.0)" class="py-1.5 px-2 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 border border-rose-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                    <button onclick="cheatAddMultiplier(1.0)" class="py-1.5 px-2 bg-rose-500/20 hover:bg-rose-500/40 text-rose-200   rounded-xl text-[9px] font-bold transition active:scale-95">
                         🔥 +1.0x Multiplier
                     </button>
-                    <button onclick="cheatSkipToBoss()" class="py-1.5 px-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 border border-purple-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                    <button onclick="cheatSkipToBoss()" class="py-1.5 px-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200   rounded-xl text-[9px] font-bold transition active:scale-95">
                         ⚔️ Jump to Boss (8/8)
                     </button>
-                    <button onclick="cheatInstantWin()" class="py-1.5 px-2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-200 border border-emerald-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                    <button onclick="cheatInstantWin()" class="py-1.5 px-2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-200   rounded-xl text-[9px] font-bold transition active:scale-95">
                         👑 Instant Round Win
                     </button>
-                    <button onclick="cheatAddShields(3)" class="py-1.5 px-2 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200 border border-indigo-500/40 rounded-xl text-[9px] font-bold transition active:scale-95">
+                    <button onclick="cheatAddShields(3)" class="py-1.5 px-2 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200   rounded-xl text-[9px] font-bold transition active:scale-95">
                         🛡️ Max Shields (3/3)
                     </button>
                 </div>
@@ -568,8 +562,8 @@
 
             <!-- LOBBY -->
             <div id="arcadeLobby" class="space-y-4">
-                <div class="relative overflow-hidden rounded-3xl p-5 border border-emerald-500/30 balatro-felt-bg shadow-2xl text-center">
-                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[9px] font-mono-custom font-bold tracking-widest uppercase mb-2">
+                <div class="relative overflow-hidden rounded-3xl p-5   balatro-felt-bg shadow-2xl text-center">
+                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10   text-amber-400 text-[9px] font-mono-custom font-bold tracking-widest uppercase mb-2">
                         <span>✨</span> Balatro Casino Edition
                     </div>
 
@@ -583,7 +577,7 @@
                     </button>
                 </div>
 
-                <section id="lobbyHallOfFame" class="glass p-4 rounded-3xl border border-emerald-500/20 shadow-2xl">
+                <section id="lobbyHallOfFame" class="glass p-4 rounded-3xl   shadow-2xl">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-1.5">
                             <span class="text-base">🏆</span>
@@ -593,10 +587,10 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <button id="adminResetLeaderboardBtn" onclick="confirmResetLeaderboard()" class="hidden text-[8px] font-mono-custom font-bold bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-lg hover:bg-red-500/30 transition">
+                            <button id="adminResetLeaderboardBtn" onclick="confirmResetLeaderboard()" class="hidden text-[8px] font-mono-custom font-bold bg-red-500/20 text-red-400   px-2 py-0.5 rounded-lg hover:bg-red-500/30 transition">
                                 🔄 RESET
                             </button>
-                            <span class="text-[8px] font-mono-custom text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/30">LIVE RANKING</span>
+                            <span class="text-[8px] font-mono-custom text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg  ">LIVE RANKING</span>
                         </div>
                     </div>
                     
@@ -611,20 +605,20 @@
             <!-- GAMEPLAY UI -->
             <div id="arcadeGameUI" class="hidden space-y-2.5">
                 
-                <div class="flex items-center justify-between glass px-3 py-2 rounded-xl border border-emerald-500/20">
+                <div class="flex items-center justify-between glass px-3 py-2 rounded-xl  ">
                     <button onclick="exitCasinoGame()" class="text-slate-300 hover:text-white text-[11px] font-bold flex items-center gap-1 transition active:scale-95">
                         <span>⬅</span> LOBBY
                     </button>
                     <div id="tableHeaderTitle" class="text-[11px] font-black tracking-wider text-amber-400 flex items-center gap-1">
                         <span>🃏</span> ANTE 1 • ROUND 1/8
                     </div>
-                    <button onclick="toggleRulesAccordion()" class="text-[9px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2 py-0.5 rounded-lg transition border border-white/10 flex items-center gap-1">
+                    <button onclick="toggleRulesAccordion()" class="text-[9px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2 py-0.5 rounded-lg transition   flex items-center gap-1">
                         📜 Rules
                     </button>
                 </div>
 
-                <div id="rulesAccordion" class="hidden p-3 rounded-2xl glass border border-amber-500/20 text-[10px] text-slate-300 space-y-1.5">
-                    <div class="font-bold text-amber-400 border-b border-white/10 pb-0.5">📜 Balatro Jokers, Boss & Consumables:</div>
+                <div id="rulesAccordion" class="hidden p-3 rounded-2xl glass   text-[10px] text-slate-300 space-y-1.5">
+                    <div class="font-bold text-amber-400   pb-0.5">📜 Balatro Jokers, Boss & Consumables:</div>
                     <p class="text-[9px] text-slate-300 leading-relaxed">Capai 21 tanpa BUST. Kumpulkan <b>$ (Cash)</b> dengan melipatgandakan <b>Multiplier</b> tiap ronde!</p>
                     <div class="grid grid-cols-1 gap-1 text-[9px] pt-0.5">
                         <div class="text-amber-300">🔥 <b>MULTIPLIER:</b> Menang berturut-turut memberi +0.2x Mult. Suited Hand (+1.5x), Pocket Pair (+1.3x).</div>
@@ -652,7 +646,7 @@
                 <div id="blackjackCard" class="balatro-felt-bg crt-container p-3.5 rounded-2xl shadow-2xl relative space-y-2.5">
                     
                     <!-- BALATRO JOKER DISPLAY SLOTS (3 SLOTS) -->
-                    <div class="bg-black/60 p-2 rounded-xl border border-emerald-500/30 relative z-20 space-y-1">
+                    <div class="bg-black/60 p-2 rounded-xl   relative z-20 space-y-1">
                         <div class="flex justify-between items-center text-[8px] font-mono-custom font-bold text-emerald-400 uppercase">
                             <span>🃏 Active Jokers (Passives)</span>
                             <span class="text-slate-400 font-normal">Auto-trigger on win</span>
@@ -680,46 +674,46 @@
                     </div>
 
                     <!-- BALATRO DUAL SCOREBOARD BAR -->
-                    <div class="bg-black/70 p-2.5 rounded-xl border border-white/15 space-y-2 relative z-20">
+                    <div class="bg-black/70 p-2.5 rounded-xl   space-y-2 relative z-20">
                         <div class="grid grid-cols-3 gap-1.5 text-center font-mono-custom">
                             <!-- ROUND -->
-                            <div class="bg-white/5 py-1.5 px-1 rounded-lg border border-white/10 flex flex-col justify-center items-center">
+                            <div class="bg-white/5 py-1.5 px-1 rounded-lg   flex flex-col justify-center items-center">
                                 <div class="text-[7px] text-slate-400 uppercase tracking-widest font-bold">ROUND</div>
                                 <div id="roundCounterText" class="text-[11px] font-black text-white">1/8 <span class="text-[8px] text-amber-400">(A1)</span></div>
                             </div>
                             <!-- CASH -->
-                            <div class="bg-amber-500/10 py-1.5 px-1 rounded-lg border border-amber-500/30 flex flex-col justify-center items-center shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                            <div class="bg-amber-500/10 py-1.5 px-1 rounded-lg   flex flex-col justify-center items-center shadow-[0_0_15px_rgba(245,158,11,0.15)]">
                                 <div class="text-[7px] text-amber-300 uppercase tracking-widest font-bold">TOTAL CASH</div>
                                 <div id="totalCashText" class="text-xs font-pixel font-bold text-amber-400">$0</div>
                             </div>
                             <!-- MULTIPLIER -->
-                            <div class="bg-rose-500/10 py-1.5 px-1 rounded-lg border border-rose-500/30 flex flex-col justify-center items-center shadow-[0_0_15px_rgba(244,63,94,0.15)]">
+                            <div class="bg-rose-500/10 py-1.5 px-1 rounded-lg   flex flex-col justify-center items-center shadow-[0_0_15px_rgba(244,63,94,0.15)]">
                                 <div class="text-[7px] text-rose-300 uppercase tracking-widest font-bold">MULTIPLIER</div>
                                 <div id="activeMultText" class="text-xs font-pixel font-bold text-rose-400">×1.0</div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-1 text-center font-mono-custom pt-1 border-t border-white/5 text-[8px]">
-                            <div class="bg-white/5 py-0.5 rounded border border-white/5">
+                        <div class="grid grid-cols-3 gap-1 text-center font-mono-custom pt-1   text-[8px]">
+                            <div class="bg-white/5 py-0.5 rounded  ">
                                 <span class="text-slate-400">W-L-D:</span> <b id="statWLD" class="text-white">0-0-0</b>
                             </div>
-                            <div class="bg-white/5 py-0.5 rounded border border-white/5">
+                            <div class="bg-white/5 py-0.5 rounded  ">
                                 <span class="text-slate-400">ROUNDS:</span> <b id="statTotal" class="text-slate-300">0</b>
                             </div>
-                            <div class="bg-white/5 py-0.5 rounded border border-white/5">
+                            <div class="bg-white/5 py-0.5 rounded  ">
                                 <span class="text-slate-400">WIN:</span> <b id="statWinrate" class="text-emerald-400">0%</b>
                             </div>
                         </div>
                     </div>
 
                     <!-- CONSUMABLES CONTAINER (BALATRO TACTICAL CONSUMABLES) -->
-                    <div class="bg-indigo-950/50 p-2 rounded-xl border border-indigo-500/30 space-y-1 relative z-20">
+                    <div class="bg-indigo-950/50 p-2 rounded-xl   space-y-1 relative z-20">
                         <div class="flex justify-between items-center text-[9px] font-bold tracking-wider text-indigo-300 uppercase">
                             <span>🧪 Tactical Items <span class="text-[7px] text-slate-400 font-normal">(Max 2 per item)</span></span>
                             <span id="consumablesLockedTag" class="hidden font-mono-custom text-[8px] text-red-400 font-bold animate-pulse">LOCKED IN BOSS BATTLE</span>
                         </div>
                         <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="useDiscard()" id="btnDiscard" class="py-1.5 px-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-between">
+                            <button onclick="useDiscard()" id="btnDiscard" class="py-1.5 px-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200   text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-between">
                                 <div class="flex items-center gap-1">
                                     <span>🔄</span>
                                     <div class="text-left">
@@ -729,7 +723,7 @@
                                 </div>
                                 <span id="countDiscard" class="font-mono-custom bg-indigo-500/30 px-1.5 py-0.5 rounded text-[8px]">1/2</span>
                             </button>
-                            <button onclick="useBuster()" id="btnBuster" class="py-1.5 px-2 bg-red-600/30 hover:bg-red-600/50 text-red-200 border border-red-400/40 text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-between">
+                            <button onclick="useBuster()" id="btnBuster" class="py-1.5 px-2 bg-red-600/30 hover:bg-red-600/50 text-red-200   text-[9px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-between">
                                 <div class="flex items-center gap-1">
                                     <span>💣</span>
                                     <div class="text-left">
@@ -743,19 +737,19 @@
                     </div>
 
                     <!-- PLAYING TABLE AREA -->
-                    <div class="space-y-2 bg-black/75 p-3 rounded-xl border border-emerald-500/20 relative z-20">
+                    <div class="space-y-2 bg-black/75 p-3 rounded-xl   relative z-20">
                         <!-- DEALER -->
                         <div>
                             <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
                                 <span class="font-bold tracking-wider flex items-center gap-1 text-slate-300">
                                     <span id="dealerAvatar">🎩</span> <span id="dealerTitleText">DEALER</span>
                                 </span>
-                                <span id="dealerScore" class="font-mono-custom text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20 text-[10px]">0</span>
+                                <span id="dealerScore" class="font-mono-custom text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.2 rounded   text-[10px]">0</span>
                             </div>
                             <div id="dealerCards" class="flex gap-1.5 min-h-[58px] items-center overflow-x-auto scrollbar-hide py-0.5"></div>
                         </div>
 
-                        <div class="border-b border-white/10 my-1"></div>
+                        <div class="  my-1"></div>
 
                         <!-- PLAYER -->
                         <div>
@@ -763,28 +757,28 @@
                                 <span class="font-bold tracking-wider flex items-center gap-1 text-slate-300">
                                     <span>👤</span> KAMU
                                 </span>
-                                <span id="playerScore" class="font-mono-custom text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20 text-[10px]">0</span>
+                                <span id="playerScore" class="font-mono-custom text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.2 rounded   text-[10px]">0</span>
                             </div>
                             <div id="playerCards" class="flex gap-1.5 min-h-[58px] items-center overflow-x-auto scrollbar-hide py-0.5"></div>
                         </div>
                     </div>
 
                     <!-- SHIELD BAR -->
-                    <div class="bg-slate-900/80 p-2 rounded-xl border border-emerald-500/20 flex items-center justify-between gap-2 relative z-20">
+                    <div class="bg-slate-900/80 p-2 rounded-xl   flex items-center justify-between gap-2 relative z-20">
                         <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-500/10   flex items-center justify-center text-emerald-400 text-xs">
                                 🛡️
                             </div>
                             <div>
                                 <div class="text-[9px] font-bold text-white uppercase flex items-center gap-1">
                                     Aegis Shield
-                                    <span id="shieldBadge" class="text-[7px] px-1 rounded font-mono-custom bg-slate-800 text-slate-400 border border-slate-700">OFF</span>
+                                    <span id="shieldBadge" class="text-[7px] px-1 rounded font-mono-custom bg-slate-800 text-slate-400  ">OFF</span>
                                 </div>
                                 <div class="text-[8px] text-slate-400">Proteksi Loss (Max 3 • Didapat saat 21)</div>
                             </div>
                         </div>
 
-                        <button onclick="toggleShield()" id="btnShieldToggle" class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border transition-all flex items-center gap-1 active:scale-95">
+                        <button onclick="toggleShield()" id="btnShieldToggle" class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider  transition-all flex items-center gap-1 active:scale-95">
                             <span>KUOTA:</span>
                             <span id="shieldCount" class="font-mono-custom text-[10px] font-bold text-emerald-400">1/3</span>
                         </button>
@@ -811,7 +805,7 @@
 
     <!-- Modal Admin Login -->
     <div id="adminModal" class="modal-base hidden-modal fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-white/10 shadow-2xl relative bg-[#0a0a0d]">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl relative bg-[#0a0a0d]">
             <button onclick="toggleAdminModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
@@ -823,7 +817,7 @@
             </div>
 
             <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="space-y-2.5">
-                <input type="password" id="adminPasswordInput" placeholder="Password Admin..." class="w-full bg-white/5 border border-white/10 text-white text-xs p-2.5 rounded-xl focus:outline-none focus:border-white transition text-center font-mono-custom">
+                <input type="password" id="adminPasswordInput" placeholder="Password Admin..." class="w-full bg-white/5 text-white text-xs p-2.5 rounded-xl focus:outline-none focus:bg-white/10 transition text-center font-mono-custom">
                 <button type="submit" class="w-full py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all shadow uppercase tracking-wider">
                     MASUK ADMIN
                 </button>
@@ -833,7 +827,7 @@
 
     <!-- MODAL PEMILIHAN JOKER PASIF BOSS -->
     <div id="passiveChoiceModal" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#07170e] relative">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#07170e] relative">
             <div class="text-3xl mb-1">🃏</div>
             <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider font-pixel">PILIH 1 JOKER PASIF</h3>
             <p id="passiveModalSubtitle" class="text-slate-300 text-[10px] mb-3">Pilih 1 kartu Joker permanen untuk run ini:</p>
@@ -846,27 +840,27 @@
 
     <!-- MODAL REWARD CONSUMABLE SETELAH BOSS BATTLE -->
     <div id="bossRewardModal" class="modal-base hidden-modal fixed inset-0 z-[66] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-indigo-500/40 shadow-2xl text-center bg-[#07170e] relative">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#07170e] relative">
             <div class="text-3xl mb-1">📦</div>
             <h3 class="text-sm font-black text-indigo-400 uppercase tracking-wider font-pixel">BOSS VICTORY REWARD</h3>
             <p class="text-slate-300 text-[10px] mb-3">Pilih 1 bonus tactical tambahan:</p>
 
             <div class="space-y-2">
-                <button onclick="chooseBossReward('discard')" class="w-full p-2 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 text-left rounded-xl transition flex items-center justify-between">
+                <button onclick="chooseBossReward('discard')" class="w-full p-2 bg-indigo-500/10   hover:bg-indigo-500/20 text-left rounded-xl transition flex items-center justify-between">
                     <div>
                         <div class="text-xs font-bold text-indigo-300 font-mono-custom">🔄 Tactical Discard</div>
                         <div class="text-[8px] text-slate-400">Ganti kartu terakhir di tangan</div>
                     </div>
                     <span class="text-xs font-bold bg-indigo-500/20 px-2 py-0.5 rounded text-indigo-300">+1</span>
                 </button>
-                <button onclick="chooseBossReward('buster')" class="w-full p-2 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-left rounded-xl transition flex items-center justify-between">
+                <button onclick="chooseBossReward('buster')" class="w-full p-2 bg-red-500/10   hover:bg-red-500/20 text-left rounded-xl transition flex items-center justify-between">
                     <div>
                         <div class="text-xs font-bold text-red-300 font-mono-custom">💣 Overcharge Buster</div>
                         <div class="text-[8px] text-slate-400">Paksa Dealer +1 Hit berisiko</div>
                     </div>
                     <span class="text-xs font-bold bg-red-500/20 px-2 py-0.5 rounded text-red-300">+1</span>
                 </button>
-                <button onclick="chooseBossReward('cash')" class="w-full p-2 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-left rounded-xl transition flex items-center justify-between">
+                <button onclick="chooseBossReward('cash')" class="w-full p-2 bg-amber-500/10   hover:bg-amber-500/20 text-left rounded-xl transition flex items-center justify-between">
                     <div>
                         <div class="text-xs font-bold text-amber-300 font-mono-custom">💵 Cash Bounty</div>
                         <div class="text-[8px] text-slate-400">Bonus instan cash tambahan</div>
@@ -879,7 +873,7 @@
 
     <!-- MODAL ENCOUNTER DEALER CONSUMABLES (GACHA CASINO ROULETTE) -->
     <div id="dealerEncounterModal" class="modal-base hidden-modal fixed inset-0 z-[66] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-purple-500/50 shadow-2xl text-center bg-[#0d0714] relative overflow-hidden">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#0d0714] relative overflow-hidden">
             <div class="text-4xl mb-1 animate-pulse">🎰</div>
             <h3 class="text-sm font-black text-purple-300 uppercase tracking-wider font-mono-custom">DEALER GACHA ROULETTE</h3>
             <p class="text-slate-400 text-[10px] mb-3">Tekan tombol untuk memutar slot keberuntungan!</p>
@@ -896,9 +890,9 @@
 
     <!-- Modal Highscore Submission (Dilengkapi BALATRO REKOR $ CASH) -->
     <div id="scoreSubmitModal" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass w-full max-w-xs p-5 rounded-3xl border border-amber-500/40 shadow-2xl text-center bg-[#07170e] relative space-y-3 max-h-[90vh] overflow-y-auto scrollbar-hide">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#07170e] relative space-y-3 max-h-[90vh] overflow-y-auto scrollbar-hide">
             
-            <div class="w-10 h-10 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg shadow">
+            <div class="w-10 h-10 mx-auto rounded-full bg-amber-500/10   flex items-center justify-center text-amber-400 text-lg shadow">
                 👑
             </div>
 
@@ -909,8 +903,8 @@
             </div>
 
             <!-- END-GAME STATISTICS BOX -->
-            <div class="bg-black/60 p-3 rounded-2xl border border-white/10 text-left space-y-1.5 font-mono-custom text-[10px]">
-                <div class="text-amber-400 font-black uppercase text-[10px] border-b border-white/10 pb-1 flex justify-between items-center">
+            <div class="bg-black/60 p-3 rounded-2xl   text-left space-y-1.5 font-mono-custom text-[10px]">
+                <div class="text-amber-400 font-black uppercase text-[10px]   pb-1 flex justify-between items-center">
                     <span>📊 End-Game Statistics</span>
                     <span class="text-[8px] text-slate-400 font-normal">Ready to Share</span>
                 </div>
@@ -924,13 +918,13 @@
             </div>
 
             <!-- Pesan Minimum Score -->
-            <div id="minScoreWarning" class="hidden text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/20 py-2 px-3 rounded-xl">
+            <div id="minScoreWarning" class="hidden text-[10px] text-amber-300 bg-amber-500/10   py-2 px-3 rounded-xl">
                 ⚠️ Minimal <b>$500 Cash</b> untuk mencatat rekor ke Leaderboard.
             </div>
 
             <form id="scoreForm" onsubmit="submitHighScore(event)" class="space-y-2.5">
                 <div id="nameInputContainer" class="space-y-1">
-                    <input type="text" id="playerName" maxlength="12" placeholder="Masukkan Nama / Alias..." required class="w-full bg-white/5 border border-white/10 text-white text-xs p-3 rounded-xl text-center focus:outline-none focus:border-amber-500 transition font-mono-custom tracking-wide">
+                    <input type="text" id="playerName" maxlength="12" placeholder="Masukkan Nama / Alias..." required class="w-full bg-white/5 text-white text-xs p-3 rounded-xl text-center focus:outline-none focus:bg-white/10 transition font-mono-custom tracking-wide">
                 </div>
 
                 <div class="space-y-1.5 pt-1">
@@ -1044,7 +1038,7 @@
 
             if (isAdminLoggedIn) {
                 if (burgerAdminBadge) {
-                    burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30";
+                    burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold  ";
                     burgerAdminBadge.textContent = "ADMIN (BLACKJACK)";
                 }
                 if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
@@ -1052,7 +1046,7 @@
                 if (adminCheatPanel) adminCheatPanel.classList.remove('hidden');
             } else if (isModeratorLoggedIn) {
                 if (burgerAdminBadge) {
-                    burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30";
+                    burgerAdminBadge.className = "text-[8px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold  ";
                     burgerAdminBadge.textContent = "MODERATOR (FEEDS)";
                 }
                 if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
@@ -1247,13 +1241,13 @@
             const icon = document.getElementById('bgmIcon');
 
             if (isBgmPlaying) {
-                if (btn) btn.className = "w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 transition active:scale-95 flex items-center justify-center shadow-lg shadow-emerald-500/10";
+                if (btn) btn.className = "w-8 h-8 rounded-xl bg-emerald-500/20   text-emerald-300 transition active:scale-95 flex items-center justify-center shadow-lg shadow-emerald-500/10";
                 if (icon) icon.textContent = "🎶";
                 bgmStep = 0;
                 bgmInterval = setInterval(playBgmBeat, 240);
                 showToast("🎵 BGM Chiptune Aktif!");
             } else {
-                if (btn) btn.className = "w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-400 hover:text-white transition active:scale-95 flex items-center justify-center";
+                if (btn) btn.className = "w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10   text-slate-400 hover:text-white transition active:scale-95 flex items-center justify-center";
                 if (icon) icon.textContent = "🎵";
                 if (bgmInterval) {
                     clearInterval(bgmInterval);
@@ -1670,11 +1664,11 @@
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             const styles = {
-                success: 'bg-emerald-500 text-black border-emerald-300/30',
-                error:   'bg-red-500 text-white border-red-300/30',
-                info:    'bg-white text-black border-white/20'
+                success: 'bg-emerald-500 text-black',
+                error:   'bg-red-500 text-white',
+                info:    'bg-white text-black'
             };
-            toast.className = toast.className.replace(/bg-\S+ text-\S+ border-\S+/, styles[type]);
+            toast.className = toast.className.replace(/bg-\S+ text-\S+/, styles[type]);
             toast.textContent = message;
             toast.style.opacity = '1';
             toast.style.transform = 'translate(-50%, 10px)';
@@ -1884,13 +1878,13 @@
             pCards.innerHTML = playerHand.map((c, idx) => {
                 if (isBossLevel && currentBoss && currentBoss.perkType === 'blind_hold' && idx === 1 && isGameActive) {
                     return `
-                        <div class="card-animate bg-gradient-to-tr from-slate-800 to-slate-900 text-rose-400 font-mono-custom font-bold w-10 h-14 rounded-lg border border-rose-500/40 flex items-center justify-center shadow flex-shrink-0 text-base">
+                        <div class="card-animate bg-gradient-to-tr from-slate-800 to-slate-900 text-rose-400 font-mono-custom font-bold w-10 h-14 rounded-lg   flex items-center justify-center shadow flex-shrink-0 text-base">
                             🔒
                         </div>
                     `;
                 }
                 return `
-                    <div class="card-animate bg-gradient-to-tr from-slate-100 to-white text-black font-mono-custom font-bold w-10 h-14 rounded-lg border border-white flex flex-col justify-between p-1 shadow flex-shrink-0 text-center ${['♥','♦'].includes(c.suit) ? 'text-red-600' : 'text-slate-900'}">
+                    <div class="card-animate bg-gradient-to-tr from-slate-100 to-white text-black font-mono-custom font-bold w-10 h-14 rounded-lg   flex flex-col justify-between p-1 shadow flex-shrink-0 text-center ${['♥','♦'].includes(c.suit) ? 'text-red-600' : 'text-slate-900'}">
                         <div class="text-[9px] text-left leading-none">${c.value}</div>
                         <div class="text-xs leading-none">${c.suit}</div>
                         <div class="text-[9px] text-right leading-none">${c.value}</div>
@@ -1901,13 +1895,13 @@
             dCards.innerHTML = dealerHand.map((c, idx) => {
                 if (idx === 1 && isGameActive && !isDealerRevealed) {
                     return `
-                        <div class="card-animate bg-gradient-to-tr from-slate-800 to-slate-900 text-amber-400 font-mono-custom font-bold w-10 h-14 rounded-lg border border-amber-500/30 flex items-center justify-center shadow flex-shrink-0 text-base">
+                        <div class="card-animate bg-gradient-to-tr from-slate-800 to-slate-900 text-amber-400 font-mono-custom font-bold w-10 h-14 rounded-lg   flex items-center justify-center shadow flex-shrink-0 text-base">
                             ❓
                         </div>
                     `;
                 }
                 return `
-                    <div class="card-animate bg-gradient-to-tr from-slate-100 to-white text-black font-mono-custom font-bold w-10 h-14 rounded-lg border border-white flex flex-col justify-between p-1 shadow flex-shrink-0 text-center ${['♥','♦'].includes(c.suit) ? 'text-red-600' : 'text-slate-900'}">
+                    <div class="card-animate bg-gradient-to-tr from-slate-100 to-white text-black font-mono-custom font-bold w-10 h-14 rounded-lg   flex flex-col justify-between p-1 shadow flex-shrink-0 text-center ${['♥','♦'].includes(c.suit) ? 'text-red-600' : 'text-slate-900'}">
                         <div class="text-[9px] text-left leading-none">${c.value}</div>
                         <div class="text-xs leading-none">${c.suit}</div>
                         <div class="text-[9px] text-right leading-none">${c.value}</div>
@@ -2186,12 +2180,12 @@
 
             if (isShieldActive && shieldCount > 0) {
                 badge.textContent = "ON";
-                badge.className = "text-[7px] px-1 rounded font-mono-custom bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
-                btn.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border border-emerald-500/40 bg-emerald-500/20 text-emerald-300 transition-all active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.2)]";
+                badge.className = "text-[7px] px-1 rounded font-mono-custom bg-emerald-500/20 text-emerald-300  ";
+                btn.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider   bg-emerald-500/20 text-emerald-300 transition-all active:scale-95 shadow-[0_0_10px_rgba(16,185,129,0.2)]";
             } else {
                 badge.textContent = "OFF";
-                badge.className = "text-[7px] px-1 rounded font-mono-custom bg-slate-800 text-slate-400 border border-slate-700";
-                btn.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border border-white/10 bg-white/5 text-slate-400 transition-all active:scale-95";
+                badge.className = "text-[7px] px-1 rounded font-mono-custom bg-slate-800 text-slate-400  ";
+                btn.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider   bg-white/5 text-slate-400 transition-all active:scale-95";
             }
         }
 
@@ -2209,7 +2203,7 @@
                 
                 if (availableJokers.includes('jester')) {
                     container.innerHTML += `
-                        <button onclick="selectJoker('jester')" class="w-full p-2.5 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-left rounded-xl transition group">
+                        <button onclick="selectJoker('jester')" class="w-full p-2.5 bg-rose-500/10   hover:bg-rose-500/20 text-left rounded-xl transition group">
                             <div class="text-xs font-bold text-rose-300 font-mono-custom">🃏 The Jester (Red Joker)</div>
                             <div class="text-[9px] text-slate-300 mt-0.5">+0.5x Multiplier permanen setiap kali menang ronde!</div>
                         </button>
@@ -2217,7 +2211,7 @@
                 }
                 if (availableJokers.includes('greedy')) {
                     container.innerHTML += `
-                        <button onclick="selectJoker('greedy')" class="w-full p-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-left rounded-xl transition group">
+                        <button onclick="selectJoker('greedy')" class="w-full p-2.5 bg-yellow-500/10   hover:bg-yellow-500/20 text-left rounded-xl transition group">
                             <div class="text-xs font-bold text-yellow-300 font-mono-custom">💰 Greedy Joker (Gold Joker)</div>
                             <div class="text-[9px] text-slate-300 mt-0.5">+50% Total Cash Reward setiap kali menang ronde!</div>
                         </button>
@@ -2225,7 +2219,7 @@
                 }
                 if (availableJokers.includes('heartbreaker')) {
                     container.innerHTML += `
-                        <button onclick="selectJoker('heartbreaker')" class="w-full p-2.5 bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 text-left rounded-xl transition group">
+                        <button onclick="selectJoker('heartbreaker')" class="w-full p-2.5 bg-purple-500/10   hover:bg-purple-500/20 text-left rounded-xl transition group">
                             <div class="text-xs font-bold text-purple-300 font-mono-custom">💔 Heartbreaker (Purple Joker)</div>
                             <div class="text-[9px] text-slate-300 mt-0.5">Hasil Seri (Draw / Push) langsung dianggap sebagai Menang!</div>
                         </button>
@@ -2234,11 +2228,11 @@
             } else {
                 subtitle.textContent = "Semua Joker utama sudah aktif! Pilih reward bounty ultimate:";
                 container.innerHTML = `
-                    <button onclick="selectUltimateBonus('cash')" class="w-full p-3 bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-left rounded-xl transition group">
+                    <button onclick="selectUltimateBonus('cash')" class="w-full p-3 bg-amber-500/20   hover:bg-amber-500/30 text-left rounded-xl transition group">
                         <div class="text-xs font-bold text-amber-300 font-mono-custom">💵 +$1,000 Cash Bounty</div>
                         <div class="text-[9px] text-slate-300 mt-0.5">Tambahan instan $1,000 ke total cash run saat ini.</div>
                     </button>
-                    <button onclick="selectUltimateBonus('aegis')" class="w-full p-3 bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 text-left rounded-xl transition group">
+                    <button onclick="selectUltimateBonus('aegis')" class="w-full p-3 bg-emerald-500/20   hover:bg-emerald-500/30 text-left rounded-xl transition group">
                         <div class="text-xs font-bold text-emerald-300 font-mono-custom">🛡️ +2 Aegis Shields</div>
                         <div class="text-[9px] text-slate-300 mt-0.5">Tambahan 2 kuota pelindung kekalahan beruntun (Max 3).</div>
                     </button>
@@ -2655,7 +2649,7 @@
 
                 if (!data || data.length === 0) {
                     listEl.innerHTML = `
-                        <div class="relative overflow-hidden p-4 rounded-2xl border border-dashed border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 via-black/40 to-transparent text-center space-y-2">
+                        <div class="relative overflow-hidden p-4 rounded-2xl    bg-gradient-to-b from-emerald-500/10 via-black/40 to-transparent text-center space-y-2">
                             <div class="text-2xl animate-bounce">👑</div>
                             <div class="text-xs font-black text-amber-400 font-mono-custom uppercase">Papan Peringkat Kosong!</div>
                             <p class="text-[9px] text-slate-400 max-w-xs mx-auto">Jadilah pemain pertama yang mencatatkan rekor *Balatro Cash* di Hall of Fame!</p>
@@ -2668,7 +2662,7 @@
                     const rankIcons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
                     const isTop1 = index === 0;
                     return `
-                        <div class="flex items-center justify-between p-2 rounded-xl ${isTop1 ? 'gold-rank' : 'bg-white/5 border border-white/5'} transition-all">
+                        <div class="flex items-center justify-between p-2 rounded-xl ${isTop1 ? 'gold-rank' : 'bg-white/[0.06]'} transition-all">
                             <div class="flex items-center gap-2">
                                 <span class="text-base">${rankIcons[index] || '🎖️'}</span>
                                 <span class="text-xs font-black ${isTop1 ? 'text-amber-300' : 'text-white'} font-mono-custom">${escapeHtml(item.player_name)}</span>
