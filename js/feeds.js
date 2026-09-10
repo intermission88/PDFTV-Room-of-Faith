@@ -10,6 +10,11 @@ let upvotedFeedIds = JSON.parse(localStorage.getItem('pdftv_upvoted_feeds') || '
 let feedsRealtimeChannel = null;
 let isSubmitting = false;
 let gifInputVisible = false;
+let isModeratorLoggedIn = false;
+let moderatorPass = null;
+let revealedNsfwIds = [];
+let myPostIds = [];
+let timeRefreshInterval = null;
 
 // ── GIF Toggle ───────────────────────────────────────────────
 function toggleGifInput() {
@@ -17,7 +22,7 @@ function toggleGifInput() {
     const container = document.getElementById('gifInputContainer');
     const toggleIcon = document.getElementById('gifToggleIcon');
     const toggleText = document.getElementById('gifToggleText');
-    
+
     if (gifInputVisible) {
         container.classList.remove('hidden');
         toggleIcon.textContent = '−';
@@ -27,6 +32,38 @@ function toggleGifInput() {
         toggleIcon.textContent = '+';
         toggleText.textContent = 'Tambah GIF';
     }
+}
+
+// ── Char Counter ─────────────────────────────────────────────
+function updateCharCounter() {
+    const ta = document.getElementById('feedContentInput');
+    const counter = document.getElementById('feedCharCounter');
+    if (!ta || !counter) return;
+    const len = ta.value.length;
+    if (len === 0) {
+        counter.textContent = '';
+        return;
+    }
+    counter.textContent = `${len}/500`;
+    counter.className = 'text-right text-[10px] mt-1 h-3 ' + (len > 450 ? 'text-amber-400' : 'text-slate-600');
+}
+
+// ── GIF Preview ──────────────────────────────────────────────
+function handleGifPreview() {
+    const input = document.getElementById('feedGifInput');
+    const container = document.getElementById('gifPreviewContainer');
+    const img = document.getElementById('gifPreviewImg');
+    const errorEl = document.getElementById('gifPreviewError');
+    if (!input || !container || !img || !errorEl) return;
+
+    const url = input.value.trim();
+    errorEl.classList.add('hidden');
+    if (!url || !/^https?:\/\/.+/.test(url)) {
+        container.classList.add('hidden');
+        return;
+    }
+    img.src = url;
+    container.classList.remove('hidden');
 }
 
 // ── Utility ──────────────────────────────────────────────────
@@ -87,6 +124,7 @@ async function fetchFeeds() {
             <div class="skeleton-bar w-2/3 h-3"></div>
         </div>
     `).join('<div class="h-px bg-white/[0.06] my-4"></div>');
+    setRefreshBtnLoading(true);
     updateFeedSyncBadge('loading');
 
     // Fetch semua data dari Supabase
@@ -97,6 +135,7 @@ async function fetchFeeds() {
 
     if (error) {
         console.error('Supabase fetch error:', error);
+        setRefreshBtnLoading(false);
         // Fallback ke INITIAL_FEEDS_DATA jika tabel belum dibuat di Supabase
         if (typeof INITIAL_FEEDS_DATA !== 'undefined' && INITIAL_FEEDS_DATA.length > 0) {
             feedsData = INITIAL_FEEDS_DATA.map(normalizeItem);
@@ -123,10 +162,35 @@ async function fetchFeeds() {
     feedsData = (data || []).map(normalizeItem);
     updateFeedSyncBadge('connected');
     renderFeeds();
+    setRefreshBtnLoading(false);
     updateBlackjackTop5Stats();
+    startTimeRefresh();
 
     // Pasang Realtime Subscription (hanya sekali)
     subscribeToRealtimeFeeds();
+}
+
+// Spinner state tombol refresh
+function setRefreshBtnLoading(loading) {
+    const btn = document.getElementById('feedRefreshBtn');
+    if (!btn) return;
+    if (loading) {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'animate-spin');
+    } else {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'animate-spin');
+    }
+}
+
+// Auto-refresh label waktu ("x mnt yang lalu") tiap 60 detik tanpa re-render penuh
+function startTimeRefresh() {
+    if (timeRefreshInterval) return;
+    timeRefreshInterval = setInterval(() => {
+        document.querySelectorAll('.feed-time[data-ts]').forEach(el => {
+            el.textContent = formatTimeAgo(Number(el.dataset.ts));
+        });
+    }, 60000);
 }
 
 function subscribeToRealtimeFeeds() {
@@ -145,9 +209,11 @@ function subscribeToRealtimeFeeds() {
                 if (!exists) {
                     feedsData.unshift(newItem);
                     renderFeeds();
-                    // Toast hanya kalau bukan dari diri sendiri (cek timestamp berbeda lebih dari 1 detik)
-                    const diff = Math.abs(Date.now() - Number(newItem.id));
-                    if (diff > 2000) {
+                    // Jangan tampilkan toast untuk postingan sendiri
+                    const ownIdx = myPostIds.indexOf(String(newItem.id));
+                    if (ownIdx !== -1) {
+                        myPostIds.splice(ownIdx, 1);
+                    } else {
                         showToast('📨 Ada pengakuan baru masuk!');
                     }
                 }
@@ -161,6 +227,18 @@ function subscribeToRealtimeFeeds() {
                 const idx = feedsData.findIndex(f => String(f.id) === String(updated.id));
                 if (idx !== -1) {
                     feedsData[idx] = updated;
+                    renderFeeds();
+                }
+            }
+        )
+        .on(
+            'postgres_changes',
+            { event: 'DELETE', schema: 'public', table: FEEDS_TABLE },
+            (payload) => {
+                const delId = String(payload.old.id);
+                const before = feedsData.length;
+                feedsData = feedsData.filter(f => String(f.id) !== delId);
+                if (feedsData.length !== before) {
                     renderFeeds();
                 }
             }
@@ -281,7 +359,7 @@ function renderFeeds() {
                     <div class="flex items-baseline gap-2 text-left">
                         <h3 class="text-sm font-semibold text-white text-left ${showNsfwBlur ? 'blur-[3px]' : ''}">${escapeHtml(item.alias || 'Anonim')}</h3>
                         ${isNsfw ? `<span class="text-[8px] uppercase tracking-wide text-red-300/80 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
-                        <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
+                        <span class="feed-time text-[11px] text-slate-500" data-ts="${Number(item.timestamp || item.id)}">${timeAgoStr}</span>
                     </div>
 
                     <div class="space-y-1 ${showNsfwBlur ? 'max-h-16 overflow-hidden blur-sm transition-all duration-300' : ''}">
@@ -319,12 +397,12 @@ function renderFeeds() {
                 ` : ''}
 
                 <div class="flex items-center justify-between pt-3 mt-3 text-[13px] text-left">
-                    <button onclick="toggleCommentsDrawer('${item.id}')" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
+                    <button onclick="toggleCommentsDrawer('${item.id}')" aria-label="Lihat komentar" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.42-4.03 8-9 8a9.9 9.9 0 01-4.2-.9L3 20l1.05-3.3A7.9 7.9 0 013 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
                         <span class="font-medium">${commentsList.length}</span>
                         <span class="text-xs text-slate-500 font-normal">Komentar</span>
                     </button>
-                    <button onclick="upvoteFeed('${item.id}')" class="flex items-center gap-1.5 ${hasUpvoted ? 'text-amber-400' : 'text-slate-400 hover:text-amber-300'} transition">
+                    <button onclick="upvoteFeed('${item.id}')" aria-label="Upvote" class="flex items-center gap-1.5 ${hasUpvoted ? 'text-amber-400' : 'text-slate-400 hover:text-amber-300'} transition">
                         <span class="text-xs text-slate-500 font-normal">${hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
                         <span class="font-medium">${item.upvotes}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
@@ -383,24 +461,47 @@ async function submitConfession(e) {
     }
 
     try {
-        const newId = Date.now();
-        const { data, error } = await supabaseClient
-            .from(FEEDS_TABLE)
-            .insert([{
-                id:        newId,
-                alias:     aliasInput,
-                confession: contentInput,
-                gif_url:   gifUrlInput,
-                upvotes:   0,
-                comments:  [],
-                timestamp: newId,
-                is_pinned: false,
-                is_nsfw:   isNsfwInput
-            }])
-            .select()
-            .single();
+        // Coba RPC atomik dulu (anti race condition + rate limit + id auto-generate).
+        // Fallback ke insert langsung jika RPC belum tersedia di Supabase.
+        let data = null;
+        let error = null;
+
+        const rpcResult = await supabaseClient.rpc('insert_confession', {
+            p_alias:     aliasInput,
+            p_confession: contentInput,
+            p_gif_url:   gifUrlInput,
+            p_is_nsfw:   isNsfwInput
+        });
+
+        if (rpcResult.error && isMissingRpcError(rpcResult.error)) {
+            const newId = Date.now();
+            const direct = await supabaseClient
+                .from(FEEDS_TABLE)
+                .insert([{
+                    id:        newId,
+                    alias:     aliasInput,
+                    confession: contentInput,
+                    gif_url:   gifUrlInput,
+                    upvotes:   0,
+                    comments:  [],
+                    timestamp: newId,
+                    is_pinned: false,
+                    is_nsfw:   isNsfwInput
+                }])
+                .select()
+                .single();
+            data = direct.data;
+            error = direct.error;
+        } else {
+            data = rpcResult.data;
+            error = rpcResult.error;
+        }
 
         if (error) throw error;
+
+        // Tandai sebagai postingan sendiri (supaya realtime tidak menampilkan toast)
+        myPostIds.push(String(data.id));
+        if (myPostIds.length > 50) myPostIds.shift();
 
         // Realtime akan auto-update, tapi kita tambahkan langsung supaya responsif
         const exists = feedsData.some(f => String(f.id) === String(data.id));
@@ -413,6 +514,10 @@ async function submitConfession(e) {
         document.getElementById('feedAliasInput').value   = '';
         const gifInput = document.getElementById('feedGifInput');
         if (gifInput) gifInput.value = '';
+        const gifPreview = document.getElementById('gifPreviewContainer');
+        if (gifPreview) gifPreview.classList.add('hidden');
+        const charCounter = document.getElementById('feedCharCounter');
+        if (charCounter) charCounter.textContent = '';
         const nsfwBox = document.getElementById('feedNsfwCheckbox');
         if (nsfwBox) nsfwBox.checked = false;
         clearFeedDraft();
@@ -432,6 +537,14 @@ async function submitConfession(e) {
     }
 }
 
+// Deteksi error "RPC function belum ada di Supabase" (untuk fallback)
+function isMissingRpcError(err) {
+    if (!err) return false;
+    return err.code === '404' || err.code === 'PGRST202' ||
+        /Could not find the function/i.test(err.message || '') ||
+        /schema catalog/i.test(err.message || '');
+}
+
 // ── Upvote ────────────────────────────────────────────────────
 async function upvoteFeed(id) {
     const idStr = String(id);
@@ -442,7 +555,8 @@ async function upvoteFeed(id) {
     triggerHaptic('light');
 
     const hasUpvoted = upvotedFeedIds.includes(idStr);
-    const newUpvotes = hasUpvoted ? Math.max(0, (post.upvotes || 0) - 1) : (post.upvotes || 0) + 1;
+    const delta = hasUpvoted ? -1 : 1;
+    const newUpvotes = Math.max(0, (post.upvotes || 0) + delta);
 
     // Optimistic update
     post.upvotes = newUpvotes;
@@ -453,28 +567,44 @@ async function upvoteFeed(id) {
         upvotedFeedIds.push(idStr);
         showToast('🔥 Upvote ditambahkan!');
     }
+    // Cap ukuran localStorage agar tidak tumbuh tanpa batas
+    if (upvotedFeedIds.length > 500) upvotedFeedIds = upvotedFeedIds.slice(-500);
     localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
     renderFeeds();
 
-    // Sync ke Supabase
-    const { error } = await supabaseClient
-        .from(FEEDS_TABLE)
-        .update({ upvotes: newUpvotes })
-        .eq('id', post.id);
+    // Sync ke Supabase — RPC atomik dulu, fallback ke update langsung
+    const rpcResult = await supabaseClient.rpc('increment_upvote', {
+        p_id: Number(post.id),
+        p_delta: delta
+    });
 
-    if (error) {
-        console.warn('Supabase upvote error:', error);
-        // Rollback
-        post.upvotes = hasUpvoted ? newUpvotes + 1 : newUpvotes - 1;
-        if (hasUpvoted) {
-            upvotedFeedIds.push(idStr);
-        } else {
-            upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
-        }
-        localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
+    if (rpcResult.error && isMissingRpcError(rpcResult.error)) {
+        const { error } = await supabaseClient
+            .from(FEEDS_TABLE)
+            .update({ upvotes: newUpvotes })
+            .eq('id', post.id);
+        if (error) handleUpvoteError(post, idStr, hasUpvoted, newUpvotes, error);
+    } else if (rpcResult.error) {
+        handleUpvoteError(post, idStr, hasUpvoted, newUpvotes, rpcResult.error);
+    } else if (typeof rpcResult.data === 'number') {
+        // Sinkronkan dengan nilai server (atomic, sudah termasuk upvote user lain)
+        post.upvotes = rpcResult.data;
         renderFeeds();
-        showToast(`❌ Gagal: ${error.message || 'Cek RLS policy Supabase'}`);
     }
+}
+
+function handleUpvoteError(post, idStr, hasUpvoted, newUpvotes, error) {
+    console.warn('Supabase upvote error:', error);
+    // Rollback
+    post.upvotes = hasUpvoted ? newUpvotes + 1 : newUpvotes - 1;
+    if (hasUpvoted) {
+        upvotedFeedIds.push(idStr);
+    } else {
+        upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
+    }
+    localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
+    renderFeeds();
+    showToast(`❌ Gagal: ${error.message || 'Cek RLS policy Supabase'}`);
 }
 
 // ── Comments ──────────────────────────────────────────────────
@@ -512,15 +642,30 @@ async function addCommentToFeed(id, e) {
     const drawer = document.getElementById(`comments-drawer-${id}`);
     if (drawer) drawer.classList.remove('hidden');
 
-    // Sync ke Supabase
-    const { error } = await supabaseClient
-        .from(FEEDS_TABLE)
-        .update({ comments: updatedComments })
-        .eq('id', id);
+    // Sync ke Supabase — RPC atomik dulu (anti timpa komentar user lain), fallback update langsung
+    const rpcResult = await supabaseClient.rpc('append_comment', {
+        p_id: Number(id),
+        p_text: text
+    });
 
-    if (error) {
-        console.warn('Supabase comment error:', error);
-        showToast(`❌ Komentar gagal: ${error.message || 'Cek RLS policy Supabase'}`);
+    if (rpcResult.error && isMissingRpcError(rpcResult.error)) {
+        const { error } = await supabaseClient
+            .from(FEEDS_TABLE)
+            .update({ comments: updatedComments })
+            .eq('id', id);
+        if (error) {
+            console.warn('Supabase comment error:', error);
+            showToast(`❌ Komentar gagal: ${error.message || 'Cek RLS policy Supabase'}`);
+        }
+    } else if (rpcResult.error) {
+        console.warn('Supabase comment error:', rpcResult.error);
+        showToast(`❌ Komentar gagal: ${rpcResult.error.message || 'Cek RLS policy Supabase'}`);
+    } else if (Array.isArray(rpcResult.data)) {
+        // Sinkronkan dengan daftar komentar versi server
+        post.comments = rpcResult.data;
+        renderFeeds();
+        const drawerAgain = document.getElementById(`comments-drawer-${id}`);
+        if (drawerAgain) drawerAgain.classList.remove('hidden');
     }
 }
 
@@ -579,29 +724,46 @@ async function updateBlackjackTop5Stats() {
 }
 
 // ── Feeds Moderator & NSFW System ──────────────────────────────
-let isModeratorLoggedIn = false;
-let revealedNsfwIds = [];
+// (state isModeratorLoggedIn, moderatorPass, revealedNsfwIds
+//  dideklarasikan di bagian atas file)
 
 function revealNsfw(id) {
     playClickSound();
     triggerHaptic('light');
     revealedNsfwIds.push(String(id));
+    if (revealedNsfwIds.length > 500) revealedNsfwIds = revealedNsfwIds.slice(-500);
     renderFeeds();
+}
+
+// Helper: eksekusi aksi moderator via RPC (verifikasi password server-side),
+// fallback ke operasi langsung jika RPC belum dijalankan di Supabase.
+async function moderatorRpc(rpcName, rpcArgs, fallbackFn) {
+    const rpcResult = await supabaseClient.rpc(rpcName, { p_pass: moderatorPass, ...rpcArgs });
+    if (rpcResult.error && isMissingRpcError(rpcResult.error) && fallbackFn) {
+        return fallbackFn();
+    }
+    return rpcResult;
 }
 
 async function moderatorTogglePin(id, currentPinned) {
     if (!isModeratorLoggedIn) {
-        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        showToast("⚠️ Akses ditolak. Login sebagai moderator diperlukan.");
         return;
     }
     const newVal = !currentPinned;
-    const { error } = await supabaseClient
-        .from(FEEDS_TABLE)
-        .update({ is_pinned: newVal })
-        .eq('id', id);
+    const result = await moderatorRpc('moderator_update_feed',
+        { p_id: Number(id), p_is_pinned: newVal, p_is_nsfw: null },
+        async () => {
+            const { error } = await supabaseClient
+                .from(FEEDS_TABLE)
+                .update({ is_pinned: newVal })
+                .eq('id', id);
+            return { error };
+        }
+    );
 
-    if (error) {
-        showToast(`❌ Gagal pin: ${error.message}`);
+    if (result.error) {
+        showToast(`❌ Gagal pin: ${result.error.message}`);
     } else {
         showToast(newVal ? "📌 Postingan berhasil di-pin!" : "📌 Pin postingan dilepas.");
         fetchFeeds();
@@ -610,17 +772,23 @@ async function moderatorTogglePin(id, currentPinned) {
 
 async function moderatorToggleNsfw(id, currentNsfw) {
     if (!isModeratorLoggedIn) {
-        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        showToast("⚠️ Akses ditolak. Login sebagai moderator diperlukan.");
         return;
     }
     const newVal = !currentNsfw;
-    const { error } = await supabaseClient
-        .from(FEEDS_TABLE)
-        .update({ is_nsfw: newVal })
-        .eq('id', id);
+    const result = await moderatorRpc('moderator_update_feed',
+        { p_id: Number(id), p_is_pinned: null, p_is_nsfw: newVal },
+        async () => {
+            const { error } = await supabaseClient
+                .from(FEEDS_TABLE)
+                .update({ is_nsfw: newVal })
+                .eq('id', id);
+            return { error };
+        }
+    );
 
-    if (error) {
-        showToast(`❌ Gagal update NSFW: ${error.message}`);
+    if (result.error) {
+        showToast(`❌ Gagal update NSFW: ${result.error.message}`);
     } else {
         showToast(newVal ? "🔞 Postingan ditandai NSFW." : "✅ Postingan dikembalikan normal (SFW).");
         fetchFeeds();
@@ -629,20 +797,28 @@ async function moderatorToggleNsfw(id, currentNsfw) {
 
 async function moderatorDeleteFeed(id) {
     if (!isModeratorLoggedIn) {
-        showToast("⚠️ Akses ditolak. Login sebagai moderator (rusdi123) diperlukan.");
+        showToast("⚠️ Akses ditolak. Login sebagai moderator diperlukan.");
         return;
     }
     if (!confirm("Yakin ingin menghapus pengakuan ini?")) return;
-    const { error } = await supabaseClient
-        .from(FEEDS_TABLE)
-        .delete()
-        .eq('id', id);
+    const result = await moderatorRpc('moderator_delete_feed',
+        { p_id: Number(id) },
+        async () => {
+            const { error } = await supabaseClient
+                .from(FEEDS_TABLE)
+                .delete()
+                .eq('id', id);
+            return { error };
+        }
+    );
 
-    if (error) {
-        showToast(`❌ Gagal menghapus: ${error.message}`);
+    if (result.error) {
+        showToast(`❌ Gagal menghapus: ${result.error.message}`);
     } else {
+        // Hapus langsung dari tampilan (realtime DELETE juga akan menangani klien lain)
+        feedsData = feedsData.filter(f => String(f.id) !== String(id));
+        renderFeeds();
         showToast("🗑️ Postingan berhasil dihapus.");
-        fetchFeeds();
     }
 }
 
