@@ -77,7 +77,7 @@ async function fetchFeeds() {
 
     // Tampilkan loading state
     container.innerHTML = [0, 1, 2].map(() => `
-        <div class="skeleton-card p-4 space-y-2.5">
+        <div class="skeleton-card p-4 space-y-2.5 my-3">
             <div class="flex items-center gap-2">
                 <div class="skeleton-bar w-20 h-3"></div>
                 <div class="skeleton-bar w-10 h-3"></div>
@@ -106,7 +106,7 @@ async function fetchFeeds() {
         }
 
         container.innerHTML = `
-            <div class="rounded-xl bg-red-500/[0.06] p-6 text-center text-red-300 text-xs space-y-2">
+            <div class="rounded-xl bg-red-500/[0.06] p-6 text-center text-red-300 text-xs space-y-2 my-3">
                 <div class="text-xl">🔌</div>
                 <div class="font-medium">Gagal memuat pengakuan</div>
                 <div class="text-slate-500 text-[11px]">${escapeHtml(error.message)}</div>
@@ -235,7 +235,7 @@ function renderFeeds() {
     if (filtered.length === 0) {
         const isSearching = !!feedSearchQuery;
         container.innerHTML = `
-            <div class="rounded-2xl bg-gradient-to-b from-emerald-500/[0.06] via-transparent to-transparent p-8 text-center space-y-3">
+            <div class="rounded-2xl bg-gradient-to-b from-emerald-500/[0.06] via-transparent to-transparent p-8 text-center space-y-3 my-3">
                 <div class="text-3xl ${isSearching ? '' : 'animate-bounce'}">${isSearching ? '🔍' : '🕊️'}</div>
                 <div class="text-sm font-bold text-white">${isSearching ? 'Tidak ditemukan' : 'Room masih sepi'}</div>
                 <p class="text-xs text-slate-400 max-w-xs mx-auto">${isSearching
@@ -269,7 +269,7 @@ function renderFeeds() {
         const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
-            <div class="feed-card rounded-2xl ${isPinned ? 'bg-amber-400/[0.06]' : isNsfw ? 'bg-red-300/[0.04]' : 'bg-white/[0.04]'} p-4 text-left w-full transition">
+            <div class="feed-card rounded-2xl ${isPinned ? 'bg-amber-400/[0.06]' : isNsfw ? 'bg-red-300/[0.04]' : 'bg-white/[0.04]'} p-4 my-3 text-left w-full transition">
                 ${isPinned ? `
                     <div class="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-amber-300/90 mb-2.5">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 011 1v13a1 1 0 01-1.4.9L12 15.9l-5.6 3A1 1 0 015 18V5a1 1 0 011-1z"/></svg>
