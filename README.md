@@ -1,61 +1,121 @@
 # PDFTV | Experience Room 🎮🔥
 
-Welcome to **PDFTV Experience Room**—web app paling chill dan *aesthetic* yang memadukan retro CRT landing page, **Room of Faith** (anonim feeds real-time), dan game roguelite arcade **Balatro-Style Blackjack** yang dijamin bikin ketagihan. 
-
-Built with pure vibes, modern web tech, and Supabase integration! ✨
+Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of Faith** (feed pengakuan anonim real-time), dan game roguelite **Blackjack Arcade** bergaya Balatro. Semua berjalan di browser dengan Supabase sebagai backend.
 
 ---
 
-## 🌟 What's Inside? (Key Features)
+## 🌟 Fitur
 
-### 1. Room of Faith (Anonymous Feeds) 💬
-- **Real-time & Public:** Ruang curhat/pengakuan anonim yang tersambung langsung ke Supabase database (`PDFTV Feeds`).
-- **Interactive Vibe:** Bisa kirim confession baru, upvote (lengkap dengan fitur *undo*), dan balas komentar tanpa ribet.
-- **Clean UI:** Tampilan super simpel, *left-aligned*, tanpa spasi ngaret di awal teks.
+### 1. Room of Faith 💬
+- Feed pengakuan anonim yang tersambung ke Supabase (`PDFTV Feeds`) dengan update realtime.
+- Kirim pengakuan (maks. 500 karakter), upvote dengan undo, komentar, dan lampiran GIF.
+- Filter **Terbaru** / **Populer**, pencarian kata kunci, serta penanda NSFW dengan blur opsional.
+- Moderator bisa pin, tandai NSFW, dan hapus postingan.
 
-### 2. Balatro-Style Blackjack (Roguelite Arcade) 🃏💸
-- **8 Rounds & Boss Battles:** Taklukkan tantangan tiap ronde sampai Ante terakhir. Lawan boss unik (kayak *The Government Boss* yang hobi narikin pajak!).
-- **Joker Cards & Consumables:** Kumpul pasif buff dari Joker, pakai *Discards*, *Busters*, dan *Aegis Shields* buat amankan skor.
-- **Hall of Fame:** Live leaderboard buat pamer siapa yang paling cuan.
-- **Admin Cheat Panel:** Buat yang suka bereksperimen, ada panel cheat khusus admin juga lho.
+### 2. Blackjack Arcade 🃏💸
+- Roguelite 8 ronde per Ante, dengan **Boss Battle** tiap ronde ke-8 (masing-masing punya perk sendiri).
+- Ekonomi Cash + Multiplier, kartu **Joker pasif**, dan consumable: Discard, Buster, serta Aegis Shield.
+- **Hall of Fame**: leaderboard Top 5 berdasarkan Cash, plus statistik end-game yang bisa dibagikan.
+- Panel admin (login diperlukan) untuk reset leaderboard dan uji coba mekanik.
 
-### 3. Visuals & Audio 🎨🎵
-- **CRT & Felt Green Aesthetics:** Nuansa meja poker hijau klasik berpadu dengan scanlines ala monitor CRT vintage.
-- **Immersive Audio:** Dilengkapi BGM dan SFX interaktif yang bikin experience main makin *immersive*.
+### 3. Aksesibilitas & UX ♿
+- Seluruh alur dapat diselesaikan dengan keyboard saja; ring fokus `:focus-visible` konsisten.
+- Modal mengunci fokus (Tab), ditutup dengan `Escape`, dan mengembalikan fokus ke pemicunya.
+- Menghormati `prefers-reduced-motion`: carousel tidak berjalan sendiri dan animasi loop berhenti.
+- Live region untuk notifikasi dan status permainan, label pada setiap field, serta input 16px di layar kecil agar iOS tidak melakukan zoom otomatis.
+- Layout aman hingga 320px, termasuk mode game.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** HTML5, Tailwind CSS, Custom CRT CSS Shaders & Keyframe Animations
-- **Logic:** Vanilla JavaScript (ES6+)
-- **Backend & Database:** Supabase (`@supabase/supabase-js`) with Realtime subscriptions
-- **Assets:** Optimized WebP media and Google Fonts (*Plus Jakarta Sans*, *Space Grotesk*, *Silkscreen*)
+- **Frontend:** HTML5, Tailwind CSS (CDN), CSS kustom (CRT scanlines, felt green), animasi keyframe
+- **Logic:** Vanilla JavaScript (ES6+), Web Audio API untuk BGM & SFX prosedural
+- **Backend:** Supabase (`@supabase/supabase-js`) dengan Realtime subscription, RPC, dan Row Level Security
+- **Aset:** gambar WebP teroptimasi + Google Fonts (*Plus Jakarta Sans*, *Space Grotesk*, *Silkscreen*)
 
 ---
 
-## 🚀 Quick Start / Local Setup
+## 📁 Struktur Proyek
 
-Mau run project ini di lokal komputer kamu? Gampang banget, bro/sist:
-
-1. Clone repo ini ke laptop/PC kamu:
-   ```bash
-   git clone https://github.com/intermission88/PDFTV-Room-of-Faith.git
-   ```
-2. Buka folder proyeknya, lalu jalankan pakai local server (biar Supabase & fetch asset lancar):
-   ```bash
-   npx serve .
-   # atau pakai python
-   python3 -m http.server 8000
-   ```
-3. Buka browser di `http://localhost:8000` and enjoy the game! 🎉
+| File | Isi |
+|---|---|
+| `index.html` | Markup, seluruh CSS, dan logika landing + game (satu file besar) |
+| `js/feeds.js` | Logika Room of Faith: fetch, render, komentar, upvote, moderasi |
+| `js/feeds-data.js` | Data feed awal untuk fallback sebelum Supabase termuat |
+| `seed_feeds.sql` | Pembuatan tabel `PDFTV Feeds`, RLS, dan data awal |
+| `supabase_upgrade.sql` | Fungsi RPC, pengetatan RLS, dan penyimpanan kredensial |
+| `assets/` | Logo, favicon, dan gambar slider (WebP) |
+| `watch-and-push.ps1` | Watcher auto commit + push untuk sinkronisasi ke GitHub |
 
 ---
 
-## 📦 Database Setup (Supabase)
+## 🚀 Menjalankan Secara Lokal
 
-Buat yang mau setup database sendiri, cukup jalankan script migrasi yang ada di file **`seed_feeds.sql`** ke Supabase SQL Editor kamu. Tabel `PDFTV Feeds` udah di-set lengkap dengan RLS policy publik supaya siap dipakai bareng temen-temen.
+Jalankan lewat local server (bukan `file://`) agar fetch aset dan Supabase lancar:
+
+```bash
+git clone https://github.com/intermission88/PDFTV-Room-of-Faith.git
+cd PDFTV-Room-of-Faith
+python3 -m http.server 8000
+```
+
+Buka `http://localhost:8000`. Alternatif lain: `npx serve .` bila Node.js tersedia.
+
+**Konfigurasi Supabase** ada di bagian atas blok `<script>` pada `index.html`:
+
+```js
+const SUPABASE_URL = 'https://<project>.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_...';
+```
+
+Kunci yang dipakai adalah *publishable key*, jadi memang aman berada di sisi klien selama RLS aktif. Jangan pernah menaruh `service_role` key atau password apa pun di file ini.
 
 ---
 
-© PDFTV Experience. All rights reserved. Stay chill & keep grinding! 🚀
+## 📦 Setup Database (Supabase)
+
+Jalankan kedua script berikut di **Supabase → SQL Editor**, berurutan:
+
+1. **`seed_feeds.sql`** — membuat tabel `PDFTV Feeds` (beserta kolom NSFW, komentar, dsb.), mengaktifkan RLS, mengatur policy publik (baca / insert / update), dan memasukkan data awal.
+2. **`supabase_upgrade.sql`** — membuat fungsi RPC (`insert_confession`, `increment_upvote`, `append_comment`, aksi moderator, reset leaderboard), memindahkan kredensial ke schema `private`, dan mengetatkan RLS. Jalankan bagian perketat RLS **terakhir**, setelah aplikasi memakai RPC.
+
+> Catatan: aplikasi punya jalur fallback ke operasi langsung bila RPC belum tersedia di database. Selama policy insert lama masih ada, fallback itu tetap bekerja.
+
+---
+
+## 🔐 Akses Admin & Moderator
+
+Password **tidak disimpan di kode klien maupun di repo ini**. Verifikasi dilakukan di server melalui RPC `verify_admin` / `verify_moderator`, yang membandingkan input dengan hash **bcrypt** di tabel `private.admin_credentials`.
+
+Schema `private` tidak diekspos PostgREST, akses dari `anon` dicabut, dan tabelnya berada dalam RLS tanpa policy, sehingga hash tidak bisa dibaca dari luar. Fungsi verifikasi berjalan `SECURITY DEFINER` sebagai pemilik tabel.
+
+Untuk memasang atau mengganti password, jalankan di SQL Editor (nilai tidak boleh di-commit ke repo):
+
+```sql
+SELECT private.set_credential('admin',     'PASSWORD_BARU');
+SELECT private.set_credential('moderator', 'PASSWORD_BARU');
+```
+
+Hak akses:
+
+| Peran | Kemampuan |
+|---|---|
+| **Admin** | Reset leaderboard + panel uji mekanik game |
+| **Moderator** | Pin, tandai NSFW, dan hapus postingan di Room of Faith |
+
+Cek apakah kredensial sudah terpasang tanpa membuka hash-nya:
+
+```sql
+SELECT role, updated_at FROM private.admin_credentials;
+```
+
+---
+
+## 🌐 Deploy
+
+Repositori ini dideploy sebagai situs statis melalui **GitHub Pages**. Cukup push ke `main`, atau gunakan `watch-and-push.ps1` yang otomatis commit dan push setiap kali ada perubahan file.
+
+---
+
+© PDFTV Experience. Stay chill & keep grinding! 🚀
