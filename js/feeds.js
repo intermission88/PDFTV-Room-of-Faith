@@ -708,7 +708,7 @@ document.addEventListener('keydown', (e) => {
 
 window.addEventListener('DOMContentLoaded', initFeedDraft);
 
-// ── Pull-to-Refresh (Feeds) ─────────────────────────────────────
+// ── Pull-to-Refresh ─────────────────────────────────────────────
 (function initPullToRefresh() {
     let touchStartY = null;
     let pulling = false;
@@ -734,21 +734,30 @@ window.addEventListener('DOMContentLoaded', initFeedDraft);
     window.addEventListener('touchmove', (e) => {
         if (touchStartY === null) return;
         const delta = e.touches[0].clientY - touchStartY;
+        if (delta > 0) e.preventDefault(); // blokir pull-to-refresh native browser
         const indicator = getIndicator();
         if (delta > 70 && !pulling) {
             pulling = true;
             indicator.style.opacity = '1';
             indicator.style.transform = 'translate(-50%, 0) rotate(180deg)';
         }
-    }, { passive: true });
+    }, { passive: false });
 
     window.addEventListener('touchend', () => {
         const indicator = getIndicator();
         if (pulling) {
             pulling = false;
             indicator.style.opacity = '0';
-            fetchFeeds();
-            showToast('🔄 Feeds dimuat ulang');
+            const activeView = !document.getElementById('viewFeeds').classList.contains('hidden') ? 'feeds'
+                             : !document.getElementById('viewArcade').classList.contains('hidden') ? 'arcade'
+                             : 'landing';
+            if (activeView === 'feeds') {
+                fetchFeeds();
+                showToast('🔄 Feeds dimuat ulang');
+            } else if (activeView === 'arcade' && typeof fetchLeaderboard === 'function') {
+                fetchLeaderboard();
+                showToast('🔄 Leaderboard dimuat ulang');
+            }
         }
         touchStartY = null;
     });
