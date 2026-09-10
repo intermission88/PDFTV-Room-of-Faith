@@ -1,0 +1,63 @@
+// ============================================================
+// PDFTV | EXPERIENCE ROOM - LANDING (index.html)
+// Typewriter + slider. Hanya dimuat di halaman utama.
+// ============================================================
+
+// --- TYPEWRITER ENGINE ---
+const taglineText = '"IF EVERY MOMENT MATTERED, WOULD IT STILL BE LIKE THIS?"';
+let taglineIndex = 0;
+
+function typeWriter() {
+    const el = document.getElementById("typewriterText");
+    if (!el) return;
+
+    // A11Y: ketik sekali lalu diamkan — teks hero tidak boleh menghapus dirinya sendiri.
+    // Teks lengkap tersedia untuk screen reader lewat span .sr-only di dalam h1.
+    if (taglineIndex <= taglineText.length) {
+        el.textContent = taglineText.substring(0, taglineIndex);
+        taglineIndex++;
+        if (taglineIndex > taglineText.length) return;
+        setTimeout(typeWriter, 45);
+    }
+}
+typeWriter();
+
+// --- SLIDER ENGINE ---
+let currentSlide = 0;
+const totalSlides = 3;
+const slider = document.getElementById('slider');
+const dots = document.querySelectorAll('.dot-btn');
+let slideInterval;
+
+function updateSliderUI() {
+    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+    dots.forEach((dot, idx) => {
+        const pill = dot.querySelector('.dot-pill');
+        const isActive = idx === currentSlide;
+        if (pill) {
+            pill.classList.remove('opacity-40', 'w-1.5', 'opacity-100', 'w-3');
+            pill.classList.add(isActive ? 'opacity-100' : 'opacity-40', isActive ? 'w-3' : 'w-1.5');
+        }
+        if (isActive) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+    });
+}
+
+function nextSlide() { playClickSound(); currentSlide = (currentSlide + 1) % totalSlides; updateSliderUI(); resetTimer(); }
+function prevSlide() { playClickSound(); currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateSliderUI(); resetTimer(); }
+function goToSlide(index) { playClickSound(); currentSlide = index; updateSliderUI(); resetTimer(); }
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+function startTimer() {
+    // A11Y: carousel tidak menyala sendiri bila pengguna meminta gerakan minimal
+    if (prefersReducedMotion.matches) return;
+    slideInterval = setInterval(() => { currentSlide = (currentSlide + 1) % totalSlides; updateSliderUI(); }, 3500);
+}
+function resetTimer() { clearInterval(slideInterval); startTimer(); }
+startTimer();
+
+// --- INIT HALAMAN LANDING ---
+// Statistik dihitung dari data feeds (diambil lewat feeds.js), tanpa realtime.
+window.addEventListener('DOMContentLoaded', () => {
+    if (typeof loadFeedsForStats === 'function') loadFeedsForStats();
+    if (typeof updateBlackjackTop5Stats === 'function') updateBlackjackTop5Stats();
+});

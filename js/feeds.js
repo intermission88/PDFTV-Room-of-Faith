@@ -1,5 +1,7 @@
 // ============================================================
 // ROOM OF FAITH — FULL ONLINE MODE + SUPABASE REALTIME
+// Dimuat di index.html (statistik) dan feeds/index.html (feed penuh).
+// Status login moderator ada di core.js karena sesi lintas halaman.
 // ============================================================
 const FEEDS_TABLE = 'PDFTV Feeds';
 
@@ -10,8 +12,6 @@ let upvotedFeedIds = JSON.parse(localStorage.getItem('pdftv_upvoted_feeds') || '
 let feedsRealtimeChannel = null;
 let isSubmitting = false;
 let gifInputVisible = false;
-let isModeratorLoggedIn = false;
-let moderatorPass = null;
 let revealedNsfwIds = [];
 let myPostIds = [];
 let timeRefreshInterval = null;
@@ -108,6 +108,28 @@ function updateFeedSyncBadge(state) {
 }
 
 // ── Fetch & Realtime ──────────────────────────────────────────
+
+// Ambil data feeds TANPA merender (dipakai halaman landing untuk statistik).
+// Tidak berlangganan realtime — landing tidak memerlukannya.
+async function loadFeedsForStats() {
+    try {
+        const { data, error } = await supabaseClient
+            .from(FEEDS_TABLE)
+            .select('*')
+            .order('id', { ascending: false });
+        if (error) throw error;
+        feedsData = (data || []).map(normalizeItem);
+    } catch (err) {
+        console.error('Gagal memuat statistik feeds:', err);
+        if (typeof INITIAL_FEEDS_DATA !== 'undefined' && INITIAL_FEEDS_DATA.length > 0) {
+            feedsData = INITIAL_FEEDS_DATA.map(normalizeItem);
+        } else {
+            return;
+        }
+    }
+    updateHomeStatsUI();
+}
+
 async function fetchFeeds() {
     const container = document.getElementById('feedsListContainer');
     if (!container) return;
@@ -194,6 +216,8 @@ function startTimeRefresh() {
 }
 
 function subscribeToRealtimeFeeds() {
+    // Hanya halaman feeds yang butuh langganan realtime
+    if (!document.getElementById('feedsListContainer')) return;
     // Kalau sudah subscribe, skip
     if (feedsRealtimeChannel) return;
 
@@ -519,22 +543,7 @@ async function submitConfession(e) {
     }
 }
 
-// Deteksi RPC yang belum ter-deploy di Supabase (dipakai app.js juga).
-function isMissingRpcError(err) {
-    if (!err) return false;
-    return err.code === '404' || err.code === 'PGRST202' ||
-        /Could not find the function/i.test(err.message || '') ||
-        /schema catalog/i.test(err.message || '');
-}
-
-// Terjemahkan error RPC yang belum ter-deploy menjadi pesan yang bisa ditindaklanjuti.
-// Hanya untuk pesan — tidak ada fallback tulis langsung.
-function rpcErrorMessage(err) {
-    if (isMissingRpcError(err)) {
-        return 'Server belum siap. Jalankan supabase_upgrade.sql di Supabase, lalu coba lagi.';
-    }
-    return (err && err.message) || 'Periksa koneksi / RLS Supabase';
-}
+// isMissingRpcError & rpcErrorMessage sekarang tinggal di core.js (dipakai lintas halaman).
 
 // ── Upvote ────────────────────────────────────────────────────
 async function upvoteFeed(id) {
@@ -841,6 +850,20 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('DOMContentLoaded', initFeedDraft);
+
+// --- INIT HALAMAN FEEDS ---
+// File ini juga dimuat di halaman landing, jadi inisialisasi dijaga
+// oleh keberadaan elemen khas halaman feeds.
+window.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('feedsListContainer')) fetchFeeds();
+
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    if (scrollTopBtn) {
+        window.addEventListener('scroll', () => {
+            scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+        }, { passive: true });
+    }
+});
 
 // ── Pull-to-Refresh ─────────────────────────────────────────────
 (function initPullToRefresh() {

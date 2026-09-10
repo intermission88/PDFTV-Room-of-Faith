@@ -1,12 +1,29 @@
 # PDFTV-Room-of-Faith
 
-Website PDFTV (Room of Faith) — deploy via GitHub Pages.
-- `index.html` ~723 baris: hanya markup. CSS di `css/style.css`, logika landing/arcade/modal di `js/app.js`. Jangan pernah dibaca utuh — selalu `grep` dulu, lalu `read` dengan `offset` + `limit` (maks 150 baris).
-- `js/feeds.js` — logika Room of Faith (fetch, render, komentar, upvote, moderasi). `isMissingRpcError` & `rpcErrorMessage` didefinisikan di sini dan dipakai `js/app.js`, jadi urutan `<script>` penting: feeds.js sebelum app.js.
-- `assets/` — file gambar biner (`.webp`), jangan dibaca, cukup `glob` untuk konfirmasi.
-- `js/feeds-data.js` — dataset awal; cek ukuran dulu, gunakan grep + offset.
-- Semua penulisan ke Supabase lewat RPC (tidak ada insert/update/delete langsung dari client). Skema & fungsi: `seed_feeds.sql` lalu `supabase_upgrade.sql`.
+Website PDFTV (Room of Faith) — deploy via GitHub Pages (multipage).
+
+**Halaman**
+- `index.html` — landing (baris ~220). `feeds/index.html` — Room of Faith. `arcade/index.html` — Blackjack Arcade.
+- Halaman di dalam folder memakai path relatif `../` untuk aset/script. Jangan pakai path absolut (`/js/...`) karena situs dilayani di subpath `/PDFTV-Room-of-Faith/`.
+- Nav (header + bottom nav) sengaja diduplikasi di tiap halaman agar tampil instan tanpa JS; tab aktif ditandai `aria-current="page"`. Modal admin disuntik dari `core.js`, tidak ditulis di HTML.
+
+**Script (urutan penting)**
+- `js/feeds-data.js` → `js/core.js` → `js/feeds.js` → `js/landing.js` (landing) atau `js/arcade.js` (arcade).
+- `js/core.js` — fondasi bersama: konfigurasi Supabase, haptic, audio/BGM/SFX, toast, manajer modal a11y, login admin, `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`, persistensi sesi. Semua halaman memuatnya.
+- `js/feeds.js` — Room of Faith (fetch, render, komentar, upvote, moderasi) + `loadFeedsForStats()` yang dipakai landing. Dimuat di landing dan feeds.
+- `js/landing.js` — typewriter + slider. Hanya landing. Jangan dimuat di halaman tanpa `#slider`.
+- `js/arcade.js` — gameplay, leaderboard, cheat, persistensi run. Hanya arcade.
+
+**State lintas halaman (reload penuh)**
+- `sessionStorage`: `pdftv_run_v1` (run blackjack), `pdftv_session_v1` (login admin/moderator), `pdftv_bgm_on` (preferensi BGM).
+- Run disimpan via `saveRun()` (dipanggil di `startNewGame`/`endRound` + event `pagehide`), dipulihkan via `restoreRun()`.
+
+**Data & keamanan**
+- Semua penulisan ke Supabase lewat RPC (tidak ada insert/update/delete langsung dari client). Skema: `seed_feeds.sql` lalu `supabase_upgrade.sql`.
 - Password admin/moderator tidak ada di repo; setel lewat `*.local.sql` (gitignored) memakai `private.set_credential`.
-- Sinkron ke GitHub: watcher `watch-and-push.ps1` (auto commit + push saat file berubah).
+
+**Lain-lain**
+- `assets/` — gambar biner (`.webp`), jangan dibaca, cukup `glob`.
+- Sinkron ke GitHub: `watch-and-push.ps1` (auto commit + push, allowlist eksplisit + pemindai rahasia).
 - Edit presisi (`edit`) selalu lebih baik daripada menulis ulang file.
 - Jangan menjalankan `watch-and-push.ps1` dari sesi opencode — itu tugas user.

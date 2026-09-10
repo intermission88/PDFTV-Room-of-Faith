@@ -40,17 +40,28 @@ Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of F
 
 | File | Isi |
 |---|---|
-| `index.html` | Markup halaman (tiga mode: landing, feeds, arcade) |
+| `index.html` | Halaman landing (manifesto, slider, kartu, statistik) |
+| `feeds/index.html` | Halaman Room of Faith |
+| `arcade/index.html` | Halaman Blackjack Arcade |
 | `css/style.css` | Gaya kustom: tema CRT/felt, animasi, ring fokus, reduced-motion |
-| `js/app.js` | Logika landing, slider, game blackjack, modal, dan panel admin |
-| `js/feeds.js` | Logika Room of Faith: fetch, render, komentar, upvote, moderasi |
+| `js/core.js` | Fondasi bersama: Supabase, haptic, audio/BGM, toast, manajer modal, login admin, util |
+| `js/feeds.js` | Logika Room of Faith + pengambilan data statistik untuk landing |
+| `js/landing.js` | Typewriter + slider (hanya halaman landing) |
+| `js/arcade.js` | Gameplay blackjack, leaderboard, panel cheat, persistensi run |
 | `js/feeds-data.js` | Data feed awal untuk fallback sebelum Supabase termuat |
 | `seed_feeds.sql` | Pembuatan tabel `PDFTV Feeds`, RLS, dan data awal |
 | `supabase_upgrade.sql` | Fungsi RPC, pengetatan RLS, dan penyimpanan kredensial |
 | `assets/` | Logo, favicon, dan gambar slider (WebP) |
 | `watch-and-push.ps1` | Watcher auto commit + push untuk sinkronisasi ke GitHub |
 
-Urutan `<script>` penting: `js/feeds.js` dimuat sebelum `js/app.js`, karena helper bersama (`isMissingRpcError`, `rpcErrorMessage`) didefinisikan di `feeds.js`.
+Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`), lalu `js/feeds.js`, kemudian `js/landing.js` (landing) atau `js/arcade.js` (arcade).
+
+### URL & state lintas halaman
+
+- `/` landing, `/feeds/` Room of Faith, `/arcade/` Blackjack Arcade.
+- Halaman di dalam folder memakai path relatif (`../assets/...`), karena situs dilayani di subpath `/PDFTV-Room-of-Faith/`. Jangan pakai path absolut.
+- Berpindah halaman berarti reload penuh, jadi state yang perlu bertahan disimpan di `sessionStorage`: `pdftv_run_v1` (run blackjack), `pdftv_session_v1` (login admin/moderator), `pdftv_bgm_on` (preferensi BGM). Semuanya terhapus saat tab ditutup.
+- BGM tidak bisa otomatis berbunyi di halaman baru (kebijakan autoplay browser); musik menyala lagi pada interaksi pertama bila sebelumnya aktif.
 
 ---
 
@@ -66,7 +77,7 @@ python3 -m http.server 8000
 
 Buka `http://localhost:8000`. Alternatif lain: `npx serve .` bila Node.js tersedia.
 
-**Konfigurasi Supabase** ada di bagian atas `js/app.js`:
+**Konfigurasi Supabase** ada di bagian atas `js/core.js`:
 
 ```js
 const SUPABASE_URL = 'https://<project>.supabase.co';
