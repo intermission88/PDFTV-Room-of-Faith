@@ -519,15 +519,21 @@ async function submitConfession(e) {
     }
 }
 
+// Deteksi RPC yang belum ter-deploy di Supabase (dipakai app.js juga).
+function isMissingRpcError(err) {
+    if (!err) return false;
+    return err.code === '404' || err.code === 'PGRST202' ||
+        /Could not find the function/i.test(err.message || '') ||
+        /schema catalog/i.test(err.message || '');
+}
+
 // Terjemahkan error RPC yang belum ter-deploy menjadi pesan yang bisa ditindaklanjuti.
 // Hanya untuk pesan — tidak ada fallback tulis langsung.
 function rpcErrorMessage(err) {
-    const msg = (err && err.message) ? err.message : '';
-    if (err && (err.code === '404' || err.code === 'PGRST202' ||
-        /Could not find the function/i.test(msg) || /schema catalog/i.test(msg))) {
+    if (isMissingRpcError(err)) {
         return 'Server belum siap. Jalankan supabase_upgrade.sql di Supabase, lalu coba lagi.';
     }
-    return msg || 'Periksa koneksi / RLS Supabase';
+    return (err && err.message) || 'Periksa koneksi / RLS Supabase';
 }
 
 // ── Upvote ────────────────────────────────────────────────────

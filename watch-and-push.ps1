@@ -19,7 +19,7 @@ $action = {
 
         # Hanya file yang memang bagian dari website yang di-stage (bukan "git add -A"),
         # supaya file asing/rahasia tidak pernah ikut ter-push.
-        $allow = @('index.html', 'README.md', 'AGENTS.md', 'watch-and-push.ps1', 'js', 'assets')
+        $allow = @('index.html', 'README.md', 'AGENTS.md', 'watch-and-push.ps1', 'js', 'css', 'assets')
         foreach ($item in $allow) {
             if (Test-Path (Join-Path $folderPath $item)) { & $gitPath add -- $item }
         }

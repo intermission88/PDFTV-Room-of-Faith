@@ -40,13 +40,17 @@ Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of F
 
 | File | Isi |
 |---|---|
-| `index.html` | Markup, seluruh CSS, dan logika landing + game (satu file besar) |
+| `index.html` | Markup halaman (tiga mode: landing, feeds, arcade) |
+| `css/style.css` | Gaya kustom: tema CRT/felt, animasi, ring fokus, reduced-motion |
+| `js/app.js` | Logika landing, slider, game blackjack, modal, dan panel admin |
 | `js/feeds.js` | Logika Room of Faith: fetch, render, komentar, upvote, moderasi |
 | `js/feeds-data.js` | Data feed awal untuk fallback sebelum Supabase termuat |
 | `seed_feeds.sql` | Pembuatan tabel `PDFTV Feeds`, RLS, dan data awal |
 | `supabase_upgrade.sql` | Fungsi RPC, pengetatan RLS, dan penyimpanan kredensial |
 | `assets/` | Logo, favicon, dan gambar slider (WebP) |
 | `watch-and-push.ps1` | Watcher auto commit + push untuk sinkronisasi ke GitHub |
+
+Urutan `<script>` penting: `js/feeds.js` dimuat sebelum `js/app.js`, karena helper bersama (`isMissingRpcError`, `rpcErrorMessage`) didefinisikan di `feeds.js`.
 
 ---
 
@@ -62,7 +66,7 @@ python3 -m http.server 8000
 
 Buka `http://localhost:8000`. Alternatif lain: `npx serve .` bila Node.js tersedia.
 
-**Konfigurasi Supabase** ada di bagian atas blok `<script>` pada `index.html`:
+**Konfigurasi Supabase** ada di bagian atas `js/app.js`:
 
 ```js
 const SUPABASE_URL = 'https://<project>.supabase.co';
