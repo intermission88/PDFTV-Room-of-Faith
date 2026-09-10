@@ -19,8 +19,10 @@ const SITE_ROOT = (() => {
     return s ? new URL('../', s.src).href : new URL('.', location.href).href;
 })();
 
+// URL share memakai halaman hasil pre-render (punya tag OG berisi isi post).
+// Halaman ?id= tetap ada sebagai cadangan; lihat 404.html.
 function buildPostUrl(id) {
-    return SITE_ROOT + 'feeds/p/?id=' + encodeURIComponent(String(id));
+    return SITE_ROOT + 'feeds/p/' + encodeURIComponent(String(id)) + '/';
 }
 
 // --- HAPTIC FEEDBACK ENGINE ---

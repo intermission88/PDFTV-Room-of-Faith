@@ -3,9 +3,17 @@
 Website PDFTV (Room of Faith) — deploy via GitHub Pages (multipage).
 
 **Halaman**
-- `index.html` — landing (baris ~220). `feeds/index.html` — Room of Faith. `feeds/p/index.html` — detail satu post (link share). `arcade/index.html` — Blackjack Arcade.
+- `index.html` — landing (baris ~220). `feeds/index.html` — Room of Faith. `feeds/p/index.html` — detail satu post (template). `arcade/index.html` — Blackjack Arcade.
+- `feeds/p/<id>/index.html` — **hasil pre-render otomatis** (tag Open Graph berisi isi post). Jangan diedit manual; skrip `scripts/prerender-posts.mjs` akan menimpanya.
 - Halaman di dalam folder memakai path relatif `../` untuk aset/script. `feeds/p/` ada dua tingkat, jadi asetnya `../../` sementara tautan nav: home `../../`, feeds `../`, arcade `../../arcade/`. Jangan pakai path absolut (`/js/...`) karena situs dilayani di subpath `/PDFTV-Room-of-Faith/`.
 - Nav (header + bottom nav) sengaja diduplikasi di tiap halaman agar tampil instan tanpa JS; tab aktif ditandai `aria-current="page"`. Modal admin disuntik dari `core.js`, tidak ditulis di HTML.
+
+**Preview share (Open Graph)**
+- WhatsApp/Facebook tidak menjalankan JS, jadi tag OG harus ada di HTML yang dikirim server. Itu sebabnya ada pre-render.
+- `.github/workflows/prerender-posts.yml` (cron 10 menit + manual) menjalankan `scripts/prerender-posts.mjs`, lalu commit `feeds/p/<id>/` dan `assets/og/<id>.png`.
+- Post NSFW **tidak pernah** menulis isi ke HTML/PNG; pakai `assets/og/fallback.png`.
+- `404.html` mengalihkan `/feeds/p/<id>/` yang belum ter-generate ke `?id=<id>`.
+- Skrip mengukur ulang hasil render untuk mendeteksi teks meluber (warning, bukan error).
 
 **Script (urutan penting)**
 - Landing: `js/feeds-data.js` → `js/core.js` → `js/feeds.js` → `js/landing.js`.

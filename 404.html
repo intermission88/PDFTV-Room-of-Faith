@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman tidak ditemukan · PDFTV</title>
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#030a06">
+    <style>
+        :root { color-scheme: dark; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: #030a06;
+            color: #cbd5e1;
+            font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+            text-align: center;
+        }
+        .card { max-width: 26rem; }
+        .emoji { font-size: 2rem; }
+        h1 { font-size: 1rem; color: #fff; margin: 12px 0 8px; }
+        p { font-size: 0.8rem; color: #94a3b8; line-height: 1.6; margin: 0 0 16px; }
+        a {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        a:focus-visible { outline: 2px solid #6ee7b7; outline-offset: 2px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="emoji" aria-hidden="true">🕊️</div>
+        <h1 id="title">Halaman tidak ditemukan</h1>
+        <p id="message">
+            Halaman yang kamu cari tidak ada. Kalau ini tautan sebuah postingan, halamannya
+            mungkin sedang disiapkan — coba muat ulang sebentar lagi.
+        </p>
+        <a id="homeLink" href="https://intermission88.github.io/PDFTV-Room-of-Faith/">Buka Room of Faith</a>
+    </div>
+
+    <script>
+        // GitHub Pages menyajikan file ini untuk path yang belum ada, termasuk
+        // link post /feeds/p/<id>/ yang belum di-pre-render. Kalau polanya cocok,
+        // alihkan ke halaman ?id= yang selalu tersedia.
+        (function () {
+            var match = window.location.pathname.match(/^(.*\/feeds\/p\/)(\d+)\/?$/);
+            if (match) {
+                var target = match[1] + '?id=' + match[2];
+                document.getElementById('title').textContent = 'Menyiapkan postingan…';
+                document.getElementById('message').textContent =
+                    'Sebentar, kami membuka postingannya.';
+                document.getElementById('homeLink').setAttribute('href', target);
+                window.location.replace(target);
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -43,11 +43,14 @@ Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of F
 | `index.html` | Halaman landing (manifesto, slider, kartu, statistik) |
 | `feeds/index.html` | Halaman Room of Faith |
 | `feeds/p/index.html` | Halaman detail satu post + seluruh komentarnya (link bisa dibagikan) |
+| `feeds/p/<id>/index.html` | Hasil pre-render per post: tag Open Graph berisi isi post (dibuat otomatis, jangan diedit manual) |
 | `arcade/index.html` | Halaman Blackjack Arcade |
 | `css/style.css` | Gaya kustom: tema CRT/felt, animasi, ring fokus, reduced-motion |
 | `js/core.js` | Fondasi bersama: Supabase, haptic, audio/BGM, toast, manajer modal, login admin, util |
 | `js/feeds.js` | Logika Room of Faith + pengambilan data statistik untuk landing |
 | `js/post.js` | Logika halaman detail post (render post, komentar, upvote, tombol bagikan) |
+| `scripts/prerender-posts.mjs` | Pre-render halaman post + kartu gambar OG (dijalankan CI) |
+| `404.html` | Pengalih untuk link post yang belum di-pre-render |
 | `js/landing.js` | Typewriter + slider (hanya halaman landing) |
 | `js/arcade.js` | Gameplay blackjack, leaderboard, panel cheat, persistensi run |
 | `js/feeds-data.js` | Data feed awal untuk fallback sebelum Supabase termuat |
@@ -60,13 +63,37 @@ Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, 
 
 ### URL & state lintas halaman
 
-- `/` landing, `/feeds/` Room of Faith, `/feeds/p/?id=<id>` detail satu post, `/arcade/` Blackjack Arcade.
-- Tiap post punya halaman sendiri dengan kode unik berupa `id` post. Tombol **Bagikan** di halaman detail memakai Web Share API, dengan fallback salin ke clipboard.
-- Detail post memuat seluruh komentar (tanpa batas tinggi seperti versi lama) dan form komentar. Konten NSFW tetap ter-blur di halaman detail sampai tombol reveal ditekan, supaya link yang tersebar tidak membocorkan isinya.
-- Preview link yang dibagikan (Open Graph) masih generik: GitHub Pages menyajikan HTML statis, jadi tag OG tidak bisa diisi per post. Butuh fungsi serverless atau pre-render saat build untuk memperbaikinya.
+- `/` landing, `/feeds/` Room of Faith, `/feeds/p/<id>/` detail satu post, `/arcade/` Blackjack Arcade. Halaman lama `/feeds/p/?id=<id>` tetap berfungsi sebagai cadangan.
+- Tiap post punya halaman statis hasil pre-render di `/feeds/p/<id>/` yang memuat tag Open Graph berisi **isi postingannya**, sehingga preview saat link dibagikan (WhatsApp, Facebook) menampilkan pengakuan itu, bukan template.
+- Preview dihasilkan oleh `.github/workflows/prerender-posts.yml` (jadwal tiap 10 menit + bisa dijalankan manual dari tab Actions). Post yang baru dibuat menunggu jadwal berikutnya; link tetap bisa dibuka sebelum itu lewat `404.html` yang mengalihkan ke halaman `?id=`.
+- Post bertanda NSFW **tidak** pernah menuliskan isinya ke tag OG maupun gambar preview: preview-nya hanya "Konten sensitif". Ini disengaja karena link menyebar bebas.
+- Tombol **Bagikan** memakai Web Share API, dengan fallback salin ke clipboard.
+- Detail post memuat seluruh komentar dan form komentar. Konten NSFW tetap ter-blur di halaman sampai tombol reveal ditekan.
 - Halaman di dalam folder memakai path relatif (`../assets/...`), karena situs dilayani di subpath `/PDFTV-Room-of-Faith/`. Jangan pakai path absolut.
 - Berpindah halaman berarti reload penuh, jadi state yang perlu bertahan disimpan di `sessionStorage`: `pdftv_run_v1` (run blackjack), `pdftv_session_v1` (login admin/moderator), `pdftv_bgm_on` (preferensi BGM). Semuanya terhapus saat tab ditutup.
 - BGM tidak bisa otomatis berbunyi di halaman baru (kebijakan autoplay browser); musik menyala lagi pada interaksi pertama bila sebelumnya aktif.
+
+### Preview share (Open Graph)
+
+WhatsApp/Facebook tidak menjalankan JavaScript, jadi tag OG harus ada di HTML yang dikirim server. Karena itu:
+
+| Bagian | Isi |
+|---|---|
+| `scripts/prerender-posts.mjs` | Mengambil post dari Supabase REST, menulis `feeds/p/<id>/index.html` + kartu `assets/og/<id>.png` |
+| `scripts/package.json` | Dependensi `sharp` untuk merasterkan kartu SVG → PNG |
+| `.github/workflows/prerender-posts.yml` | Menjalankan skrip di runner, commit hasilnya, lalu push |
+| `assets/og/fallback.png` | Kartu brand, dipakai untuk post NSFW dan sebagai cadangan |
+| `404.html` | Mengalihkan `/feeds/p/<id>/` yang belum ter-generate ke `?id=<id>` |
+
+Menjalankan manual (butuh Node 20+):
+
+```bash
+cd scripts && npm install
+node scripts/prerender-posts.mjs            # semua post
+node scripts/prerender-posts.mjs --limit=3  # hanya 3 terbaru
+```
+
+Skrip hanya menulis berkas yang isinya berubah, jadi jadwal berulang tidak menghasilkan commit kosong. Kartu yang teksnya melebihi batas diukur ulang setelah render dan dilaporkan sebagai peringatan.
 
 ---
 

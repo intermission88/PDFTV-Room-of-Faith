@@ -3,3 +3,4 @@
 .idea/
 .commandcode/
 *.local.sql
+scripts/node_modules/

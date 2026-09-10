@@ -1,0 +1,53 @@
+name: Pre-render post (Open Graph)
+
+# WhatsApp/Facebook tidak menjalankan JavaScript, jadi halaman post perlu
+# tag Open Graph yang sudah ada di HTML. Workflow ini menghasilkan halaman
+# statis feeds/p/<id>/ + kartu assets/og/<id>.png, lalu meng-commit hasilnya.
+#
+# Post yang baru dibuat butuh menunggu jadwal berikutnya (atau jalankan
+# manual lewat tombol "Run workflow").
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prerender-posts
+  cancel-in-progress: false
+
+jobs:
+  prerender:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependensi (sharp)
+        working-directory: scripts
+        run: npm install --no-audit --no-fund
+
+      - name: Jalankan pre-render
+        run: node scripts/prerender-posts.mjs
+
+      - name: Commit hasil
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add feeds/p assets/og
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan."
+            exit 0
+          fi
+          git commit -m "Pre-render halaman post untuk preview share"
+          # Watcher lokal juga push ke main; sinkronkan dulu agar tidak ditolak
+          git pull --rebase --autostash origin main
+          git push

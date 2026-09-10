@@ -1,0 +1,12 @@
+{
+  "name": "pdftv-prerender",
+  "private": true,
+  "type": "module",
+  "description": "Pre-render halaman post + kartu OG. Dipakai oleh .github/workflows/prerender-posts.yml",
+  "scripts": {
+    "prerender": "node prerender-posts.mjs"
+  },
+  "dependencies": {
+    "sharp": "^0.33.5"
+  }
+}

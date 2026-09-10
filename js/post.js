@@ -7,10 +7,22 @@
 
 let currentPost = null;
 
-// Ambil id dari query string. Hanya terima angka.
+// Ambil id post, berurutan dari: meta pre-render, query string, lalu path cantik.
 function getPostIdFromUrl() {
+    // 1) Halaman hasil pre-render menyimpan id di meta (dipakai saat share)
+    const meta = document.querySelector('meta[name="post-id"]');
+    const metaId = meta && meta.getAttribute('content');
+    if (metaId && /^\d+$/.test(metaId)) return metaId;
+
+    // 2) Query string: /feeds/p/?id=<id>
     const raw = new URLSearchParams(window.location.search).get('id');
-    return raw && /^\d+$/.test(raw) ? raw : null;
+    if (raw && /^\d+$/.test(raw)) return raw;
+
+    // 3) Path cantik: /feeds/p/<id>/
+    const m = window.location.pathname.match(/\/feeds\/p\/(\d+)\/?$/);
+    if (m) return m[1];
+
+    return null;
 }
 
 function renderSkeletons() {
