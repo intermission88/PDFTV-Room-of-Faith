@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>PDFTV - Review Report</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+		.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+		.report-section { border: 1px solid #222226; background: #0a0a0b; position: relative; }
+		.corner-box { position: absolute; width: 20px; height: 20px; border: 1px solid #222226; background: #000; }
+	</style>
+</head>
+<body class="bg-black text-[#fafafa]">
+	<main class="mx-auto w-full max-w-6xl px-5 py-8 md:px-10 md:py-12">
+		<header class="report-section mb-8 p-6 md:p-8">
+			<div class="corner-box left-0 top-0 -translate-x-1/2 -translate-y-1/2"></div>
+			<div class="corner-box right-0 top-0 translate-x-1/2 -translate-y-1/2"></div>
+			<div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+				<div>
+					<div class="mono mb-2 text-xs tracking-widest text-[#666]">// REVIEW</div>
+					<h1 class="text-4xl font-bold tracking-tight md:text-6xl">PDFTV</h1>
+					<div class="mono mt-2 text-xs tracking-widest text-[#666]">EXPERIENCE ROOM · ROOM OF FAITH · BLACKJACK ARCADE</div>
+				</div>
+				<div class="mono text-left text-xs text-[#666] md:text-right">
+					<div>COMMANDCODE REPORT</div>
+					<div class="text-[#444]">2026-09-10</div>
+				</div>
+			</div>
+		</header>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="corner-box left-0 top-0 -translate-x-1/2 -translate-y-1/2"></div>
+			<div class="corner-box right-0 top-0 translate-x-1/2 -translate-y-1/2"></div>
+			<div class="grid gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+				<div>
+					<div class="mono mb-2 text-xs tracking-widest text-[#666]">// OVERALL</div>
+					<div class="text-6xl font-bold tracking-tight md:text-7xl">33</div>
+					<div class="mt-1 text-lg text-[#666]">/ 50</div>
+					<div class="mt-4 inline-flex border border-[#f43f5e]/30 bg-[#f43f5e]/10 px-3 py-1 text-sm text-[#f43f5e]">BLOCK</div>
+				</div>
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#666]">// TL;DR</div>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Karakter visual kuat dan authored — felt-green Balatro yang disiplin, manifesto typewriter, ruang game yang benar-benar dikomposisi. Masalahnya di lantai interaksi: CTA utama landing mati bagi keyboard, indikator fokus dihapus tanpa pengganti, carousel autoplay mengabaikan prefers-reduced-motion, dan toolbar feeds terpotong di 320px.</p>
+					<p class="mt-4 text-sm leading-6 text-[#fbbf24]">Jalankan /design a11y lebih dulu untuk menutup 7 HIGH, lalu /design typeset dan /design responsive.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// HEURISTIC SCORES</div>
+			<div class="overflow-x-auto">
+				<table class="w-full min-w-[720px] border-collapse text-sm">
+					<thead>
+						<tr class="border-b border-[#222226] text-left mono text-xs text-[#666]">
+							<th class="py-3 pr-4 font-normal">#</th>
+							<th class="py-3 pr-4 font-normal">HEURISTIC</th>
+							<th class="py-3 pr-4 font-normal">SCORE</th>
+							<th class="py-3 font-normal">KEY FINDING</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">1</td>
+							<td class="py-4 pr-4 text-[#fafafa]">First impression</td>
+							<td class="py-4 pr-4 text-[#fbbf24]">7/10</td>
+							<td class="py-4 text-[#a0a0a0]">Suara visual kuat; hero H1 menghapus dirinya tiap siklus dan desktop 1440px hanya kolom 448px di kehampaan.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">2</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Hierarchy</td>
+							<td class="py-4 pr-4 text-[#fbbf24]">7/10</td>
+							<td class="py-4 text-[#a0a0a0]">Urutan baca jelas dan lobby arcade sangat baik; CTA "Kirim" lebih sunyi dari tombol game, banjir label 8–9px.</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">3</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Color voice</td>
+							<td class="py-4 pr-4 text-[#34d399]">8/10</td>
+							<td class="py-4 text-[#a0a0a0]">Lensa terkuat: emerald/amber/rose disiplin dengan warna status yang terbaca; slate-600 di bawah AA (2.64:1 terukur).</td>
+						</tr>
+						<tr class="border-b border-[#1a1a1e]">
+							<td class="py-4 pr-4 text-[#555]">4</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Type voice</td>
+							<td class="py-4 pr-4 text-[#fbbf24]">6/10</td>
+							<td class="py-4 text-[#a0a0a0]">Tiga font berkarakter pas register; ukuran one-off 8–13px tanpa skala dan input 12px memicu zoom iOS.</td>
+						</tr>
+						<tr>
+							<td class="py-4 pr-4 text-[#555]">5</td>
+							<td class="py-4 pr-4 text-[#fafafa]">Interaction feel</td>
+							<td class="py-4 pr-4 text-[#f43f5e]">5/10</td>
+							<td class="py-4 text-[#a0a0a0]">Feedback kaya (haptic, skeleton, empty/error state) tapi keyboard dan screen reader putus di titik kunci.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// RISK SIGNALS</div>
+			<div class="grid gap-6 md:grid-cols-2">
+				<div>
+					<div class="mb-3 text-xl font-semibold">Risiko terkonsentrasi di aksesibilitas</div>
+					<ul class="space-y-3 text-sm text-[#a0a0a0]">
+						<li><span class="mono mr-2 text-[#34d399]">PASS</span>XSS hygiene: escapeHtml konsisten di semua render dinamis</li>
+						<li><span class="mono mr-2 text-[#34d399]">PASS</span>State lengkap: skeleton, empty, error, char counter, preview GIF, blur NSFW</li>
+						<li><span class="mono mr-2 text-[#34d399]">PASS</span>Data live Supabase tampil benar di stats, feeds, dan leaderboard</li>
+						<li><span class="mono mr-2 text-[#fbbf24]">WATCH</span>Template literal mentah ter-render saat fetch leaderboard pending/gagal</li>
+						<li><span class="mono mr-2 text-[#ef4444]">FAIL</span>7 pemicu eskalasi aksesibilitas berdiri (fokus, nama kontrol, gerak, 320px, label, modal, jalur keyboard)</li>
+					</ul>
+				</div>
+				<div>
+					<div class="mono mb-3 text-xs tracking-widest text-[#666]">// NEXT MODES</div>
+					<div class="flex flex-wrap gap-2">
+						<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design a11y</span>
+						<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design typeset</span>
+						<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design responsive</span>
+					</div>
+					<div class="mono mb-3 mt-6 text-xs tracking-widest text-[#666]">// VERIFIKASI</div>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Render nyata via Chromium CDP pada 390/320/1440px, alur landing → feeds → arcade → game dijalankan, state offline diuji dengan route abort, kontras dan overflow diukur via DOM. Belum: walk screen reader nyata, perangkat iOS fisik, viewport 768/2560px.</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// WHAT'S WORKING</div>
+			<div class="grid gap-4 md:grid-cols-3">
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">Suara warna yang disiplin</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Emerald sebagai suara produk, amber khusus momen dopamin game, rose untuk bahaya. Warna status (pin, NSFW, boss) terbaca tanpa teks. 60-30-10 dijaga di ketiga mode.</p>
+				</article>
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">Ruang game berkarakter</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Lobby arcade dan game UI dikomposisi sungguhan: felt radial, CRT overlay, slot Joker, pixel font untuk skor, CTA amber yang dipercaya. Terasa authored, bukan generik.</p>
+				</article>
+				<article class="border border-[#1f1f24] p-4">
+					<h2 class="mb-2 text-sm font-semibold">Higienitas konten dinamis</h2>
+					<p class="text-sm leading-6 text-[#a0a0a0]">Semua render feed melewati escapeHtml, semua img punya alt, hapus konten moderator pakai konfirmasi, empty state mengajarkan tindakan ("Tulis Pengakuan").</p>
+				</article>
+			</div>
+		</section>
+
+		<section class="report-section mb-8 p-6 md:p-8">
+			<div class="mono mb-6 text-xs tracking-widest text-[#666]">// PRIORITY ISSUES</div>
+			<div class="space-y-5">
+				<article class="border border-[#2a1d22] bg-[#110b0d] p-5">
+					<div class="mono mb-2 text-xs text-[#f43f5e]">P0 · INTERACTION</div>
+					<h2 class="mb-2 text-lg font-semibold">CTA utama landing tidak bisa dijangkau keyboard</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">Kartu "Room of Faith" dan "Blackjack Arcade" adalah div onclick (index.html:390, 406); reveal NSFW juga div onclick (feeds.js:377). Terverifikasi: hanya 6 elemen tabbable di landing, kedua kartu di luar itu — jalur mouse yang tidak bisa dijalan keyboard.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Jadikan button (atau a) dengan nama aksesibel; sama untuk reveal NSFW.</div>
+				</article>
+				<article class="border border-[#2a1d22] bg-[#110b0d] p-5">
+					<div class="mono mb-2 text-xs text-[#f43f5e]">P0 · ACCESSIBILITY</div>
+					<h2 class="mb-2 text-lg font-semibold">Fokus keyboard dihapus tanpa pengganti</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">Seluruh input memakai focus:outline-none dengan kompensasi bg 5%→10% yang tak terbedakan (index.html:481, 484, 493, 522, 829, 936; feeds.js:424). Screenshot textarea terfokus menunjukkan nol indikator visual.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Ring focus-visible 2px emerald dengan offset; jangan hapus outline tanpa pengganti yang terverifikasi.</div>
+				</article>
+				<article class="border border-[#2a1d22] bg-[#110b0d] p-5">
+					<div class="mono mb-2 text-xs text-[#f43f5e]">P0 · ACCESSIBILITY</div>
+					<h2 class="mb-2 text-lg font-semibold">Kontrol ikon tanpa nama; motion tanpa gerbang reduced-motion</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">Panah slider, dots, dan close modal tanpa aria-label; BGM/burger hanya title tanpa aria-pressed. Slider auto-play tiap 3,5 detik (index.html:1782), bossPulse dan animate-bounce/ping/pulse berjalan infinite — tidak ada prefers-reduced-motion di seluruh file.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: aria-label + aria-pressed; media query reduced-motion untuk mematikan autoplay dan loop infinite.</div>
+				</article>
+				<article class="border border-[#2a1d22] bg-[#110b0d] p-5">
+					<div class="mono mb-2 text-xs text-[#f43f5e]">P0 · ACCESSIBILITY</div>
+					<h2 class="mb-2 text-lg font-semibold">Modal menangkap mouse, membiarkan keyboard terdampar</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">Lima modal (index.html:816–948) tanpa focus trap, tanpa inert di background, tanpa Escape (tidak ada keydown handler di seluruh file), tanpa restore fokus — hanya modal admin yang memindahkan fokus masuk (index.html:987).</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: role="dialog" + aria-modal, trap fokus, Escape menutup, fokus kembali ke pemicu.</div>
+				</article>
+				<article class="border border-[#2a1d22] bg-[#110b0d] p-5">
+					<div class="mono mb-2 text-xs text-[#f43f5e]">P0 · ACCESSIBILITY + LAYOUT</div>
+					<h2 class="mb-2 text-lg font-semibold">Label form disamakan placeholder; toolbar terpotong di 320px</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">Field kunci hanya ber-placeholder, termasuk password admin (index.html:481, 484, 493, 522, 829, 936; feeds.js:423). Terpisah tapi setingkat: di 320px toolbar feeds overflow — konten 338px vs viewport 320px, tombol refresh keluar layar (index.html:516–527).</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Label terlihat atau aria-label; toolbar dibolehkan wrap / search dikecilkan di viewport sempit.</div>
+				</article>
+				<article class="border border-[#2a2416] bg-[#12100a] p-5">
+					<div class="mono mb-2 text-xs text-[#fbbf24]">P1 · SURFACE</div>
+					<h2 class="mb-2 text-lg font-semibold">Kode JS mentah tampil di Hall of Fame saat fetch lambat/gagal</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">index.html:608 berisi template literal `${[0,1,2,3,4].map(...)}` di HTML statis. Terverifikasi visual + eval dengan Supabase diblokir: teks kode terbaca oleh pengguna selama fase pending. Error state sebenarnya ada, tapi hanya setelah fetch gagal total.</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Ganti dengan markup skeleton statis yang setara.</div>
+				</article>
+				<article class="border border-[#2a2416] bg-[#12100a] p-5">
+					<div class="mono mb-2 text-xs text-[#fbbf24]">P1 · TYPE + INTERACTION</div>
+					<h2 class="mb-2 text-lg font-semibold">Banjir mikro-tipografi; input 12px memicu zoom iOS</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">Puluhan label informatif berukuran text-[8px]–text-[10px] tanpa skala konsisten (index.html:595, 599, 602, 691, 722, dst), dan seluruh input text-xs (12px) memicu zoom-on-focus iOS Safari yang melanggar layout. Toast dan gameStatus juga tidak punya live region (role=0 di seluruh dokumen).</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Skala type tetap dengan floor 11px; input ≥16px di viewport &lt;640px; role="status" pada toast dan gameStatus.</div>
+				</article>
+				<article class="border border-[#1f2a24] bg-[#0a1210] p-5">
+					<div class="mono mb-2 text-xs text-[#34d399]">P2 · LAYOUT + COLOR</div>
+					<h2 class="mb-2 text-lg font-semibold">Desktop tak dikomposisi; slate-600 di bawah AA; h1 menghapus dirinya</h2>
+					<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">1440×900: kolom 448px di kehampaan dan footer tertindih bottom nav. text-slate-600 di atas #030a06 terukur 2.64:1 (footer ©, char counter). Hero h1 diketik lalu dihapus berulang dan ada tiga h1 dalam satu dokumen (index.html:356, 473, 579).</p>
+					<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Komposisi desktop yang disengaja, naikkan ke slate-500, ketik hero sekali lalu diamkan, satu h1 per dokumen.</div>
+				</article>
+			</div>
+		</section>
+
+		<footer class="mono py-8 text-center text-xs tracking-widest text-[#444]">
+			Generated with CommandCode - 2026-09-10
+		</footer>
+	</main>
+</body>
+</html>
