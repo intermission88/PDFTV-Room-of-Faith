@@ -1,11 +1,14 @@
 # PDFTV-Room-of-Faith
 
-Website PDFTV (Room of Faith) — deploy via GitHub Pages (multipage).
+Website PDFTV (Room of Faith) — deploy via Vercel (multipage) di `https://pdftv.vercel.app/`.
+
+- GitHub Pages **tidak** dipakai (`has_pages: false`). Jangan pernah menulis URL `intermission88.github.io` ke halaman: domain itu 404, dan preview share WhatsApp akan tampil sebagai teks tanpa gambar.
+- Origin situs untuk tag absolut ada di `SITE_ORIGIN` (`scripts/prerender-posts.mjs`, di-override workflow lewat env). Kalau domain berubah, ubah di kedua tempat lalu jalankan ulang pre-render.
 
 **Halaman**
 - `index.html` — landing (baris ~220). `feeds/index.html` — Room of Faith. `feeds/p/index.html` — detail satu post (template). `arcade/index.html` — Blackjack Arcade.
 - `feeds/p/<id>/index.html` — **hasil pre-render otomatis** (tag Open Graph berisi isi post). Jangan diedit manual; skrip `scripts/prerender-posts.mjs` akan menimpanya.
-- Halaman di dalam folder memakai path relatif `../` untuk aset/script. `feeds/p/` ada dua tingkat, jadi asetnya `../../` sementara tautan nav: home `../../`, feeds `../`, arcade `../../arcade/`. Jangan pakai path absolut (`/js/...`) karena situs dilayani di subpath `/PDFTV-Room-of-Faith/`.
+- Halaman di dalam folder memakai path relatif `../` untuk aset/script. `feeds/p/` ada dua tingkat, jadi asetnya `../../` sementara tautan nav: home `../../`, feeds `../`, arcade `../../arcade/`. Jangan pakai path absolut (`/js/...`) agar halaman tetap jalan dari kedalaman folder mana pun.
 - Nav (header + bottom nav) sengaja diduplikasi di tiap halaman agar tampil instan tanpa JS; tab aktif ditandai `aria-current="page"`. Modal admin disuntik dari `core.js`, tidak ditulis di HTML.
 
 **Preview share (Open Graph)**

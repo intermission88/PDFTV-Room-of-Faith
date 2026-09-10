@@ -161,7 +161,9 @@ SELECT role, updated_at FROM private.admin_credentials;
 
 ## 🌐 Deploy
 
-Repositori ini dideploy sebagai situs statis melalui **GitHub Pages**. Cukup push ke `main`, atau gunakan `watch-and-push.ps1` yang otomatis commit dan push setiap kali ada perubahan file.
+Repositori ini dideploy sebagai situs statis melalui **Vercel** di `https://pdftv.vercel.app/`. Cukup push ke `main`, atau gunakan `watch-and-push.ps1` yang otomatis commit dan push setiap kali ada perubahan file.
+
+GitHub Pages tidak dipakai. Tag Open Graph memuat URL absolut yang dihasilkan dari `SITE_ORIGIN` di `scripts/prerender-posts.mjs` (di-override workflow `prerender-posts.yml`); kalau domain berubah, ubah di kedua tempat lalu jalankan ulang pre-render, jika tidak preview share WhatsApp kehilangan gambarnya.
 
 ---
 

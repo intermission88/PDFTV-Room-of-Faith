@@ -36,6 +36,10 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Jalankan pre-render
+        # Harus origin tempat situs benar-benar dilayani (Vercel). Kalau diisi
+        # domain lain, og:image menunjuk ke gambar yang tidak ada.
+        env:
+          SITE_ORIGIN: https://pdftv.vercel.app/
         run: node scripts/prerender-posts.mjs
 
       - name: Commit hasil

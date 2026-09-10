@@ -23,7 +23,10 @@ const TEMPLATE_PATH = path.join(ROOT, 'feeds/p/index.html');
 const OG_DIR = path.join(ROOT, 'assets/og');
 const PAGE_DIR = path.join(ROOT, 'feeds/p');
 
-const SITE_ORIGIN = (process.env.SITE_ORIGIN || 'https://intermission88.github.io/PDFTV-Room-of-Faith/').replace(/\/?$/, '/');
+// Origin situs yang benar-benar melayani halaman ini (Vercel), BUKAN GitHub
+// Pages: repo ini tidak mengaktifkan Pages, jadi gambar dari github.io 404 dan
+// WhatsApp hanya menampilkan preview teks tanpa gambar.
+const SITE_ORIGIN = (process.env.SITE_ORIGIN || 'https://pdftv.vercel.app/').replace(/\/?$/, '/');
 const OG_FALLBACK = SITE_ORIGIN + 'assets/og/fallback.png';
 
 const CARD_W = 1200;
