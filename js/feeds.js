@@ -45,7 +45,7 @@ function updateCharCounter() {
         return;
     }
     counter.textContent = `${len}/500`;
-    counter.className = 'text-right text-[10px] mt-1 h-3 ' + (len > 450 ? 'text-amber-400' : 'text-slate-600');
+    counter.className = 'text-right text-[10px] mt-1 h-3 ' + (len > 450 ? 'text-amber-400' : 'text-slate-500');
 }
 
 // ── GIF Preview ──────────────────────────────────────────────
@@ -103,7 +103,7 @@ function updateFeedSyncBadge(state) {
         error:     { cls: 'bg-red-500/20 border-red-500/40 text-red-300',        dot: 'bg-red-400',                  label: 'GAGAL TERHUBUNG' },
     };
     const c = configs[state] || configs.error;
-    badge.className = `text-[8px] font-mono-custom font-bold px-2 py-0.5 rounded-full border ${c.cls} flex items-center gap-1`;
+    badge.className = `text-[10px] font-mono-custom font-bold px-2 py-0.5 rounded-full border ${c.cls} flex items-center gap-1`;
     badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${c.dot}"></span> ${c.label}`;
 }
 
@@ -273,8 +273,14 @@ function setFeedFilter(filter) {
     const active   = 'px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-lg transition';
     const inactive = 'px-3 py-1.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-medium rounded-lg transition';
 
-    if (btnLatest)  btnLatest.className  = filter === 'latest'  ? active : inactive;
-    if (btnPopular) btnPopular.className = filter === 'popular' ? active : inactive;
+    if (btnLatest) {
+        btnLatest.className  = filter === 'latest'  ? active : inactive;
+        btnLatest.setAttribute('aria-pressed', String(filter === 'latest'));
+    }
+    if (btnPopular) {
+        btnPopular.className = filter === 'popular' ? active : inactive;
+        btnPopular.setAttribute('aria-pressed', String(filter === 'popular'));
+    }
 
     renderFeeds();
 }
@@ -358,7 +364,7 @@ function renderFeeds() {
                 <div class="relative ${showNsfwBlur ? 'select-none pointer-events-none' : ''}">
                     <div class="flex items-baseline gap-2 text-left">
                         <h3 class="text-sm font-semibold text-white text-left ${showNsfwBlur ? 'blur-[3px]' : ''}">${escapeHtml(item.alias || 'Anonim')}</h3>
-                        ${isNsfw ? `<span class="text-[8px] uppercase tracking-wide text-red-300/80 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
+                        ${isNsfw ? `<span class="text-[10px] uppercase tracking-wide text-red-300/80 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
                         <span class="feed-time text-[11px] text-slate-500" data-ts="${Number(item.timestamp || item.id)}">${timeAgoStr}</span>
                     </div>
 
@@ -374,11 +380,11 @@ function renderFeeds() {
                     </div>
 
                     ${showNsfwBlur ? `
-                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 flex items-center justify-center cursor-pointer z-10 pointer-events-auto">
+                        <button type="button" onclick="revealNsfw('${item.id}')" aria-label="Tampilkan konten sensitif" class="absolute inset-0 flex items-center justify-center cursor-pointer z-10 pointer-events-auto">
                             <span class="flex items-center gap-1.5 text-[10px] font-semibold text-slate-200 bg-white/10 backdrop-blur-sm rounded-full px-3.5 py-1.5 active:scale-95 transition">
                                 🔒 Konten sensitif — klik untuk lihat
                             </span>
-                        </div>
+                        </button>
                     ` : ''}
                 </div>
 
@@ -420,8 +426,9 @@ function renderFeeds() {
                         }
                     </div>
                     <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-2 pt-0.5 text-left">
+                        <label for="comment-input-${item.id}" class="sr-only">Tulis komentar</label>
                         <input id="comment-input-${item.id}" type="text" placeholder="Tulis komentar..." required
-                            class="flex-1 bg-white/[0.07] rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:bg-white/[0.12] font-sans text-left">
+                            class="flex-1 bg-white/[0.07] rounded-lg px-3 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:bg-white/[0.12] font-sans text-left">
                         <button type="submit" class="px-3.5 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg text-xs font-medium transition">
                             Kirim
                         </button>
@@ -433,7 +440,7 @@ function renderFeeds() {
         <div class="py-8 text-center text-slate-500 text-xs space-y-1 mt-4">
             <div class="inline-block animate-bounce text-sm">⚓</div>
             <div class="text-slate-400">Semua pengakuan telah dimuat</div>
-            <div class="text-[11px] text-slate-600">Anda telah mencapai akhir dari linimasa.</div>
+            <div class="text-[11px] text-slate-500">Anda telah mencapai akhir dari linimasa.</div>
         </div>
     `;
 }
@@ -860,13 +867,20 @@ function openLightbox(src) {
         lb = document.createElement('div');
         lb.id = 'gifLightbox';
         lb.className = 'fixed inset-0 z-[90] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out opacity-0 transition-opacity duration-200';
+        lb.setAttribute('role', 'dialog');
+        lb.setAttribute('aria-modal', 'true');
+        lb.setAttribute('aria-label', 'Pratinjau GIF, klik atau tekan Escape untuk menutup');
+        lb.tabIndex = -1;
         lb.innerHTML = '<img src="" alt="GIF" class="max-w-full max-h-[85vh] rounded-xl shadow-2xl">';
         lb.addEventListener('click', () => closeLightbox());
         document.body.appendChild(lb);
     }
     const img = lb.querySelector('img');
     img.src = src;
-    requestAnimationFrame(() => lb.style.opacity = '1');
+    requestAnimationFrame(() => {
+        lb.style.opacity = '1';
+        lb.focus();
+    });
     document.body.style.overflow = 'hidden';
 }
 
