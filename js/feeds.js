@@ -359,13 +359,6 @@ function renderFeeds() {
         return;
     }
 
-    // Simpan drawer yang sedang terbuka sebelum re-render
-    const openDrawers = new Set(
-        [...document.querySelectorAll('[id^="comments-drawer-"]')]
-            .filter(el => !el.classList.contains('hidden'))
-            .map(el => el.id.replace('comments-drawer-', ''))
-    );
-
     container.innerHTML = filtered.map(item => {
         const isPinned      = item.is_pinned;
         const isNsfw        = item.is_nsfw === true || item.is_nsfw === 'true';
@@ -374,7 +367,6 @@ function renderFeeds() {
         const commentsList  = Array.isArray(item.comments) ? item.comments : [];
         const timeAgoStr    = formatTimeAgo(item.timestamp || item.id);
         const hasUpvoted    = upvotedFeedIds.includes(String(item.id));
-        const drawerOpen    = openDrawers.has(String(item.id));
 
         return `
             <div class="feed-card rounded-2xl ${isPinned ? 'bg-amber-400/[0.06]' : isNsfw ? 'bg-red-300/[0.04]' : 'bg-white/[0.04]'} p-4 text-left w-full transition">
@@ -386,22 +378,24 @@ function renderFeeds() {
                 ` : ''}
 
                 <div class="relative ${showNsfwBlur ? 'select-none pointer-events-none' : ''}">
-                    <div class="flex items-baseline gap-2 text-left">
-                        <h3 class="text-sm font-semibold text-white text-left ${showNsfwBlur ? 'blur-[3px]' : ''}">${escapeHtml(item.alias || 'Anonim')}</h3>
-                        ${isNsfw ? `<span class="text-[10px] uppercase tracking-wide text-red-300/80 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
-                        <span class="feed-time text-[11px] text-slate-500" data-ts="${Number(item.timestamp || item.id)}">${timeAgoStr}</span>
-                    </div>
+                    <a href="p/?id=${encodeURIComponent(String(item.id))}" class="block text-left">
+                        <div class="flex items-baseline gap-2 text-left">
+                            <h3 class="text-sm font-semibold text-white text-left ${showNsfwBlur ? 'blur-[3px]' : ''}">${escapeHtml(item.alias || 'Anonim')}</h3>
+                            ${isNsfw ? `<span class="text-[10px] uppercase tracking-wide text-red-300/80 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
+                            <span class="feed-time text-[11px] text-slate-500" data-ts="${Number(item.timestamp || item.id)}">${timeAgoStr}</span>
+                        </div>
 
-                    <div class="space-y-1 ${showNsfwBlur ? 'max-h-16 overflow-hidden blur-sm transition-all duration-300' : ''}">
-                        ${item.confession ? `
-                            <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
-                        ` : ''}
-                        ${item.gif_url ? `
-                            <div class="rounded-xl overflow-hidden bg-black/30 max-h-80 flex items-center justify-center">
-                                <img src="${escapeHtml(item.gif_url)}" alt="GIF" class="w-full max-h-80 object-contain rounded-xl cursor-zoom-in" loading="lazy" onclick="openLightbox(this.src)" onerror="this.parentNode.style.display='none'">
-                            </div>
-                        ` : ''}
-                    </div>
+                        <div class="space-y-1 ${showNsfwBlur ? 'max-h-16 overflow-hidden blur-sm transition-all duration-300' : ''}">
+                            ${item.confession ? `
+                                <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
+                            ` : ''}
+                            ${item.gif_url ? `
+                                <div class="rounded-xl overflow-hidden bg-black/30 max-h-80 flex items-center justify-center">
+                                    <img src="${escapeHtml(item.gif_url)}" alt="GIF" class="w-full max-h-80 object-contain rounded-xl cursor-zoom-in" loading="lazy" onclick="event.preventDefault(); event.stopPropagation(); openLightbox(this.src)" onerror="this.parentNode.style.display='none'">
+                                </div>
+                            ` : ''}
+                        </div>
+                    </a>
 
                     ${showNsfwBlur ? `
                         <button type="button" onclick="revealNsfw('${item.id}')" aria-label="Tampilkan konten sensitif" class="absolute inset-0 flex items-center justify-center cursor-pointer z-10 pointer-events-auto">
@@ -427,36 +421,16 @@ function renderFeeds() {
                 ` : ''}
 
                 <div class="flex items-center justify-between pt-3 mt-3 text-[13px] text-left">
-                    <button onclick="toggleCommentsDrawer('${item.id}')" aria-label="Lihat komentar" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.42-4.03 8-9 8a9.9 9.9 0 01-4.2-.9L3 20l1.05-3.3A7.9 7.9 0 013 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
+                    <a href="p/?id=${encodeURIComponent(String(item.id))}" aria-label="Lihat komentar" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
+                        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.42-4.03 8-9 8a9.9 9.9 0 01-4.2-.9L3 20l1.05-3.3A7.9 7.9 0 013 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
                         <span class="font-medium">${commentsList.length}</span>
                         <span class="text-xs text-slate-500 font-normal">Komentar</span>
-                    </button>
+                    </a>
                     <button onclick="upvoteFeed('${item.id}')" aria-label="Upvote" class="flex items-center gap-1.5 ${hasUpvoted ? 'text-amber-400' : 'text-slate-400 hover:text-amber-300'} transition">
                         <span class="text-xs text-slate-500 font-normal">${hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
                         <span class="font-medium">${item.upvotes}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+                        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
                     </button>
-                </div>
-
-                <!-- COMMENTS DRAWER -->
-                <div id="comments-drawer-${item.id}" class="${drawerOpen ? '' : 'hidden'} pt-3 mt-1 space-y-2 text-left">
-                    <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1 text-left">
-                        ${commentsList.length === 0
-                            ? `<p class="text-[11px] text-slate-500 italic text-left">Belum ada komentar.</p>`
-                            : commentsList.map(c => `
-                                <div class="bg-white/[0.06] p-2.5 rounded-lg text-[12px] text-slate-300 font-sans text-left">${escapeHtml(c)}</div>
-                            `).join('')
-                        }
-                    </div>
-                    <form onsubmit="addCommentToFeed('${item.id}', event)" class="flex gap-2 pt-0.5 text-left">
-                        <label for="comment-input-${item.id}" class="sr-only">Tulis komentar</label>
-                        <input id="comment-input-${item.id}" type="text" placeholder="Tulis komentar..." required
-                            class="flex-1 bg-white/[0.07] rounded-lg px-3 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:bg-white/[0.12] font-sans text-left">
-                        <button type="submit" class="px-3.5 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg text-xs font-medium transition">
-                            Kirim
-                        </button>
-                    </form>
                 </div>
             </div>
         `;
@@ -545,7 +519,72 @@ async function submitConfession(e) {
 
 // isMissingRpcError & rpcErrorMessage sekarang tinggal di core.js (dipakai lintas halaman).
 
-// ── Upvote ────────────────────────────────────────────────────
+// ── Lapisan API bersama (dipakai halaman feeds dan halaman detail post) ──
+
+// Ambil satu post berdasarkan id. Dipakai halaman detail /feeds/p/.
+async function fetchFeedById(id) {
+    const numericId = Number(id);
+    if (!Number.isFinite(numericId)) return null;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from(FEEDS_TABLE)
+            .select('*')
+            .eq('id', numericId)
+            .maybeSingle();
+        if (error) throw error;
+        if (data) return normalizeItem(data);
+    } catch (err) {
+        console.error('Gagal memuat post:', err);
+    }
+
+    // Fallback: kalau Supabase tidak bisa dihubungi, coba data awal
+    if (typeof INITIAL_FEEDS_DATA !== 'undefined') {
+        const found = INITIAL_FEEDS_DATA.find(it => String(it.id) === String(id));
+        if (found) return normalizeItem(found);
+    }
+    return null;
+}
+
+// Upvote lewat RPC atomik. Hanya untuk mengirim — UI diurus pemanggil.
+async function sendUpvote(id, delta) {
+    const { data, error } = await supabaseClient.rpc('increment_upvote', {
+        p_id: Number(id),
+        p_delta: delta
+    });
+    if (error) return { error };
+    return { upvotes: typeof data === 'number' ? data : null };
+}
+
+// Kirim komentar lewat RPC atomik (anti timpa komentar user lain).
+async function sendComment(id, text) {
+    const { data, error } = await supabaseClient.rpc('append_comment', {
+        p_id: Number(id),
+        p_text: text
+    });
+    if (error) return { error };
+    return { comments: Array.isArray(data) ? data : null };
+}
+
+function hasUpvotedFeed(id) {
+    return upvotedFeedIds.includes(String(id));
+}
+
+// Balik status upvote di localStorage. Mengembalikan true bila sekarang ter-upvote.
+function toggleLocalUpvote(idStr) {
+    const wasUpvoted = upvotedFeedIds.includes(idStr);
+    if (wasUpvoted) {
+        upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
+    } else {
+        upvotedFeedIds.push(idStr);
+    }
+    // Cap ukuran localStorage agar tidak tumbuh tanpa batas
+    if (upvotedFeedIds.length > 500) upvotedFeedIds = upvotedFeedIds.slice(-500);
+    localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
+    return !wasUpvoted;
+}
+
+// ── Upvote (halaman feeds) ────────────────────────────────────
 async function upvoteFeed(id) {
     const idStr = String(id);
     const post = feedsData.find(item => String(item.id) === idStr);
@@ -554,103 +593,28 @@ async function upvoteFeed(id) {
     playClickSound();
     triggerHaptic('light');
 
-    const hasUpvoted = upvotedFeedIds.includes(idStr);
-    const delta = hasUpvoted ? -1 : 1;
+    const wasUpvoted = hasUpvotedFeed(idStr);
+    const delta = wasUpvoted ? -1 : 1;
     const newUpvotes = Math.max(0, (post.upvotes || 0) + delta);
 
     // Optimistic update
+    const nowUpvoted = toggleLocalUpvote(idStr);
     post.upvotes = newUpvotes;
-    if (hasUpvoted) {
-        upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
-        showToast('🔥 Upvote dibatalkan.');
-    } else {
-        upvotedFeedIds.push(idStr);
-        showToast('🔥 Upvote ditambahkan!');
-    }
-    // Cap ukuran localStorage agar tidak tumbuh tanpa batas
-    if (upvotedFeedIds.length > 500) upvotedFeedIds = upvotedFeedIds.slice(-500);
-    localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
+    showToast(nowUpvoted ? '🔥 Upvote ditambahkan!' : '🔥 Upvote dibatalkan.');
     renderFeeds();
 
-    // Sync ke Supabase — hanya lewat RPC atomik
-    const rpcResult = await supabaseClient.rpc('increment_upvote', {
-        p_id: Number(post.id),
-        p_delta: delta
-    });
+    const result = await sendUpvote(id, delta);
 
-    if (rpcResult.error) {
-        handleUpvoteError(post, idStr, hasUpvoted, newUpvotes, rpcResult.error);
-    } else if (typeof rpcResult.data === 'number') {
+    if (result.error) {
+        // Rollback
+        toggleLocalUpvote(idStr);
+        post.upvotes = newUpvotes - delta;
+        renderFeeds();
+        showToast(`❌ Gagal: ${rpcErrorMessage(result.error)}`);
+    } else if (typeof result.upvotes === 'number') {
         // Sinkronkan dengan nilai server (atomic, sudah termasuk upvote user lain)
-        post.upvotes = rpcResult.data;
+        post.upvotes = result.upvotes;
         renderFeeds();
-    }
-}
-
-function handleUpvoteError(post, idStr, hasUpvoted, newUpvotes, error) {
-    console.warn('Supabase upvote error:', error);
-    // Rollback
-    post.upvotes = hasUpvoted ? newUpvotes + 1 : newUpvotes - 1;
-    if (hasUpvoted) {
-        upvotedFeedIds.push(idStr);
-    } else {
-        upvotedFeedIds = upvotedFeedIds.filter(x => x !== idStr);
-    }
-    localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
-    renderFeeds();
-    showToast(`❌ Gagal: ${error.message || 'Cek RLS policy Supabase'}`);
-}
-
-// ── Comments ──────────────────────────────────────────────────
-function toggleCommentsDrawer(id) {
-    playClickSound();
-    triggerHaptic('light');
-    const drawer = document.getElementById(`comments-drawer-${id}`);
-    if (drawer) drawer.classList.toggle('hidden');
-}
-
-async function addCommentToFeed(id, e) {
-    e.preventDefault();
-    const commentInput = document.getElementById(`comment-input-${id}`);
-    if (!commentInput) return;
-
-    const text = cleanText(commentInput.value);
-    if (!text) return;
-
-    playClickSound();
-    triggerHaptic('medium');
-
-    const post = feedsData.find(item => item.id == id);
-    if (!post) return;
-
-    if (!Array.isArray(post.comments)) post.comments = [];
-
-    const updatedComments = [...post.comments, text];
-
-    // Optimistic update
-    post.comments = updatedComments;
-    commentInput.value = '';
-    renderFeeds();
-
-    // Re-open drawer setelah render (supaya tidak tertutup)
-    const drawer = document.getElementById(`comments-drawer-${id}`);
-    if (drawer) drawer.classList.remove('hidden');
-
-    // Sync ke Supabase — hanya lewat RPC atomik (anti timpa komentar user lain)
-    const rpcResult = await supabaseClient.rpc('append_comment', {
-        p_id: Number(id),
-        p_text: text
-    });
-
-    if (rpcResult.error) {
-        console.warn('Supabase comment error:', rpcResult.error);
-        showToast(`❌ Komentar gagal: ${rpcErrorMessage(rpcResult.error)}`);
-    } else if (Array.isArray(rpcResult.data)) {
-        // Sinkronkan dengan daftar komentar versi server
-        post.comments = rpcResult.data;
-        renderFeeds();
-        const drawerAgain = document.getElementById(`comments-drawer-${id}`);
-        if (drawerAgain) drawerAgain.classList.remove('hidden');
     }
 }
 
@@ -717,7 +681,16 @@ function revealNsfw(id) {
     triggerHaptic('light');
     revealedNsfwIds.push(String(id));
     if (revealedNsfwIds.length > 500) revealedNsfwIds = revealedNsfwIds.slice(-500);
-    renderFeeds();
+    // Status reveal murni lokal, jadi cukup render ulang (tanpa ambil data baru)
+    if (document.getElementById('feedsListContainer')) renderFeeds();
+    else if (typeof currentPost !== 'undefined' && currentPost) renderPostDetail();
+}
+
+// Segarkan tampilan yang sedang aktif setelah perubahan dari server
+// (pin/NSFW). Di halaman detail, data diambil ulang agar benar-benar sinkron.
+function refreshFeedView() {
+    if (document.getElementById('feedsListContainer')) renderFeeds();
+    else if (typeof refreshPostDetail === 'function') refreshPostDetail();
 }
 
 // Helper: eksekusi aksi moderator lewat RPC (verifikasi password server-side).
@@ -740,7 +713,7 @@ async function moderatorTogglePin(id, currentPinned) {
         showToast(`❌ Gagal pin: ${result.error.message}`);
     } else {
         showToast(newVal ? "📌 Postingan berhasil di-pin!" : "📌 Pin postingan dilepas.");
-        fetchFeeds();
+        refreshFeedView();
     }
 }
 
@@ -758,7 +731,7 @@ async function moderatorToggleNsfw(id, currentNsfw) {
         showToast(`❌ Gagal update NSFW: ${result.error.message}`);
     } else {
         showToast(newVal ? "🔞 Postingan ditandai NSFW." : "✅ Postingan dikembalikan normal (SFW).");
-        fetchFeeds();
+        refreshFeedView();
     }
 }
 
@@ -777,8 +750,13 @@ async function moderatorDeleteFeed(id) {
     } else {
         // Hapus langsung dari tampilan (realtime DELETE juga akan menangani klien lain)
         feedsData = feedsData.filter(f => String(f.id) !== String(id));
-        renderFeeds();
         showToast("🗑️ Postingan berhasil dihapus.");
+        if (document.getElementById('feedsListContainer')) {
+            renderFeeds();
+        } else {
+            // Dihapus dari halaman detail: post sudah tidak ada, kembali ke daftar
+            setTimeout(() => { window.location.href = SITE_ROOT + 'feeds/'; }, 800);
+        }
     }
 }
 

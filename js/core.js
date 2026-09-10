@@ -11,6 +11,18 @@ const SUPABASE_KEY = 'sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
 
+// --- ROOT SITUS & LINK POST ---
+// Dihitung dari lokasi core.js supaya kedalaman folder tidak pernah salah hitung
+// (halaman feeds maupun feeds/p menghasilkan root yang sama).
+const SITE_ROOT = (() => {
+    const s = document.querySelector('script[src$="js/core.js"]');
+    return s ? new URL('../', s.src).href : new URL('.', location.href).href;
+})();
+
+function buildPostUrl(id) {
+    return SITE_ROOT + 'feeds/p/?id=' + encodeURIComponent(String(id));
+}
+
 // --- HAPTIC FEEDBACK ENGINE ---
 function triggerHaptic(type = 'light') {
     if (!('vibrate' in navigator)) return;

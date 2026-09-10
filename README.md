@@ -42,10 +42,12 @@ Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of F
 |---|---|
 | `index.html` | Halaman landing (manifesto, slider, kartu, statistik) |
 | `feeds/index.html` | Halaman Room of Faith |
+| `feeds/p/index.html` | Halaman detail satu post + seluruh komentarnya (link bisa dibagikan) |
 | `arcade/index.html` | Halaman Blackjack Arcade |
 | `css/style.css` | Gaya kustom: tema CRT/felt, animasi, ring fokus, reduced-motion |
 | `js/core.js` | Fondasi bersama: Supabase, haptic, audio/BGM, toast, manajer modal, login admin, util |
 | `js/feeds.js` | Logika Room of Faith + pengambilan data statistik untuk landing |
+| `js/post.js` | Logika halaman detail post (render post, komentar, upvote, tombol bagikan) |
 | `js/landing.js` | Typewriter + slider (hanya halaman landing) |
 | `js/arcade.js` | Gameplay blackjack, leaderboard, panel cheat, persistensi run |
 | `js/feeds-data.js` | Data feed awal untuk fallback sebelum Supabase termuat |
@@ -58,7 +60,10 @@ Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, 
 
 ### URL & state lintas halaman
 
-- `/` landing, `/feeds/` Room of Faith, `/arcade/` Blackjack Arcade.
+- `/` landing, `/feeds/` Room of Faith, `/feeds/p/?id=<id>` detail satu post, `/arcade/` Blackjack Arcade.
+- Tiap post punya halaman sendiri dengan kode unik berupa `id` post. Tombol **Bagikan** di halaman detail memakai Web Share API, dengan fallback salin ke clipboard.
+- Detail post memuat seluruh komentar (tanpa batas tinggi seperti versi lama) dan form komentar. Konten NSFW tetap ter-blur di halaman detail sampai tombol reveal ditekan, supaya link yang tersebar tidak membocorkan isinya.
+- Preview link yang dibagikan (Open Graph) masih generik: GitHub Pages menyajikan HTML statis, jadi tag OG tidak bisa diisi per post. Butuh fungsi serverless atau pre-render saat build untuk memperbaikinya.
 - Halaman di dalam folder memakai path relatif (`../assets/...`), karena situs dilayani di subpath `/PDFTV-Room-of-Faith/`. Jangan pakai path absolut.
 - Berpindah halaman berarti reload penuh, jadi state yang perlu bertahan disimpan di `sessionStorage`: `pdftv_run_v1` (run blackjack), `pdftv_session_v1` (login admin/moderator), `pdftv_bgm_on` (preferensi BGM). Semuanya terhapus saat tab ditutup.
 - BGM tidak bisa otomatis berbunyi di halaman baru (kebijakan autoplay browser); musik menyala lagi pada interaksi pertama bila sebelumnya aktif.
