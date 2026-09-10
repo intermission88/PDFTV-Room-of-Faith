@@ -79,7 +79,51 @@ $$;
 -- 3. RPC INSERT CONFESSION + rate limit sederhana per IP
 -- (maks 1 postingan / 15 detik per IP)
 -- ============================================================
+-- pgcrypto dipakai untuk hash IP dan password (butuh digest/crypt).
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
+
 ALTER TABLE public."PDFTV Feeds" ADD COLUMN IF NOT EXISTS poster_ip TEXT;
+
+-- Penting: tabel lama mungkin belum punya created_at (CREATE TABLE IF NOT EXISTS
+-- tidak menambah kolom ke tabel yang sudah ada), padahal rate limit memakainya.
+ALTER TABLE public."PDFTV Feeds" ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Isi created_at untuk baris lama dari timestamp (ms) agar pengurutan rate limit benar.
+UPDATE public."PDFTV Feeds"
+    SET created_at = to_timestamp(timestamp / 1000.0)
+    WHERE created_at IS NULL AND timestamp IS NOT NULL;
+
+-- Percepat query rate limit per IP (sebelumnya full scan).
+CREATE INDEX IF NOT EXISTS idx_feeds_poster_ip
+    ON public."PDFTV Feeds" (poster_ip, created_at DESC);
+
+-- Konversi IP mentah yang sudah tersimpan menjadi hash (sekali jalan).
+-- Skema pgcrypto diresolusi dinamis, jadi tetap jalan walau ekstensinya
+-- tidak berada di schema `extensions`.
+DO $$
+DECLARE
+    pgc_schema TEXT;
+BEGIN
+    SELECT n.nspname INTO pgc_schema
+        FROM pg_extension e
+        JOIN pg_namespace n ON n.oid = e.extnamespace
+        WHERE e.extname = 'pgcrypto';
+
+    IF pgc_schema IS NULL THEN
+        RAISE NOTICE 'pgcrypto tidak ditemukan, lewati konversi IP lama';
+        RETURN;
+    END IF;
+
+    EXECUTE format(
+        'UPDATE public."PDFTV Feeds"
+            SET poster_ip = encode(%I.digest(poster_ip || ''pdftv-feeds'', ''sha256''), ''hex'')
+            WHERE poster_ip IS NOT NULL
+              AND poster_ip <> ''''
+              AND length(poster_ip) < 64',
+        pgc_schema
+    );
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION public.insert_confession(
     p_alias TEXT,
@@ -90,13 +134,14 @@ CREATE OR REPLACE FUNCTION public.insert_confession(
 RETURNS public."PDFTV Feeds"
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, extensions
 AS $$
 DECLARE
     clean_conf TEXT;
     clean_alias TEXT;
     clean_gif TEXT;
     client_ip TEXT;
+    ip_hash TEXT;
     last_created TIMESTAMPTZ;
     new_row public."PDFTV Feeds";
 BEGIN
@@ -114,15 +159,19 @@ BEGIN
         RAISE EXCEPTION 'link GIF harus dimulai dengan http(s)://';
     END IF;
 
-    -- Rate limit per IP (abaikan jika header tidak tersedia, mis. dari SQL Editor)
+    -- Rate limit per IP (abaikan jika header tidak tersedia, mis. dari SQL Editor).
+    -- Yang disimpan HANYA hash IP, bukan IP mentah — postingan tetap anonim,
+    -- tapi rate limit masih bisa bekerja.
     client_ip := COALESCE(
         split_part(COALESCE(current_setting('request.headers', true)::json->>'x-forwarded-for', ''), ',', 1),
         ''
     );
     IF client_ip <> '' THEN
+        ip_hash := encode(digest(client_ip || 'pdftv-feeds', 'sha256'), 'hex');
+
         SELECT created_at INTO last_created
             FROM public."PDFTV Feeds"
-            WHERE poster_ip = client_ip
+            WHERE poster_ip = ip_hash
             ORDER BY created_at DESC LIMIT 1;
         IF last_created IS NOT NULL AND last_created > NOW() - INTERVAL '15 seconds' THEN
             RAISE EXCEPTION 'terlalu cepat! tunggu sebentar sebelum posting lagi';
@@ -139,13 +188,35 @@ BEGIN
         (EXTRACT(EPOCH FROM NOW()) * 1000)::BIGINT,
         FALSE,
         COALESCE(p_is_nsfw, FALSE),
-        NULLIF(client_ip, '')
+        ip_hash
     )
     RETURNING * INTO new_row;
 
     RETURN new_row;
 END;
 $$;
+
+-- Retensi: hapus hash IP lama. Jalankan berkala (manual atau via pg_cron).
+CREATE OR REPLACE FUNCTION public.purge_old_poster_ips(p_days INT DEFAULT 30)
+RETURNS INTEGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    affected INTEGER;
+BEGIN
+    UPDATE public."PDFTV Feeds"
+        SET poster_ip = NULL
+        WHERE poster_ip IS NOT NULL
+          AND created_at < NOW() - make_interval(days => GREATEST(COALESCE(p_days, 30), 1));
+    GET DIAGNOSTICS affected = ROW_COUNT;
+    RETURN affected;
+END;
+$$;
+
+-- Fungsi perawatan: jangan diekspos ke publik.
+REVOKE ALL ON FUNCTION public.purge_old_poster_ips(INT) FROM anon, authenticated;
 
 -- ============================================================
 -- 4. VERIFIKASI PASSWORD SERVER-SIDE (HASHED)
@@ -288,17 +359,88 @@ END;
 $$;
 
 -- ============================================================
--- 7. PERKETAT RLS
+-- 7. LEADERBOARD: submit via RPC + RLS
+-- Skor dihitung di browser, jadi anti-cheat sempurna tidak mungkin.
+-- Yang bisa dilakukan server: menolak insert langsung, memvalidasi
+-- rentang, dan membatasi spam per IP.
+-- ============================================================
+ALTER TABLE public."PDFTV Blackjack Leaderboard" ENABLE ROW LEVEL SECURITY;
+
+-- Simpan hanya hash IP (bukan IP mentah) sebagai dasar rate limit.
+ALTER TABLE public."PDFTV Blackjack Leaderboard"
+    ADD COLUMN IF NOT EXISTS submit_ip TEXT;
+ALTER TABLE public."PDFTV Blackjack Leaderboard"
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Publik hanya boleh membaca. Tidak ada policy INSERT/UPDATE/DELETE,
+-- sehingga penulisan langsung dari anon selalu ditolak.
+DROP POLICY IF EXISTS "Public Insert Access" ON public."PDFTV Blackjack Leaderboard";
+DROP POLICY IF EXISTS "Public Update Access" ON public."PDFTV Blackjack Leaderboard";
+DROP POLICY IF EXISTS "Public Delete Access" ON public."PDFTV Blackjack Leaderboard";
+DROP POLICY IF EXISTS "Public Read Access"   ON public."PDFTV Blackjack Leaderboard";
+CREATE POLICY "Public Read Access" ON public."PDFTV Blackjack Leaderboard"
+    FOR SELECT USING (true);
+
+CREATE INDEX IF NOT EXISTS idx_blackjack_cash
+    ON public."PDFTV Blackjack Leaderboard" (streak_count DESC);
+
+CREATE INDEX IF NOT EXISTS idx_blackjack_submit_ip
+    ON public."PDFTV Blackjack Leaderboard" (submit_ip, created_at DESC);
+
+CREATE OR REPLACE FUNCTION public.submit_score(p_name TEXT, p_cash BIGINT)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, extensions
+AS $$
+DECLARE
+    clean_name  TEXT;
+    client_ip   TEXT;
+    last_submit TIMESTAMPTZ;
+BEGIN
+    clean_name := NULLIF(btrim(regexp_replace(COALESCE(p_name, ''), '[[:cntrl:]]', '', 'g')), '');
+
+    IF clean_name IS NULL OR length(clean_name) > 12 THEN
+        RAISE EXCEPTION 'nama tidak valid (1-12 karakter)';
+    END IF;
+    -- Batas bawah mengikuti syarat minimum di UI; batas atas menahan nilai mustahil.
+    IF p_cash IS NULL OR p_cash < 500 OR p_cash > 1000000000 THEN
+        RAISE EXCEPTION 'skor di luar rentang yang wajar';
+    END IF;
+
+    -- Rate limit per IP: maksimal 1 skor per menit.
+    client_ip := COALESCE(
+        split_part(COALESCE(current_setting('request.headers', true)::json->>'x-forwarded-for', ''), ',', 1),
+        ''
+    );
+    IF client_ip <> '' THEN
+        SELECT created_at INTO last_submit
+            FROM public."PDFTV Blackjack Leaderboard"
+            WHERE submit_ip = encode(digest(client_ip || 'pdftv-leaderboard', 'sha256'), 'hex')
+            ORDER BY created_at DESC LIMIT 1;
+        IF last_submit IS NOT NULL AND last_submit > NOW() - INTERVAL '60 seconds' THEN
+            RAISE EXCEPTION 'terlalu cepat! tunggu sebentar sebelum mengirim skor lagi';
+        END IF;
+    END IF;
+
+    INSERT INTO public."PDFTV Blackjack Leaderboard" (player_name, streak_count, submit_ip)
+    VALUES (
+        clean_name,
+        p_cash,
+        NULLIF(encode(digest(client_ip || 'pdftv-leaderboard', 'sha256'), 'hex'), '')
+    );
+END;
+$$;
+
+-- ============================================================
+-- 8. PERKETAT RLS FEEDS
 -- Publik hanya boleh BACA. Semua penulisan (upvote, komentar,
--- posting, moderasi) kini hanya lewat RPC di atas.
--- Catatan: jalankan bagian ini TERAKHIR. Selama JS masih punya
--- fallback insert langsung, policy INSERT lama dipertahankan.
+-- posting, moderasi) hanya lewat RPC di atas. JS sudah tidak punya
+-- jalur tulis langsung, jadi policy insert lama ikut dicabut.
 -- ============================================================
 DROP POLICY IF EXISTS "Public Update Access" ON public."PDFTV Feeds";
-
--- Policy insert tetap ada sebagai fallback jika RPC belum tersedia.
--- (Opsional: hapus baris di bawah untuk memaksa semua insert lewat RPC)
--- DROP POLICY IF EXISTS "Public Insert Access" ON public."PDFTV Feeds";
+DROP POLICY IF EXISTS "Public Insert Access" ON public."PDFTV Feeds";
+DROP POLICY IF EXISTS "Public Delete Access" ON public."PDFTV Feeds";
 
 -- Izin eksekusi RPC untuk publik
 GRANT EXECUTE ON FUNCTION public.increment_upvote(BIGINT, INT) TO anon, authenticated;
@@ -309,17 +451,19 @@ GRANT EXECUTE ON FUNCTION public.verify_admin(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.moderator_update_feed(TEXT, BIGINT, BOOLEAN, BOOLEAN) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.moderator_delete_feed(TEXT, BIGINT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_reset_leaderboard(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.submit_score(TEXT, BIGINT) TO anon, authenticated;
 
 -- ============================================================
--- 8. SEED PASSWORD
--- Diset via hash, jadi tidak ada teks biasa yang disimpan di tabel.
--- Catatan: dua password ini sudah pernah publik di git history repo,
--- jadi sebaiknya diganti bila akses admin/moderator mau dibatasi.
--- Ganti kapan saja tanpa ubah kode:
---   SELECT private.set_credential('admin',     'PASSWORD_BARU');
---   SELECT private.set_credential('moderator', 'PASSWORD_BARU');
--- Cek hash terpasang (jangan bagikan nilai hash-nya):
+-- 9. PASSWORD ADMIN & MODERATOR (SETEL DI LUAR REPO)
+-- Tidak ada password di file ini. Setel lewat SQL Editor memakai
+-- cuplikan yang kamu simpan sendiri (lihat contoh di bawah), atau
+-- file lokal yang tidak ikut ter-commit.
+--
+--   SELECT private.set_credential('admin',     '<password admin>');
+--   SELECT private.set_credential('moderator', '<password moderator>');
+--
+-- Cek tanpa membuka hash-nya:
 --   SELECT role, updated_at FROM private.admin_credentials;
+--
+-- Ganti kapan saja tanpa mengubah kode di website.
 -- ============================================================
-SELECT private.set_credential('admin',     'cikini123');
-SELECT private.set_credential('moderator', 'rusdi123');

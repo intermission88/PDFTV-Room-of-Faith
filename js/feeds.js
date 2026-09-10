@@ -468,11 +468,7 @@ async function submitConfession(e) {
     }
 
     try {
-        // Coba RPC atomik dulu (anti race condition + rate limit + id auto-generate).
-        // Fallback ke insert langsung jika RPC belum tersedia di Supabase.
-        let data = null;
-        let error = null;
-
+        // Semua penulisan lewat RPC: validasi, rate limit, dan id dibuat server.
         const rpcResult = await supabaseClient.rpc('insert_confession', {
             p_alias:     aliasInput,
             p_confession: contentInput,
@@ -480,29 +476,8 @@ async function submitConfession(e) {
             p_is_nsfw:   isNsfwInput
         });
 
-        if (rpcResult.error && isMissingRpcError(rpcResult.error)) {
-            const newId = Date.now();
-            const direct = await supabaseClient
-                .from(FEEDS_TABLE)
-                .insert([{
-                    id:        newId,
-                    alias:     aliasInput,
-                    confession: contentInput,
-                    gif_url:   gifUrlInput,
-                    upvotes:   0,
-                    comments:  [],
-                    timestamp: newId,
-                    is_pinned: false,
-                    is_nsfw:   isNsfwInput
-                }])
-                .select()
-                .single();
-            data = direct.data;
-            error = direct.error;
-        } else {
-            data = rpcResult.data;
-            error = rpcResult.error;
-        }
+        const data = rpcResult.data;
+        const error = rpcResult.error;
 
         if (error) throw error;
 
@@ -534,7 +509,7 @@ async function submitConfession(e) {
 
     } catch (err) {
         console.error('Submit confession error:', err);
-        showToast(`❌ Gagal: ${err.message || 'Periksa koneksi / RLS Supabase'}`);
+        showToast(`❌ Gagal: ${rpcErrorMessage(err)}`);
     } finally {
         isSubmitting = false;
         if (submitBtn) {
@@ -544,12 +519,15 @@ async function submitConfession(e) {
     }
 }
 
-// Deteksi error "RPC function belum ada di Supabase" (untuk fallback)
-function isMissingRpcError(err) {
-    if (!err) return false;
-    return err.code === '404' || err.code === 'PGRST202' ||
-        /Could not find the function/i.test(err.message || '') ||
-        /schema catalog/i.test(err.message || '');
+// Terjemahkan error RPC yang belum ter-deploy menjadi pesan yang bisa ditindaklanjuti.
+// Hanya untuk pesan — tidak ada fallback tulis langsung.
+function rpcErrorMessage(err) {
+    const msg = (err && err.message) ? err.message : '';
+    if (err && (err.code === '404' || err.code === 'PGRST202' ||
+        /Could not find the function/i.test(msg) || /schema catalog/i.test(msg))) {
+        return 'Server belum siap. Jalankan supabase_upgrade.sql di Supabase, lalu coba lagi.';
+    }
+    return msg || 'Periksa koneksi / RLS Supabase';
 }
 
 // ── Upvote ────────────────────────────────────────────────────
@@ -579,19 +557,13 @@ async function upvoteFeed(id) {
     localStorage.setItem('pdftv_upvoted_feeds', JSON.stringify(upvotedFeedIds));
     renderFeeds();
 
-    // Sync ke Supabase — RPC atomik dulu, fallback ke update langsung
+    // Sync ke Supabase — hanya lewat RPC atomik
     const rpcResult = await supabaseClient.rpc('increment_upvote', {
         p_id: Number(post.id),
         p_delta: delta
     });
 
-    if (rpcResult.error && isMissingRpcError(rpcResult.error)) {
-        const { error } = await supabaseClient
-            .from(FEEDS_TABLE)
-            .update({ upvotes: newUpvotes })
-            .eq('id', post.id);
-        if (error) handleUpvoteError(post, idStr, hasUpvoted, newUpvotes, error);
-    } else if (rpcResult.error) {
+    if (rpcResult.error) {
         handleUpvoteError(post, idStr, hasUpvoted, newUpvotes, rpcResult.error);
     } else if (typeof rpcResult.data === 'number') {
         // Sinkronkan dengan nilai server (atomic, sudah termasuk upvote user lain)
@@ -649,24 +621,15 @@ async function addCommentToFeed(id, e) {
     const drawer = document.getElementById(`comments-drawer-${id}`);
     if (drawer) drawer.classList.remove('hidden');
 
-    // Sync ke Supabase — RPC atomik dulu (anti timpa komentar user lain), fallback update langsung
+    // Sync ke Supabase — hanya lewat RPC atomik (anti timpa komentar user lain)
     const rpcResult = await supabaseClient.rpc('append_comment', {
         p_id: Number(id),
         p_text: text
     });
 
-    if (rpcResult.error && isMissingRpcError(rpcResult.error)) {
-        const { error } = await supabaseClient
-            .from(FEEDS_TABLE)
-            .update({ comments: updatedComments })
-            .eq('id', id);
-        if (error) {
-            console.warn('Supabase comment error:', error);
-            showToast(`❌ Komentar gagal: ${error.message || 'Cek RLS policy Supabase'}`);
-        }
-    } else if (rpcResult.error) {
+    if (rpcResult.error) {
         console.warn('Supabase comment error:', rpcResult.error);
-        showToast(`❌ Komentar gagal: ${rpcResult.error.message || 'Cek RLS policy Supabase'}`);
+        showToast(`❌ Komentar gagal: ${rpcErrorMessage(rpcResult.error)}`);
     } else if (Array.isArray(rpcResult.data)) {
         // Sinkronkan dengan daftar komentar versi server
         post.comments = rpcResult.data;
@@ -742,14 +705,10 @@ function revealNsfw(id) {
     renderFeeds();
 }
 
-// Helper: eksekusi aksi moderator via RPC (verifikasi password server-side),
-// fallback ke operasi langsung jika RPC belum dijalankan di Supabase.
-async function moderatorRpc(rpcName, rpcArgs, fallbackFn) {
-    const rpcResult = await supabaseClient.rpc(rpcName, { p_pass: moderatorPass, ...rpcArgs });
-    if (rpcResult.error && isMissingRpcError(rpcResult.error) && fallbackFn) {
-        return fallbackFn();
-    }
-    return rpcResult;
+// Helper: eksekusi aksi moderator lewat RPC (verifikasi password server-side).
+// Tidak ada jalur tulis langsung — tanpa RPC, aksi ditolak.
+async function moderatorRpc(rpcName, rpcArgs) {
+    return supabaseClient.rpc(rpcName, { p_pass: moderatorPass, ...rpcArgs });
 }
 
 async function moderatorTogglePin(id, currentPinned) {
@@ -759,14 +718,7 @@ async function moderatorTogglePin(id, currentPinned) {
     }
     const newVal = !currentPinned;
     const result = await moderatorRpc('moderator_update_feed',
-        { p_id: Number(id), p_is_pinned: newVal, p_is_nsfw: null },
-        async () => {
-            const { error } = await supabaseClient
-                .from(FEEDS_TABLE)
-                .update({ is_pinned: newVal })
-                .eq('id', id);
-            return { error };
-        }
+        { p_id: Number(id), p_is_pinned: newVal, p_is_nsfw: null }
     );
 
     if (result.error) {
@@ -784,14 +736,7 @@ async function moderatorToggleNsfw(id, currentNsfw) {
     }
     const newVal = !currentNsfw;
     const result = await moderatorRpc('moderator_update_feed',
-        { p_id: Number(id), p_is_pinned: null, p_is_nsfw: newVal },
-        async () => {
-            const { error } = await supabaseClient
-                .from(FEEDS_TABLE)
-                .update({ is_nsfw: newVal })
-                .eq('id', id);
-            return { error };
-        }
+        { p_id: Number(id), p_is_pinned: null, p_is_nsfw: newVal }
     );
 
     if (result.error) {
@@ -809,14 +754,7 @@ async function moderatorDeleteFeed(id) {
     }
     if (!confirm("Yakin ingin menghapus pengakuan ini?")) return;
     const result = await moderatorRpc('moderator_delete_feed',
-        { p_id: Number(id) },
-        async () => {
-            const { error } = await supabaseClient
-                .from(FEEDS_TABLE)
-                .delete()
-                .eq('id', id);
-            return { error };
-        }
+        { p_id: Number(id) }
     );
 
     if (result.error) {

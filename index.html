@@ -1305,11 +1305,8 @@
             if (!isAdminLoggedIn) return;
             if (confirm("⚠️ Yakin ingin menghapus seluruh Leaderboard?")) {
                 try {
-                    let result = await supabaseClient.rpc('admin_reset_leaderboard', { p_pass: adminPass });
-                    if (result.error && isMissingRpcErrorCompat(result.error)) {
-                        // Fallback: delete langsung (jika RPC belum dijalankan)
-                        result = await supabaseClient.from(LEADERBOARD_TABLE).delete().neq('id', 0);
-                    }
+                    // Hanya lewat RPC: reset langsung dari client tidak lagi diizinkan.
+                    const result = await supabaseClient.rpc('admin_reset_leaderboard', { p_pass: adminPass });
                     if (result.error) throw result.error;
                     showToast("🔄 Leaderboard berhasil direset!");
                     fetchLeaderboard();
@@ -2808,20 +2805,21 @@
 
             if (nameInput) {
                 try {
-                    const payload = {
-                        player_name: nameInput,
-                        streak_count: Number(cashToSubmit)
-                    };
+                    // Skor dikirim lewat RPC: validasi rentang + rate limit di server.
+                    const { error } = await supabaseClient.rpc('submit_score', {
+                        p_name: nameInput,
+                        p_cash: Number(cashToSubmit)
+                    });
 
-                    const { error } = await supabaseClient.from(LEADERBOARD_TABLE).insert([payload]);
-                    
-                    if (error) throw new Error(error.message);
+                    if (error) throw error;
 
                     showToast("🏆 Rekor Balatro Cash berhasil dicatat!");
                     await fetchLeaderboard();
                 } catch (err) {
                     console.error('Error submitting score:', err);
-                    alert("Gagal mencatat rekor: " + (err.message || "Pastikan tabel Supabase sesuai."));
+                    alert("Gagal mencatat rekor: " + (isMissingRpcErrorCompat(err)
+                        ? "Server belum siap. Jalankan supabase_upgrade.sql di Supabase, lalu coba lagi."
+                        : (err.message || "Pastikan tabel Supabase sesuai.")));
                 }
             }
 
