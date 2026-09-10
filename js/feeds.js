@@ -277,14 +277,14 @@ function renderFeeds() {
                     </div>
                 ` : ''}
 
-                <div class="flex items-baseline gap-2 text-left">
-                    <h3 class="text-sm font-semibold text-white text-left">${escapeHtml(item.alias || 'Anonim')}</h3>
-                    ${isNsfw ? `<span class="text-[8px] uppercase tracking-wide text-red-300/80 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
-                    <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
-                </div>
+                <div class="relative ${showNsfwBlur ? 'select-none pointer-events-none' : ''}">
+                    <div class="flex items-baseline gap-2 text-left">
+                        <h3 class="text-sm font-semibold text-white text-left ${showNsfwBlur ? 'blur-[3px]' : ''}">${escapeHtml(item.alias || 'Anonim')}</h3>
+                        ${isNsfw ? `<span class="text-[8px] uppercase tracking-wide text-red-300/80 bg-red-300/[0.06] px-1 py-px rounded self-center">18+</span>` : ''}
+                        <span class="text-[11px] text-slate-500">${timeAgoStr}</span>
+                    </div>
 
-                <div class="relative">
-                    <div class="space-y-1 ${showNsfwBlur ? 'max-h-16 overflow-hidden blur-sm select-none pointer-events-none transition-all duration-300' : ''}">
+                    <div class="space-y-1 ${showNsfwBlur ? 'max-h-16 overflow-hidden blur-sm transition-all duration-300' : ''}">
                         ${item.confession ? `
                             <p class="text-[13px] text-slate-200 leading-relaxed font-sans whitespace-pre-wrap text-left break-words m-0 pt-0.5">${escapeHtml(item.confession)}</p>
                         ` : ''}
@@ -296,9 +296,9 @@ function renderFeeds() {
                     </div>
 
                     ${showNsfwBlur ? `
-                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 flex items-center justify-center cursor-pointer z-10">
-                            <span class="flex items-center gap-1.5 text-[10px] font-medium text-slate-300 bg-black/70 backdrop-blur-sm rounded-full px-3 py-1.5">
-                                🔒 Konten sensitif · Klik untuk lihat
+                        <div onclick="revealNsfw('${item.id}')" class="absolute inset-0 flex items-center justify-center cursor-pointer z-10 pointer-events-auto">
+                            <span class="flex items-center gap-1.5 text-[10px] font-semibold text-slate-200 bg-white/10 backdrop-blur-sm rounded-full px-3.5 py-1.5 active:scale-95 transition">
+                                🔒 Konten sensitif — klik untuk lihat
                             </span>
                         </div>
                     ` : ''}
