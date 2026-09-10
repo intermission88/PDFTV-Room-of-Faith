@@ -1120,7 +1120,6 @@
             }
 
             let role = null;
-            let usingFallback = false;
 
             try {
                 const adminCheck = await verifyPasswordServerSide(passwordInput, 'verify_admin');
@@ -1128,10 +1127,10 @@
                     role = 'admin';
                     adminPass = passwordInput;
                 } else if (adminCheck.ok === null) {
-                    // RPC belum ada → fallback lokal
-                    usingFallback = true;
-                    if (passwordInput === 'cikini123') { role = 'admin'; adminPass = passwordInput; }
-                    else if (passwordInput === 'rusdi123') { role = 'moderator'; }
+                    // Tidak ada verifikasi lokal. Password TIDAK boleh ada di kode client.
+                    playBustSound();
+                    alert("Verifikasi server belum aktif. Jalankan supabase_upgrade.sql di Supabase, lalu coba lagi.");
+                    return;
                 } else {
                     const modCheck = await verifyPasswordServerSide(passwordInput, 'verify_moderator');
                     if (modCheck.ok === true) {
@@ -1147,7 +1146,6 @@
                     playAdminSound();
                     triggerHaptic('heavy');
                     showToast("🔓 Akses Admin Blackjack (Cheat Panel) Aktif!");
-                    if (usingFallback) showToast("⚠️ RPC belum aktif — jalankan supabase_upgrade.sql");
                 } else if (role === 'moderator') {
                     isModeratorLoggedIn = true;
                     isAdminLoggedIn = false;
@@ -1157,7 +1155,6 @@
                     playAdminSound();
                     triggerHaptic('heavy');
                     showToast("🛡️ Akses Moderator Feeds (Pin & NSFW) Aktif!");
-                    if (usingFallback) showToast("⚠️ RPC belum aktif — jalankan supabase_upgrade.sql");
                 } else {
                     playBustSound();
                     triggerHaptic('bust');

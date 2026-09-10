@@ -148,25 +148,76 @@ END;
 $$;
 
 -- ============================================================
--- 4. VERIFIKASI PASSWORD SERVER-SIDE
--- Password TIDAK lagi tersimpan di kode client.
+-- 4. VERIFIKASI PASSWORD SERVER-SIDE (HASHED)
+-- Password tidak lagi ada di kode client, dan tidak lagi
+-- disimpan sebagai teks biasa di sini. Yang disimpan hanya hash
+-- bcrypt, di schema `private` yang TIDAK diekspos PostgREST.
 -- ============================================================
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
+
+CREATE SCHEMA IF NOT EXISTS private;
+REVOKE ALL ON SCHEMA private FROM anon, authenticated;
+
+CREATE TABLE IF NOT EXISTS private.admin_credentials (
+    role       TEXT PRIMARY KEY,
+    pass_hash  TEXT NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+REVOKE ALL ON TABLE private.admin_credentials FROM anon, authenticated;
+
+-- RLS aktif TANPA policy = tolak semua akses langsung dari anon/authenticated.
+-- Tidak mengganggu verifikasi login, karena private.verify_credential adalah
+-- SECURITY DEFINER dan berjalan sebagai pemilik tabel (pemilik melewati RLS).
+-- Jangan pakai FORCE ROW LEVEL SECURITY — itu akan memblokir fungsinya juga.
+ALTER TABLE private.admin_credentials ENABLE ROW LEVEL SECURITY;
+
+-- Satu-satunya tempat password dibandingkan. SECURITY DEFINER agar
+-- anon tetap bisa memverifikasi tanpa pernah bisa membaca tabelnya.
+CREATE OR REPLACE FUNCTION private.verify_credential(p_role TEXT, p_pass TEXT)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = private, public, extensions
+AS $$
+    SELECT EXISTS (
+        SELECT 1 FROM private.admin_credentials
+        WHERE role = p_role
+          AND COALESCE(p_pass, '') <> ''
+          AND pass_hash = crypt(p_pass, pass_hash)
+    );
+$$;
+
+-- Setel / ganti password (jalankan manual di SQL Editor, bukan dari client):
+--   SELECT private.set_credential('admin',     'PASSWORD_ADMIN_BARU');
+--   SELECT private.set_credential('moderator', 'PASSWORD_MOD_BARU');
+CREATE OR REPLACE FUNCTION private.set_credential(p_role TEXT, p_pass TEXT)
+RETURNS VOID
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = private, extensions
+AS $$
+    INSERT INTO private.admin_credentials (role, pass_hash, updated_at)
+    VALUES (p_role, crypt(p_pass, gen_salt('bf', 12)), now())
+    ON CONFLICT (role) DO UPDATE
+        SET pass_hash = EXCLUDED.pass_hash, updated_at = now();
+$$;
+
 CREATE OR REPLACE FUNCTION public.verify_moderator(p_pass TEXT)
 RETURNS BOOLEAN
 LANGUAGE sql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = private, public, extensions
 AS $$
-    SELECT COALESCE(p_pass, '') = 'rusdi123';
+    SELECT private.verify_credential('moderator', p_pass);
 $$;
 
 CREATE OR REPLACE FUNCTION public.verify_admin(p_pass TEXT)
 RETURNS BOOLEAN
 LANGUAGE sql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = private, public, extensions
 AS $$
-    SELECT COALESCE(p_pass, '') = 'cikini123';
+    SELECT private.verify_credential('admin', p_pass);
 $$;
 
 -- ============================================================
@@ -258,3 +309,17 @@ GRANT EXECUTE ON FUNCTION public.verify_admin(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.moderator_update_feed(TEXT, BIGINT, BOOLEAN, BOOLEAN) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.moderator_delete_feed(TEXT, BIGINT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.admin_reset_leaderboard(TEXT) TO anon, authenticated;
+
+-- ============================================================
+-- 8. SEED PASSWORD
+-- Diset via hash, jadi tidak ada teks biasa yang disimpan di tabel.
+-- Catatan: dua password ini sudah pernah publik di git history repo,
+-- jadi sebaiknya diganti bila akses admin/moderator mau dibatasi.
+-- Ganti kapan saja tanpa ubah kode:
+--   SELECT private.set_credential('admin',     'PASSWORD_BARU');
+--   SELECT private.set_credential('moderator', 'PASSWORD_BARU');
+-- Cek hash terpasang (jangan bagikan nilai hash-nya):
+--   SELECT role, updated_at FROM private.admin_credentials;
+-- ============================================================
+SELECT private.set_credential('admin',     'cikini123');
+SELECT private.set_credential('moderator', 'rusdi123');
