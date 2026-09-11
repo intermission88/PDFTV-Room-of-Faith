@@ -24,7 +24,7 @@ typeWriter();
 
 // --- SLIDER ENGINE ---
 let currentSlide = 0;
-const totalSlides = 3;
+const totalSlides = 4;
 const slider = document.getElementById('slider');
 const dots = document.querySelectorAll('.dot-btn');
 let slideInterval;
