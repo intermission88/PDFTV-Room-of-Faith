@@ -34,6 +34,7 @@ Situs statis, live di **https://pdftv.vercel.app/** (multipage, tanpa build step
 - WhatsApp/Facebook tidak menjalankan JS, jadi tag OG harus ada di HTML yang dikirim server → itu sebabnya ada pre-render.
 - CI `.github/workflows/prerender-posts.yml` (cron 10 menit + manual) menjalankan `scripts/prerender-posts.mjs`, lalu commit `feeds/p/<id>/` + `assets/og/<id>.png`.
 - Post NSFW **tidak pernah** menulis isi ke HTML/PNG (pakai `assets/og/fallback.png`). Skrip mengukur ulang hasil render untuk deteksi teks meluber (warning, bukan error).
+- Skrip juga **menghapus** `feeds/p/<id>/` + `assets/og/<id>.png` untuk post yang sudah tidak ada di database (kalau tidak, link lama tetap menampilkan konten terhapus). Pemulihan ini dilewati saat `--limit` dipakai.
 - **PNG hanya boleh digenerate CI.** macOS tidak punya DejaVu Sans (font runner Ubuntu) → hasil run lokal selalu beda byte dan bikin commit bolak-balik. Setelah run lokal: `git checkout -- assets/og/`. HTML `feeds/p/` aman di-commit (tidak bergantung font).
 
 ## Lain-lain
