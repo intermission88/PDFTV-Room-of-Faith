@@ -169,7 +169,7 @@
             </div>
 
             <!-- STATS WIDGET -->
-            <div class="rounded-2xl bg-white/[0.03]   p-4 space-y-3 text-left">
+            <div class="rounded-2xl bg-white/[0.03] p-4 space-y-3 text-left">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-medium text-slate-300">Statistik Platform</span>
                     <span class="flex items-center gap-1.5 text-[11px] text-slate-500">
@@ -180,16 +180,23 @@
                         <span class="animate-pulse">still counting...</span>
                     </span>
                 </div>
+
+                <div class="bg-white/[0.03] p-3 rounded-xl text-center">
+                    <div class="text-[10px] text-slate-500 uppercase tracking-wide">Total Pengunjung</div>
+                    <div id="statVisitors" class="text-xl font-black text-emerald-300 mt-1">—</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">unik sejak awal</div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-2.5 text-left">
-                    <div class="bg-white/[0.03]   p-3 rounded-xl">
-                        <div class="text-[10px] text-slate-500 uppercase tracking-wide">Room of Faith</div>
+                    <div class="bg-white/[0.03] p-3 rounded-xl">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wide">Pengakuan</div>
                         <div id="statFeedsCount" class="text-sm font-semibold text-white mt-1">—</div>
                         <div id="statFeedsEngagement" class="text-[11px] text-slate-400 mt-0.5">—</div>
                     </div>
-                    <div class="bg-white/[0.03]   p-3 rounded-xl">
+                    <div class="bg-white/[0.03] p-3 rounded-xl">
                         <div class="text-[10px] text-slate-500 uppercase tracking-wide">Blackjack</div>
-                        <div id="statBlackjackTop5" class="text-sm font-semibold text-amber-300/90 mt-1">—</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">Total Top 5 Skor</div>
+                        <div id="statBlackjackTotal" class="text-sm font-semibold text-amber-300/90 mt-1">—</div>
+                        <div id="statBlackjackBest" class="text-[11px] text-slate-400 mt-0.5">—</div>
                     </div>
                 </div>
             </div>

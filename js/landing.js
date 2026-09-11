@@ -55,9 +55,33 @@ function startTimer() {
 function resetTimer() { clearInterval(slideInterval); startTimer(); }
 startTimer();
 
+// --- STATISTIK PENGUNJUNG ---
+// Hanya halaman landing yang mencatat kunjungan (permintaan pemilik situs).
+// Server yang menentukan unik/tidak (hash IP), jadi panggilan berulang aman;
+// flag sesi dipakai supaya tidak menembak RPC tiap kali halaman dimuat ulang.
+const VISIT_FLAG = 'pdftv_visit_logged';
+
+async function recordVisit() {
+    try {
+        if (sessionStorage.getItem(VISIT_FLAG)) return;
+    } catch (e) {
+        // sessionStorage diblokir: lanjut saja, server yang dedup
+    }
+
+    try {
+        const { error } = await supabaseClient.rpc('record_visit');
+        if (error) {
+            console.warn('Gagal mencatat kunjungan:', rpcErrorMessage(error));
+            return;
+        }
+        try { sessionStorage.setItem(VISIT_FLAG, '1'); } catch (e) { /* abaikan */ }
+    } catch (err) {
+        console.warn('Gagal mencatat kunjungan:', err);
+    }
+}
+
 // --- INIT HALAMAN LANDING ---
-// Statistik dihitung dari data feeds (diambil lewat feeds.js), tanpa realtime.
 window.addEventListener('DOMContentLoaded', () => {
-    if (typeof loadFeedsForStats === 'function') loadFeedsForStats();
-    if (typeof updateBlackjackTop5Stats === 'function') updateBlackjackTop5Stats();
+    recordVisit();
+    if (typeof loadPlatformStats === 'function') loadPlatformStats();
 });

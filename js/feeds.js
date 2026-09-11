@@ -93,27 +93,6 @@ function normalizeItem(item) {
 
 // ── Fetch & Realtime ──────────────────────────────────────────
 
-// Ambil data feeds TANPA merender (dipakai halaman landing untuk statistik).
-// Tidak berlangganan realtime — landing tidak memerlukannya.
-async function loadFeedsForStats() {
-    try {
-        const { data, error } = await supabaseClient
-            .from(FEEDS_TABLE)
-            .select('*')
-            .order('id', { ascending: false });
-        if (error) throw error;
-        feedsData = (data || []).map(normalizeItem);
-    } catch (err) {
-        console.error('Gagal memuat statistik feeds:', err);
-        if (typeof INITIAL_FEEDS_DATA !== 'undefined' && INITIAL_FEEDS_DATA.length > 0) {
-            feedsData = INITIAL_FEEDS_DATA.map(normalizeItem);
-        } else {
-            return;
-        }
-    }
-    updateHomeStatsUI();
-}
-
 async function fetchFeeds() {
     const container = document.getElementById('feedsListContainer');
     if (!container) return;
@@ -165,7 +144,6 @@ async function fetchFeeds() {
     feedsData = (data || []).map(normalizeItem);
     renderFeeds();
     setRefreshBtnLoading(false);
-    updateBlackjackTop5Stats();
     startTimeRefresh();
 
     // Pasang Realtime Subscription (hanya sekali)
@@ -286,7 +264,6 @@ function handleFeedSearch(e) {
 
 // ── Render ────────────────────────────────────────────────────
 function renderFeeds() {
-    updateHomeStatsUI();
     const container = document.getElementById('feedsListContainer');
     if (!container) return;
 
@@ -605,40 +582,32 @@ function formatTimeAgo(timestamp) {
 }
 
 // ── Platform Stats ────────────────────────────────────────────
-function updateHomeStatsUI() {
-    const totalPosts = feedsData.length;
-    let totalUpvotes = 0;
-    let totalComments = 0;
-    feedsData.forEach(item => {
-        totalUpvotes += Number(item.upvotes || 0);
-        totalComments += Array.isArray(item.comments) ? item.comments.length : 0;
-    });
+// Semua angka (pengunjung, pengakuan, upvote, komentar, skor blackjack)
+// diambil dari SATU RPC supaya hemat round-trip dan angkanya konsisten.
+const STAT_IDS = ['statVisitors', 'statFeedsCount', 'statFeedsEngagement',
+                  'statBlackjackTotal', 'statBlackjackBest'];
 
-    const countEl = document.getElementById('statFeedsCount');
-    const engEl = document.getElementById('statFeedsEngagement');
-    if (countEl) countEl.innerText = `${totalPosts} Pengakuan`;
-    if (engEl) engEl.innerText = `${totalUpvotes} Upvote · ${totalComments} Komentar`;
+function setStatText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
 }
 
-async function updateBlackjackTop5Stats() {
-    const statEl = document.getElementById('statBlackjackTop5');
-    if (!statEl) return;
+async function loadPlatformStats() {
     try {
-        const { data, error } = await supabaseClient
-            .from('PDFTV Blackjack Leaderboard')
-            .select('streak_count')
-            .order('streak_count', { ascending: false })
-            .limit(5);
-
+        const { data, error } = await supabaseClient.rpc('get_platform_stats');
         if (error) throw error;
-        let sum = 0;
-        if (data && data.length > 0) {
-            sum = data.reduce((acc, curr) => acc + Number(curr.streak_count || 0), 0);
-        }
-        statEl.innerText = `$${sum.toLocaleString()} 💵`;
+
+        const s = data || {};
+        const n = (v) => Number(v || 0).toLocaleString('id-ID');
+
+        setStatText('statVisitors', n(s.visitors));
+        setStatText('statFeedsCount', `${n(s.confessions)} Pengakuan`);
+        setStatText('statFeedsEngagement', `${n(s.upvotes)} Upvote · ${n(s.comments)} Komentar`);
+        setStatText('statBlackjackTotal', `$${n(s.blackjack_total)} 💵`);
+        setStatText('statBlackjackBest', `Rekor $${n(s.blackjack_best)}`);
     } catch (err) {
-        console.warn('Failed to load blackjack top 5 stats:', err);
-        statEl.innerText = '$0 💵';
+        console.warn('Gagal memuat statistik platform:', rpcErrorMessage(err));
+        STAT_IDS.forEach(id => setStatText(id, '—'));
     }
 }
 
