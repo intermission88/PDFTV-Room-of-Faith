@@ -1,0 +1,8 @@
+# Repo ini dipakai dari macOS dan Windows. Tanpa aturan ini, Windows Git
+# (core.autocrlf) bisa mengubah line ending dan membuat diff satu file penuh
+# hanya karena CRLF/LF.
+* text=auto eol=lf
+
+# Biner: jangan dinormalisasi
+*.webp binary
+*.png binary

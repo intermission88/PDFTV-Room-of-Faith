@@ -161,6 +161,29 @@ SELECT role, updated_at FROM private.admin_credentials;
 
 ---
 
+## 🔄 Kerja dari 2 device
+
+Repo ini dikerjakan bergantian dari macOS dan Windows, keduanya sudah punya clone. Aturannya sederhana: **selalu tarik dulu sebelum mulai, kirim setelah selesai.**
+
+```bash
+git pull --rebase          # sebelum mulai kerja
+# ...kerjakan perubahan...
+git add <file> && git commit -m "..." && git push
+```
+
+Tanpa `pull` di awal, push akan ditolak ketika device lain sudah mengirim perubahan lebih dulu. `watch-and-push.ps1` (Windows) sudah melakukan pull-otomatis sebelum push, jadi kalau watcher itu menyala, perubahan file langsung tersinkron.
+
+Yang **tidak** ikut tersinkron dan memang sebaiknya begitu:
+
+| Hal | Alasan |
+|---|---|
+| `node_modules/` (16 MB) | Regenerasi sekali per device: `cd scripts && npm ci` |
+| `.commandcode/` (catatan belajar agent) | Lokal per device dan pernah memuat kredensial — jangan pernah di-commit. Aturan penting taruh di `AGENTS.md` |
+| `private-seed.local.sql` | Sekali pakai (password sudah masuk Supabase), tidak perlu disalin |
+| `~/.commandcode/auth.json` | Login Command Code per device — login sendiri di setiap mesin |
+
+---
+
 ## 🌐 Deploy
 
 Repositori ini dideploy sebagai situs statis melalui **Vercel** di `https://pdftv.vercel.app/`. Cukup push ke `main`, atau gunakan `watch-and-push.ps1` yang otomatis commit dan push setiap kali ada perubahan file.

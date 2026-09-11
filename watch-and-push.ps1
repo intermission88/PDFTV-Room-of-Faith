@@ -55,7 +55,21 @@ $action = {
 
             $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
             & $gitPath commit -m "Auto-update: $timestamp"
+
+            # Repo ini dipakai dari 2 device (macOS + Windows). Tanpa pull dulu,
+            # push akan ditolak setiap kali device lain sudah push lebih dulu,
+            # dan commit-nya nyangkut belum terkirim.
+            & $gitPath pull --rebase --autostash origin main
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "Rebase gagal (kemungkinan konflik). Commit lokal sudah dibuat, selesaikan manual lalu push." -ForegroundColor Red
+                return
+            }
+
             & $gitPath push origin main
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "Push gagal. Periksa 'git status' dan 'git log origin/main' sebelum mencoba lagi." -ForegroundColor Red
+                return
+            }
             Write-Host "Changes pushed to GitHub at $timestamp" -ForegroundColor Green
         }
     }
