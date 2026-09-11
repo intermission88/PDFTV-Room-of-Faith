@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAMAK LORNA · Room of Faith</title>
+    <meta name="description" content="Admin pe kpala so mcm lolok">
+    <link rel="canonical" href="https://pdftv.vercel.app/feeds/p/3/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="MAMAK LORNA · Room of Faith">
+    <meta property="og:description" content="Admin pe kpala so mcm lolok">
+    <meta property="og:url" content="https://pdftv.vercel.app/feeds/p/3/">
+    <meta property="og:image" content="https://pdftv.vercel.app/assets/og/3.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="MAMAK LORNA">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="post-id" content="3">
+    <meta name="theme-color" content="#030a06">
+    <link rel="icon" type="image/webp" href="../../../assets/PDFTV_favicon.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,800;1,400&family=Space+Grotesk:wght@500;700;900&family=Silkscreen:wght@400;700&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../../../css/style.css">
+</head>
+<body class="scrollbar-hide min-h-screen flex flex-col justify-between pb-20">
+    <!-- Toast Notification -->
+    <div id="toast" role="status" aria-live="polite" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-white text-black text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl opacity-0 pointer-events-none   whitespace-nowrap">
+        ✨ Notifikasi
+    </div>
+
+    <!-- TOP HEADER WITH BGM TOGGLE & BURGER MENU -->
+    <nav class="fixed top-0 w-full z-40 bg-[#030a06]/95 backdrop-blur-xl border-b border-white/[0.06] transition-all py-2.5">
+        <div class="max-w-md mx-auto px-4 flex justify-between items-center relative">
+            <!-- BRAND LOGO & TITLE -->
+            <a href="../../../" class="flex items-center gap-2 active:scale-95 transition">
+                <img src="../../../assets/PDFTV-white.webp" alt="PDFTV Logo" class="h-4 sm:h-5 w-auto">
+                <span class="text-[10px] sm:text-xs font-black tracking-wider text-white uppercase font-mono-custom   pl-2">Experience</span>
+            </a>
+
+            <div class="flex items-center gap-2">
+                <!-- BGM TOGGLE BUTTON (ICON ONLY) -->
+                <button id="btnBgmToggle" onclick="toggleBGM()" title="Toggle BGM" aria-label="Musik latar" aria-pressed="false" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10   text-slate-400 hover:text-white transition active:scale-95 flex items-center justify-center">
+                    <span id="bgmIcon" class="text-sm" aria-hidden="true">🎵</span>
+                </button>
+
+                <!-- BURGER MENU BUTTON -->
+                <button id="btnBurgerMenu" onclick="toggleBurgerMenu()" title="Open Menu" aria-label="Menu" aria-expanded="false" aria-controls="burgerMenuDropdown" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20   text-white transition active:scale-95 flex items-center justify-center">
+                    <svg class="w-4 h-4 fill-current" aria-hidden="true" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M3 6C3 5.44772 3.44772 5 4 5H20C20.5523 5 21 5.44772 21 6C21 6.55228 20.5523 7 20 7H4C3.44772 7 3 6.55228 3 6ZM3 12C3 11.4477 3.44772 11 4 11H20C20.5523 11 21 11.4477 21 12C21 12.5523 20.5523 13 20 13H4C3.44772 13 3 12.5523 3 12ZM3 18C3 17.4477 3.44772 17 4 17H20C20.5523 17 21 17.4477 21 18C21 18.5523 20.5523 19 20 19H4C3.44772 19 3 18.5523 3 18Z" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- BURGER MENU DROPDOWN (EXPANDS DOWNWARD) -->
+            <div id="burgerMenuDropdown" class="hidden absolute top-11 right-4 w-60 glass   rounded-2xl shadow-2xl p-2 space-y-1.5 z-50 bg-[#030a06]/95 backdrop-blur-2xl">
+                <div class="px-2 py-1 text-[10px] font-mono-custom font-bold text-slate-400 uppercase tracking-wider   flex items-center justify-between">
+                    <span>⚡ Quick Menu</span>
+                    <span id="burgerAdminBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300">Guest</span>
+                </div>
+
+                <button onclick="toggleBurgerMenu(false); toggleAdminModal(true);" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs font-bold text-white font-mono-custom flex items-center justify-between transition">
+                    <span class="flex items-center gap-2">🔒 Admin Panel</span>
+                    <span class="text-[10px] text-amber-400">Login ➔</span>
+                </button>
+
+                <div id="burgerAdminActions" class="hidden space-y-1 pt-1  ">
+                    <button onclick="toggleBurgerMenu(false); handleAdminLogout();" class="w-full text-left p-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-400 font-mono-custom flex items-center gap-2 transition">
+                        <span>🚪 Logout Admin / Mod</span>
+                    </button>
+                </div>
+
+                <div class="pt-1   space-y-1">
+                    <a href="../../../" onclick="toggleBurgerMenu(false)" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs text-slate-300 font-mono-custom flex items-center gap-2 transition">
+                        <span>🏠 Home</span>
+                    </a>
+                    <a href="../../" onclick="toggleBurgerMenu(false)" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs text-slate-300 font-mono-custom flex items-center gap-2 transition">
+                        <span>💬 Feeds (Room of Faith)</span>
+                    </a>
+                    <a href="../../../arcade/" onclick="toggleBurgerMenu(false)" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs text-slate-300 font-mono-custom flex items-center gap-2 transition">
+                        <span>🎰 Arcade (Balatro)</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BOTTOM NAVBAR -->
+    <div class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-4">
+        <div class="glass p-1 rounded-full   flex justify-between items-center shadow-2xl text-[10px] font-bold tracking-wider uppercase">
+            <a href="../../../" class="flex-1 py-1.5 rounded-full text-slate-400 hover:text-white transition-all text-center">HOME</a>
+            <a href="../../" aria-current="page" class="flex-1 py-1.5 rounded-full text-white bg-white/10 transition-all text-center">FEEDS</a>
+            <a href="../../../arcade/" class="flex-1 py-1.5 rounded-full text-slate-400 hover:text-white transition-all text-center">ARCADE</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="px-3 pb-8 max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
+        <div class="space-y-4 pt-20 pb-8 text-left">
+
+            <!-- KEMBALI KE DAFTAR -->
+            <a href="../../" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition">
+                <svg class="w-3.5 h-3.5" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                <span>Kembali ke Room of Faith</span>
+            </a>
+
+            <!-- POST + SELURUH KOMENTAR (dirender post.js) -->
+            <div id="postContainer" class="space-y-4">
+                <div class="skeleton-card p-4 space-y-2.5">
+                    <div class="skeleton-bar w-24 h-3"></div>
+                    <div class="skeleton-bar w-full h-3"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- SCRIPT ENGINE LOGIC -->
+    <script src="../../../js/feeds-data.js"></script>
+    <script src="../../../js/core.js"></script>
+    <script src="../../../js/feeds.js"></script>
+    <script src="../../../js/post.js"></script>
+</body>
+</html>
