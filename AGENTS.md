@@ -1,49 +1,41 @@
 # PDFTV-Room-of-Faith
 
-Website PDFTV (Room of Faith) — deploy via Vercel (multipage) di `https://pdftv.vercel.app/`.
+Situs statis, live di **https://pdftv.vercel.app/** (multipage, tanpa build step). GitHub Pages **tidak** dipakai — jangan tulis `intermission88.github.io` ke halaman: domain itu 404 dan preview share WhatsApp rusak.
 
-- GitHub Pages **tidak** dipakai (`has_pages: false`). Jangan pernah menulis URL `intermission88.github.io` ke halaman: domain itu 404, dan preview share WhatsApp akan tampil sebagai teks tanpa gambar.
-- Origin situs untuk tag absolut ada di `SITE_ORIGIN` (`scripts/prerender-posts.mjs`, di-override workflow lewat env). Kalau domain berubah, ubah di kedua tempat lalu jalankan ulang pre-render.
+## Hemat context (baca dulu)
+- **Jangan baca**: `feeds/p/<angka>/` (43 halaman hasil pre-render — turunan, bukan sumber), `assets/og/` (35 PNG), `assets/*.webp` (biner), `scripts/node_modules/` (16 MB), `scripts/package-lock.json`. Cukup `glob`/`ls` untuk memastikan keberadaannya.
+- Yang diedit hanya `feeds/p/index.html` (template, 125 baris). Halaman berangka di dalam `feeds/p/` ditimpa `scripts/prerender-posts.mjs` — jangan disentuh.
+- `js/arcade.js` (~1200 baris), `js/feeds.js` (~870), `js/core.js` (~790): **grep dulu, baru `read` dengan offset/limit** — jangan pernah dibaca utuh.
+- Edit presisi (`edit`) lebih baik daripada menulis ulang file. Ukuran file cek cepat dengan `wc -l`.
 
-**Halaman**
-- `index.html` — landing (baris ~220). `feeds/index.html` — Room of Faith. `feeds/p/index.html` — detail satu post (template). `arcade/index.html` — Blackjack Arcade.
-- `feeds/p/<id>/index.html` — **hasil pre-render otomatis** (tag Open Graph berisi isi post). Jangan diedit manual; skrip `scripts/prerender-posts.mjs` akan menimpanya.
-- Halaman di dalam folder memakai path relatif `../` untuk aset/script. `feeds/p/` ada dua tingkat, jadi asetnya `../../` sementara tautan nav: home `../../`, feeds `../`, arcade `../../arcade/`. Jangan pakai path absolut (`/js/...`) agar halaman tetap jalan dari kedalaman folder mana pun.
-- Nav (header + bottom nav) sengaja diduplikasi di tiap halaman agar tampil instan tanpa JS; tab aktif ditandai `aria-current="page"`. Modal admin disuntik dari `core.js`, tidak ditulis di HTML.
+## Di mana harus ubah
+| Kebutuhan | File |
+|---|---|
+| Landing (manifesto, slider, kartu, statistik) | `index.html` + `js/landing.js` + `css/style.css` |
+| Feed / komentar / upvote / moderasi | `js/feeds.js` |
+| Halaman detail post | `js/post.js` + `feeds/p/index.html` |
+| Game / leaderboard / cheat | `js/arcade.js` + `arcade/index.html` |
+| Nav, header, bottom nav | **keempat** HTML (sengaja diduplikasi agar tampil instan tanpa JS) |
+| Domain absolut / tag Open Graph | `scripts/prerender-posts.mjs` **dan** env `SITE_ORIGIN` di `.github/workflows/prerender-posts.yml` **dan** `404.html` |
+| Logika bersama (modal a11y, audio, login, toast) | `js/core.js` |
+| Skema / RPC Supabase | `seed_feeds.sql` lalu `supabase_upgrade.sql` |
 
-**Preview share (Open Graph)**
-- WhatsApp/Facebook tidak menjalankan JS, jadi tag OG harus ada di HTML yang dikirim server. Itu sebabnya ada pre-render.
-- `.github/workflows/prerender-posts.yml` (cron 10 menit + manual) menjalankan `scripts/prerender-posts.mjs`, lalu commit `feeds/p/<id>/` dan `assets/og/<id>.png`.
-- Post NSFW **tidak pernah** menulis isi ke HTML/PNG; pakai `assets/og/fallback.png`.
-- `404.html` mengalihkan `/feeds/p/<id>/` yang belum ter-generate ke `?id=<id>`.
-- Skrip mengukur ulang hasil render untuk mendeteksi teks meluber (warning, bukan error).
-- **PNG hanya boleh digenerate CI.** macOS tidak punya DejaVu Sans (font yang dipakai render di runner Ubuntu), jadi hasil run lokal selalu berbeda byte-nya dan bikin commit bolak-balik. Jangan commit PNG hasil run lokal; kembalikan dengan `git checkout -- assets/og/`. Perubahan HTML (`feeds/p/`) aman di-commit karena tidak bergantung font.
+## Path & urutan script
+- Pakai path relatif, jangan absolut (`/js/...`). `feeds/p/` **dua tingkat**: asetnya `../../`, tautan nav home `../../`, feeds `../`, arcade `../../arcade/`.
+- Urutan `<script>` penting: `feeds-data.js` → `core.js` (menyediakan `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`) → `feeds.js` → lalu `landing.js` (landing; jangan dimuat tanpa `#slider`) / `post.js` (detail) / `arcade.js` (arcade, tanpa `feeds.js`).
+- Modal admin disuntik dari `core.js`; observer a11y didaftarkan **setelah** injeksi.
 
-**Script (urutan penting)**
-- Landing: `js/feeds-data.js` → `js/core.js` → `js/feeds.js` → `js/landing.js`.
-- Feeds: `js/feeds-data.js` → `js/core.js` → `js/feeds.js`.
-- Detail post: `js/feeds-data.js` → `js/core.js` → `js/feeds.js` → `js/post.js`.
-- Arcade: `js/core.js` → `js/arcade.js`.
-- `js/core.js` — fondasi bersama: konfigurasi Supabase, `SITE_ROOT`/`buildPostUrl`, haptic, audio/BGM/SFX, toast, manajer modal a11y, login admin, `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`, persistensi sesi.
-- `js/feeds.js` — Room of Faith (fetch, render, komentar, upvote, moderasi). Lapisan API bersama `fetchFeedById`/`sendUpvote`/`sendComment` dipakai juga oleh `js/post.js`.
-- `js/post.js` — halaman detail: render post + seluruh komentar, upvote, `sharePost()`.
-- `js/landing.js` — typewriter + slider. Hanya landing. Jangan dimuat di halaman tanpa `#slider`.
-- `js/arcade.js` — gameplay, leaderboard, cheat, persistensi run. Hanya arcade.
+## Link post, state, data
+- URL share `feeds/p/<id>/` (dibuat `buildPostUrl()` dari lokasi `core.js`). Template `?id=<id>` tetap hidup sebagai cadangan yang diarahkan `404.html`. Drawer komentar inline sudah dihapus — jangan dihidupkan lagi.
+- `sessionStorage`: `pdftv_run_v1` (run), `pdftv_session_v1` (login admin/moderator), `pdftv_bgm_on`. Run disimpan `saveRun()` (+event `pagehide`), dipulihkan `restoreRun()`.
+- **Semua penulisan lewat RPC** — tidak ada insert/update/delete langsung dari client. Password admin/moderator tidak ada di repo; setel via `*.local.sql` (gitignored) memakai `private.set_credential`; jangan tulis nilai asli ke doc/README.
 
-**Link post**
-- URL: `feeds/p/?id=<id post>`. `buildPostUrl()` menghitung dari lokasi `core.js` supaya kedalaman folder tidak salah.
-- Konten kartu di daftar feed adalah tautan ke halaman detail. Drawer komentar inline sudah dihapus — jangan dihidupkan lagi.
+## Preview share (Open Graph)
+- WhatsApp/Facebook tidak menjalankan JS, jadi tag OG harus ada di HTML yang dikirim server → itu sebabnya ada pre-render.
+- CI `.github/workflows/prerender-posts.yml` (cron 10 menit + manual) menjalankan `scripts/prerender-posts.mjs`, lalu commit `feeds/p/<id>/` + `assets/og/<id>.png`.
+- Post NSFW **tidak pernah** menulis isi ke HTML/PNG (pakai `assets/og/fallback.png`). Skrip mengukur ulang hasil render untuk deteksi teks meluber (warning, bukan error).
+- **PNG hanya boleh digenerate CI.** macOS tidak punya DejaVu Sans (font runner Ubuntu) → hasil run lokal selalu beda byte dan bikin commit bolak-balik. Setelah run lokal: `git checkout -- assets/og/`. HTML `feeds/p/` aman di-commit (tidak bergantung font).
 
-**State lintas halaman (reload penuh)**
-- `sessionStorage`: `pdftv_run_v1` (run blackjack), `pdftv_session_v1` (login admin/moderator), `pdftv_bgm_on` (preferensi BGM).
-- Run disimpan via `saveRun()` (dipanggil di `startNewGame`/`endRound` + event `pagehide`), dipulihkan via `restoreRun()`.
-
-**Data & keamanan**
-- Semua penulisan ke Supabase lewat RPC (tidak ada insert/update/delete langsung dari client). Skema: `seed_feeds.sql` lalu `supabase_upgrade.sql`.
-- Password admin/moderator tidak ada di repo; setel lewat `*.local.sql` (gitignored) memakai `private.set_credential`.
-
-**Lain-lain**
-- `assets/` — gambar biner (`.webp`), jangan dibaca, cukup `glob`.
-- Sinkron ke GitHub: `watch-and-push.ps1` (auto commit + push, allowlist eksplisit + pemindai rahasia).
-- Edit presisi (`edit`) selalu lebih baik daripada menulis ulang file.
-- Jangan menjalankan `watch-and-push.ps1` dari sesi opencode — itu tugas user.
+## Lain-lain
+- `watch-and-push.ps1` (auto commit + push, allowlist + pemindai rahasia): **jangan dijalankan dari sesi agent** — itu tugas user.
+- Env: macOS, `node`/`npm` tidak ada di PATH shell (pakai `/opt/homebrew/opt/node/bin/node`); tanpa Postgres/Docker/PowerShell → SQL & `.ps1` divalidasi statis, eksekusi akhir di sisi user.
