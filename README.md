@@ -184,6 +184,39 @@ Yang **tidak** ikut tersinkron dan memang sebaiknya begitu:
 
 ---
 
+## ⏰ Menjaga Supabase tetap aktif
+
+Supabase free tier menjeda proyek yang tidak ada aktivitas API selama ~7 hari. Proyek yang dijeda harus di-resume manual dari dashboard, dan selama itu situs tidak bisa baca/tulis.
+
+Dua lapis penjagaan:
+
+| Lapis | Apa | Kenapa |
+|---|---|---|
+| 1 | `.github/workflows/supabase-keepalive.yml` — menembak `get_platform_stats()` tiap 6 jam | Tanpa dependensi (hanya `curl`), jadi tidak bisa gagal karena `npm ci`/sharp. Kalau ping gagal, job sengaja exit non-zero supaya GitHub mengirim notifikasi |
+| 2 | Pinger eksternal (disarankan) | Lihat peringatan di bawah |
+
+Sebenarnya workflow pre-render (`*/10 * * * *`) juga sudah menembak Supabase tiap 10 menit. Tapi workflow itu butuh `npm ci` + sharp, jadi kalau langkah itu gagal, job mati sebelum sempat menyentuh database. Itu sebabnya lapis 1 dibuat terpisah dan sengaja dibuat sesederhana mungkin.
+
+> **Risiko yang tidak bisa ditutup oleh GitHub saja:** GitHub menonaktifkan workflow terjadwal otomatis setelah **60 hari** repo tanpa aktivitas. Kalau situs sedang sepi (tidak ada posting, tidak ada commit), jadwal mati → tidak ada lagi yang menembak Supabase → proyek bisa dijeda.
+>
+> Penawarnya: daftarkan pinger eksternal gratis yang tidak bergantung pada GitHub, mis. [cron-job.org](https://cron-job.org) atau [UptimeRobot](https://uptimerobot.com), dijadwalkan harian. Pakai URL ini (kunci di query string supaya bisa dipakai layanan yang tidak mendukung header kustom, dan endpoint ini mengembalikan angka statistik sebagai bukti query benar-benar jalan):
+>
+> ```
+> https://fhpyvnbsreoaiaeqfkvk.supabase.co/rest/v1/rpc/get_platform_stats?apikey=sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky
+> ```
+>
+> Kunci ini memang publik (dikirim ke setiap browser lewat `js/core.js`) dan RLS membatasi apa yang bisa dibaca, jadi menaruhnya di URL pinger aman.
+
+Cara manual mengecek proyek masih hidup (sama seperti URL pinger di atas):
+
+```bash
+curl -sS -o /dev/null -w '%{http_code}\n' \
+  "https://fhpyvnbsreoaiaeqfkvk.supabase.co/rest/v1/rpc/get_platform_stats?apikey=<publishable key>"
+# 200 = hidup, 503 = sedang dijeda
+```
+
+---
+
 ## 🌐 Deploy
 
 Repositori ini dideploy sebagai situs statis melalui **Vercel** di `https://pdftv.vercel.app/`. Cukup push ke `main`, atau gunakan `watch-and-push.ps1` yang otomatis commit dan push setiap kali ada perubahan file.

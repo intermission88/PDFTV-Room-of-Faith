@@ -1,0 +1,78 @@
+name: Supabase keepalive
+
+# Supabase free tier menjeda proyek yang tidak ada aktivitas API selama
+# ~7 hari. Workflow ini menembak database secara berkala supaya proyek
+# tidak pernah masuk hitungan idle.
+#
+# Sengaja DIPISAH dari prerender-posts.yml dan TANPA dependensi:
+# - prerender butuh `npm ci` + sharp; kalau langkah itu gagal, job mati
+#   sebelum sempat menyentuh Supabase.
+# - Workflow ini hanya `curl`, jadi jauh lebih kecil kemungkinan gagalnya.
+#
+# Kalau ping gagal, job sengaja exit non-zero supaya GitHub mengirim
+# notifikasi — sekaligus berfungsi sebagai alarm proyek terjeda.
+
+on:
+  schedule:
+    # Tiap 6 jam. Menit digeser dari :00 karena jadwal GitHub paling padat
+    # di jam bulat dan bisa tertunda lama.
+    - cron: '23 1,7,13,19 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ping database Supabase
+        run: |
+          set -euo pipefail
+
+          # Ambil konfigurasi dari sumber yang sama dengan situs, supaya
+          # tidak ada nilai yang perlu disalin manual kalau berubah.
+          SUPABASE_URL=$(grep -oE "SUPABASE_URL = '[^']+'" js/core.js | head -1 | cut -d"'" -f2)
+          SUPABASE_KEY=$(grep -oE "SUPABASE_KEY = '[^']+'" js/core.js | head -1 | cut -d"'" -f2)
+
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "::error::SUPABASE_URL / SUPABASE_KEY tidak ditemukan di js/core.js"
+            exit 1
+          fi
+
+          echo "Menembak $SUPABASE_URL ..."
+
+          # Hanya status HTTP yang dicetak; kunci tidak pernah masuk log.
+          # `|| CODE="000"` supaya kegagalan curl (DNS/timeout) tetap tertangkap
+          # dan bisa dilaporkan dengan pesan yang jelas, bukan mati mendadak.
+          CODE=$(curl -sS --max-time 30 -o /tmp/stats.json -w '%{http_code}' \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/get_platform_stats" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}') || CODE="000"
+
+          echo "HTTP $CODE"
+
+          if [ "$CODE" = "503" ]; then
+            echo "::error::Supabase menjawab 503 — proyek kemungkinan DIJEDA karena idle. Buka dashboard Supabase dan resume, lalu jalankan workflow ini lagi."
+            exit 1
+          fi
+
+          if [ "$CODE" != "200" ]; then
+            echo "::error::Supabase menjawab HTTP $CODE (bukan 503). Cek apakah get_platform_stats sudah dibuat (jalankan supabase_upgrade.sql) dan kunci di js/core.js masih benar."
+            exit 1
+          fi
+
+          # RPC ini menjalankan COUNT pada beberapa tabel, jadi benar-benar
+          # ada query ke Postgres (bukan cuma singgah di gateway).
+          echo "Respons:"
+          cat /tmp/stats.json
+          echo ""
+          echo "Ping berhasil."

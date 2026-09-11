@@ -38,6 +38,7 @@ Situs statis, live di **https://pdftv.vercel.app/** (multipage, tanpa build step
 - **PNG hanya boleh digenerate CI.** macOS tidak punya DejaVu Sans (font runner Ubuntu) → hasil run lokal selalu beda byte dan bikin commit bolak-balik. Setelah run lokal: `git checkout -- assets/og/`. HTML `feeds/p/` aman di-commit (tidak bergantung font).
 
 ## Lain-lain
+- **Supabase dijeda kalau tidak ada aktivitas ~7 hari** (free tier). Dua penjaga: `.github/workflows/supabase-keepalive.yml` (tiap 6 jam, hanya `curl`, gagal = notifikasi) dan workflow pre-render yang juga menembak REST tiap 10 menit. Celah yang belum tertutup: GitHub menonaktifkan workflow terjadwal setelah 60 hari repo tanpa aktivitas → lihat README untuk pinger eksternal.
 - Cara kerja: user berbahasa Indonesia → balas dalam Bahasa Indonesia (termasuk artifact seperti README/laporan). Selesai kerja langsung commit + push ke `main` (tanpa branch/PR), dan jangan tinggalkan perubahan menggantung.
 - Repo dipakai dari **2 device** (macOS + Windows, keduanya sudah clone). Windows menjalankan `watch-and-push.ps1` (auto commit + push, allowlist + pemindai rahasia): **jangan dijalankan dari sesi agent** — itu tugas user. Selalu `git pull --rebase` sebelum mulai kerja; jangan tinggalkan perubahan menggantung antar sesi.
 - `.commandcode/` (catatan belajar agent) bersifat **lokal per device**, di-gitignore, dan pernah memuat kredensial asli → jangan pernah di-commit. Aturan lintas-device yang penting taruh di AGENTS.md ini, bukan di sana.
