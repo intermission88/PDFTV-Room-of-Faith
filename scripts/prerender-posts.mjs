@@ -13,7 +13,7 @@
 // Jalankan: node scripts/prerender-posts.mjs [--limit=N]
 // ============================================================
 
-import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rm, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -274,6 +274,36 @@ async function cardOverflows(pngBuffer) {
     return bright > 0;
 }
 
+// ── Bersihkan hasil untuk post yang sudah dihapus ────────────
+// Link share lama harus berhenti menampilkan konten yang sudah dihapus,
+// jadi halaman dan kartunya ikut dibuang. `fallback.png` tidak pernah dihapus.
+async function removeOrphans(liveIds) {
+    let removed = 0;
+
+    if (existsSync(PAGE_DIR)) {
+        for (const entry of await readdir(PAGE_DIR, { withFileTypes: true })) {
+            if (!entry.isDirectory() || !/^\d+$/.test(entry.name)) continue;
+            if (liveIds.has(entry.name)) continue;
+            await rm(path.join(PAGE_DIR, entry.name), { recursive: true });
+            console.log(`  - hapus halaman yatim: feeds/p/${entry.name}/`);
+            removed++;
+        }
+    }
+
+    if (existsSync(OG_DIR)) {
+        for (const name of await readdir(OG_DIR)) {
+            const m = name.match(/^(\d+)\.png$/);
+            if (!m) continue; // fallback.png dan berkas lain dibiarkan
+            if (liveIds.has(m[1])) continue;
+            await rm(path.join(OG_DIR, name));
+            console.log(`  - hapus kartu yatim: assets/og/${name}`);
+            removed++;
+        }
+    }
+
+    return removed;
+}
+
 // ── Main ─────────────────────────────────────────────────────
 async function main() {
     const limitArg = process.argv.find(a => a.startsWith('--limit='));
@@ -293,6 +323,7 @@ async function main() {
     console.log(`Ditemukan ${posts.length} post.`);
 
     const overflowIds = [];
+    const liveIds = new Set();
 
     // Kartu brand sebagai cadangan (dipakai post NSFW & kalau kartu gagal dibuat)
     await writeIfChanged(
@@ -311,6 +342,7 @@ async function main() {
             console.warn(`  ! lewati post dengan id tidak valid: ${JSON.stringify(post.id)}`);
             continue;
         }
+        liveIds.add(id);
         const isNsfw = post.is_nsfw === true || post.is_nsfw === 'true';
         const alias = collapse(post.alias) || 'Anonim';
         const confession = collapse(post.confession);
@@ -369,7 +401,16 @@ async function main() {
         console.warn(`PERINGATAN: ${overflowIds.length} kartu meluber: ${overflowIds.join(', ')}`);
     }
 
-    console.log(`Selesai. berubah: ${written.changed}, tetap: ${written.unchanged}, dihapus: ${written.removed}, meluber: ${overflowIds.length}`);
+    // Bersihkan hasil untuk post yang sudah tidak ada di database.
+    // Tanpa ini, link share lama tetap menampilkan konten yang sudah dihapus.
+    // HANYA dijalankan saat daftar post lengkap; dengan --limit, post di luar
+    // jendela itu akan salah dianggap yatim.
+    let orphanRemoved = 0;
+    if (!limit) {
+        orphanRemoved = await removeOrphans(liveIds);
+    }
+
+    console.log(`Selesai. berubah: ${written.changed}, tetap: ${written.unchanged}, dihapus: ${written.removed}, meluber: ${overflowIds.length}, yatim dibersihkan: ${orphanRemoved}`);
     return overflowIds.length;
 }
 
