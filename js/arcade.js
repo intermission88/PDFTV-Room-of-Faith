@@ -10,9 +10,7 @@ function cheatToggleUnlimitedConsumables() {
     const statusStr = cheatUnlimitedConsumables ? "ON" : "OFF";
     
     const txt = document.getElementById('textCheatConsumables');
-    const txtBurger = document.getElementById('textCheatConsumablesBurger');
     if (txt) txt.textContent = statusStr;
-    if (txtBurger) txtBurger.textContent = statusStr;
 
     const btn = document.getElementById('btnCheatConsumables');
     if (btn) btn.classList.toggle('bg-emerald-500/30', cheatUnlimitedConsumables);

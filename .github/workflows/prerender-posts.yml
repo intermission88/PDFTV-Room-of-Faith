@@ -33,7 +33,8 @@ jobs:
 
       - name: Install dependensi (sharp)
         working-directory: scripts
-        run: npm install --no-audit --no-fund
+        # npm ci memakai package-lock.json sehingga versi dependensi konsisten
+        run: npm ci --no-audit --no-fund
 
       - name: Jalankan pre-render
         # Harus origin tempat situs benar-benar dilayani (Vercel). Kalau diisi

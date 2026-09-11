@@ -17,6 +17,7 @@ Website PDFTV (Room of Faith) — deploy via Vercel (multipage) di `https://pdft
 - Post NSFW **tidak pernah** menulis isi ke HTML/PNG; pakai `assets/og/fallback.png`.
 - `404.html` mengalihkan `/feeds/p/<id>/` yang belum ter-generate ke `?id=<id>`.
 - Skrip mengukur ulang hasil render untuk mendeteksi teks meluber (warning, bukan error).
+- **PNG hanya boleh digenerate CI.** macOS tidak punya DejaVu Sans (font yang dipakai render di runner Ubuntu), jadi hasil run lokal selalu berbeda byte-nya dan bikin commit bolak-balik. Jangan commit PNG hasil run lokal; kembalikan dengan `git checkout -- assets/og/`. Perubahan HTML (`feeds/p/`) aman di-commit karena tidak bergantung font.
 
 **Script (urutan penting)**
 - Landing: `js/feeds-data.js` → `js/core.js` → `js/feeds.js` → `js/landing.js`.

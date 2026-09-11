@@ -95,6 +95,8 @@ node scripts/prerender-posts.mjs --limit=3  # hanya 3 terbaru
 
 Skrip hanya menulis berkas yang isinya berubah, jadi jadwal berulang tidak menghasilkan commit kosong. Kartu yang teksnya melebihi batas diukur ulang setelah render dan dilaporkan sebagai peringatan.
 
+> **Penting saat menjalankan lokal:** PNG hanya boleh digenerate oleh CI. macOS tidak memiliki font DejaVu Sans yang dipakai runner Ubuntu, sehingga hasil render lokal selalu berbeda byte-nya dan akan membuat commit bolak-balik. Setelah menjalankan skrip lokal, kembalikan gambarnya dengan `git checkout -- assets/og/`. Perubahan HTML di `feeds/p/` aman di-commit karena tidak bergantung pada font.
+
 ---
 
 ## 🚀 Menjalankan Secara Lokal

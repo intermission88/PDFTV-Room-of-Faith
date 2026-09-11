@@ -659,12 +659,6 @@ function triggerPageAnimation(targetEl) {
     targetEl.classList.add('page-transition');
 }
 
-function animateViewIn(el) {
-    el.classList.remove('view-enter');
-    void el.offsetWidth;
-    el.classList.add('view-enter');
-}
-
 function showToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     const styles = {

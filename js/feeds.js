@@ -91,22 +91,6 @@ function normalizeItem(item) {
     };
 }
 
-// ── Badge ─────────────────────────────────────────────────────
-function updateFeedSyncBadge(state) {
-    // state: 'connected' | 'realtime' | 'error' | 'loading'
-    const badge = document.getElementById('feedSyncBadge');
-    if (!badge) return;
-    const configs = {
-        loading:   { cls: 'bg-slate-500/20 border-slate-500/40 text-slate-300',  dot: 'bg-slate-400 animate-pulse', label: 'MEMUAT...' },
-        connected: { cls: 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300', dot: 'bg-emerald-400 animate-ping', label: 'SUPABASE CONNECTED' },
-        realtime:  { cls: 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300',     dot: 'bg-cyan-400 animate-ping',    label: '🔴 LIVE REALTIME' },
-        error:     { cls: 'bg-red-500/20 border-red-500/40 text-red-300',        dot: 'bg-red-400',                  label: 'GAGAL TERHUBUNG' },
-    };
-    const c = configs[state] || configs.error;
-    badge.className = `text-[10px] font-mono-custom font-bold px-2 py-0.5 rounded-full border ${c.cls} flex items-center gap-1`;
-    badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${c.dot}"></span> ${c.label}`;
-}
-
 // ── Fetch & Realtime ──────────────────────────────────────────
 
 // Ambil data feeds TANPA merender (dipakai halaman landing untuk statistik).
@@ -147,7 +131,6 @@ async function fetchFeeds() {
         </div>
     `).join('<div class="h-px bg-white/[0.06] my-4"></div>');
     setRefreshBtnLoading(true);
-    updateFeedSyncBadge('loading');
 
     // Fetch semua data dari Supabase
     const { data, error } = await supabaseClient
@@ -161,7 +144,6 @@ async function fetchFeeds() {
         // Fallback ke INITIAL_FEEDS_DATA jika tabel belum dibuat di Supabase
         if (typeof INITIAL_FEEDS_DATA !== 'undefined' && INITIAL_FEEDS_DATA.length > 0) {
             feedsData = INITIAL_FEEDS_DATA.map(normalizeItem);
-            updateFeedSyncBadge('connected');
             renderFeeds();
             return;
         }
@@ -177,12 +159,10 @@ async function fetchFeeds() {
                 </button>
             </div>
         `;
-        updateFeedSyncBadge('error');
         return;
     }
 
     feedsData = (data || []).map(normalizeItem);
-    updateFeedSyncBadge('connected');
     renderFeeds();
     setRefreshBtnLoading(false);
     updateBlackjackTop5Stats();
@@ -269,20 +249,10 @@ function subscribeToRealtimeFeeds() {
         )
         .subscribe((status) => {
             if (status === 'SUBSCRIBED') {
-                updateFeedSyncBadge('realtime');
             } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-                updateFeedSyncBadge('connected');
                 feedsRealtimeChannel = null; // reset supaya bisa reconnect
             }
         });
-}
-
-// Unsubscribe kalau user keluar dari halaman feeds
-function unsubscribeFeeds() {
-    if (feedsRealtimeChannel) {
-        supabaseClient.removeChannel(feedsRealtimeChannel);
-        feedsRealtimeChannel = null;
-    }
 }
 
 // ── Filter & Search ───────────────────────────────────────────

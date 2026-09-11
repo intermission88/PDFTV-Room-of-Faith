@@ -110,13 +110,6 @@ body {
 }
 .card-animate { animation: cardDeal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-@keyframes tensionCardDeal {
-    0% { transform: scale(1.25) translateY(-20px) rotate(5deg); box-shadow: 0 0 30px rgba(245, 158, 11, 0.8); }
-    50% { transform: scale(1.1) translateY(-10px) rotate(-3deg); }
-    100% { transform: scale(1) translateY(0) rotate(0deg); box-shadow: none; }
-}
-.tension-card-anim { animation: tensionCardDeal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
 .gold-rank {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(10, 25, 18, 0.7) 100%);
     box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
@@ -209,18 +202,6 @@ body {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.35) 0%, rgba(185, 28, 28, 0.45) 100%);
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
 }
-
-.bgm-btn-active {
-    background: rgba(16, 185, 129, 0.25) !important;
-    color: #6ee7b7 !important;
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
-}
-
-@keyframes viewIn {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.view-enter { animation: viewIn 0.35s ease-out; }
 
 @keyframes shimmer {
     0%   { background-position: -400px 0; }
