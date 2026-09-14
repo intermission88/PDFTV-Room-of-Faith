@@ -582,7 +582,8 @@ CREATE TABLE IF NOT EXISTS public."PDFTV News" (
     excerpt       TEXT,
     body          TEXT NOT NULL,
     cover_url     TEXT,
-    category      TEXT NOT NULL DEFAULT 'Berita',
+    tags          TEXT,
+    category      TEXT NOT NULL DEFAULT 'Artikel',
     author_name   TEXT NOT NULL DEFAULT 'Redaksi',
     status        TEXT NOT NULL DEFAULT 'pending',
     reject_reason TEXT,
@@ -592,6 +593,13 @@ CREATE TABLE IF NOT EXISTS public."PDFTV News" (
     CONSTRAINT news_status_chk
         CHECK (status IN ('pending', 'approved', 'rejected', 'unpublished'))
 );
+
+-- Tabel bisa saja sudah ada dari versi sebelumnya, jadi kolom & default baru
+-- dipasang lewat ALTER (idempotent) — `CREATE TABLE IF NOT EXISTS` saja tidak
+-- akan mengubah tabel yang sudah berdiri.
+-- `tags` diisi bebas oleh writer (tanpa daftar preset); pemisahnya koma.
+ALTER TABLE public."PDFTV News" ADD COLUMN IF NOT EXISTS tags TEXT;
+ALTER TABLE public."PDFTV News" ALTER COLUMN category SET DEFAULT 'Artikel';
 
 CREATE INDEX IF NOT EXISTS news_status_created_idx
     ON public."PDFTV News" (status, created_at DESC);
@@ -625,14 +633,22 @@ $$;
 -- --- Aksi writer: kirim / ubah / hapus / lihat daftar ---
 -- Artikel selalu masuk sebagai 'pending' dan baru tampil ke publik
 -- setelah disetujui CEO.
+--
+-- Menambah parameter = SIGNATURE BARU, sedangkan Postgres menyimpan versi
+-- lama sebagai overload terpisah (PostgREST lalu menolak panggilan sebagai
+-- ambigu). Jadi signature lama di-DROP dulu sebelum dibuat ulang.
+DROP FUNCTION IF EXISTS public.writer_submit_news(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT);
+DROP FUNCTION IF EXISTS public.writer_update_news(TEXT, BIGINT, TEXT, TEXT, TEXT, TEXT, TEXT);
+
 CREATE OR REPLACE FUNCTION public.writer_submit_news(
     p_pass TEXT,
     p_title TEXT,
     p_body TEXT,
     p_excerpt TEXT DEFAULT NULL,
     p_cover_url TEXT DEFAULT NULL,
-    p_category TEXT DEFAULT 'Berita',
-    p_author TEXT DEFAULT 'Redaksi'
+    p_category TEXT DEFAULT 'Artikel',
+    p_author TEXT DEFAULT 'Redaksi',
+    p_tags TEXT DEFAULT NULL
 )
 RETURNS public."PDFTV News"
 LANGUAGE plpgsql
@@ -646,6 +662,7 @@ DECLARE
     v_cover   TEXT := NULLIF(btrim(COALESCE(p_cover_url, '')), '');
     v_author  TEXT := NULLIF(btrim(COALESCE(p_author, '')), '');
     v_cat     TEXT := NULLIF(btrim(COALESCE(p_category, '')), '');
+    v_tags    TEXT := NULLIF(left(regexp_replace(btrim(COALESCE(p_tags, '')), '\s+', ' ', 'g'), 200), '');
     v_row     public."PDFTV News";
 BEGIN
     IF NOT public.verify_writer(p_pass) THEN
@@ -666,9 +683,9 @@ BEGIN
     END IF;
 
     INSERT INTO public."PDFTV News"
-        (title, body, excerpt, cover_url, category, author_name, status)
+        (title, body, excerpt, cover_url, tags, category, author_name, status)
     VALUES
-        (v_title, v_body, v_excerpt, v_cover, COALESCE(v_cat, 'Berita'),
+        (v_title, v_body, v_excerpt, v_cover, v_tags, COALESCE(v_cat, 'Artikel'),
          COALESCE(v_author, 'Redaksi'), 'pending')
     RETURNING * INTO v_row;
 
@@ -683,7 +700,8 @@ CREATE OR REPLACE FUNCTION public.writer_update_news(
     p_body TEXT,
     p_excerpt TEXT DEFAULT NULL,
     p_cover_url TEXT DEFAULT NULL,
-    p_category TEXT DEFAULT 'Berita'
+    p_category TEXT DEFAULT 'Artikel',
+    p_tags TEXT DEFAULT NULL
 )
 RETURNS VOID
 LANGUAGE plpgsql
@@ -696,6 +714,7 @@ DECLARE
     v_excerpt TEXT := NULLIF(btrim(COALESCE(p_excerpt, '')), '');
     v_cover   TEXT := NULLIF(btrim(COALESCE(p_cover_url, '')), '');
     v_cat     TEXT := NULLIF(btrim(COALESCE(p_category, '')), '');
+    v_tags    TEXT := NULLIF(left(regexp_replace(btrim(COALESCE(p_tags, '')), '\s+', ' ', 'g'), 200), '');
 BEGIN
     IF NOT public.verify_writer(p_pass) THEN
         RAISE EXCEPTION 'akses writer ditolak';
@@ -716,6 +735,7 @@ BEGIN
             body = v_body,
             excerpt = v_excerpt,
             cover_url = v_cover,
+            tags = v_tags,
             category = COALESCE(v_cat, category),
             status = 'pending',
             reject_reason = NULL,
@@ -866,8 +886,8 @@ $$;
 -- Izin eksekusi (semua fungsi di atas memverifikasi password sendiri).
 GRANT EXECUTE ON FUNCTION public.verify_writer(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.verify_ceo(TEXT) TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.writer_submit_news(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.writer_update_news(TEXT, BIGINT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.writer_submit_news(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.writer_update_news(TEXT, BIGINT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.writer_delete_news(TEXT, BIGINT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.writer_list_news(TEXT) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.ceo_list_news(TEXT, TEXT) TO anon, authenticated;

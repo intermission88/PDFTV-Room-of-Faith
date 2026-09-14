@@ -9,9 +9,10 @@
 // ============================================================
 
 const NEWS_TABLE = 'PDFTV News';
-// Kategori=chip di halaman berita + isi dropdown dashboard. Tambah/hapus di sini
-// saja; chip "Semua" selalu ada dan tidak perlu didaftarkan.
-const NEWS_CATEGORIES = ['Movies'];
+// Kategori = chip di halaman berita + isi dropdown dashboard. Tambah/hapus di
+// sini saja; chip "Semua" selalu ada dan tidak perlu didaftarkan.
+// Terpisah dari `tags`, yang diisi bebas per artikel oleh writer (tanpa preset).
+const NEWS_CATEGORIES = ['Artikel'];
 
 let newsData = [];
 let currentNewsCategory = 'all';
@@ -39,9 +40,10 @@ function normalizeNews(item) {
         title: cleanNewsText(item.title),
         excerpt: cleanNewsText(item.excerpt),
         body: String(item.body || '').replace(/\r\n?/g, '\n').trim(),
-        category: cleanNewsText(item.category) || 'Movies',
+        category: cleanNewsText(item.category) || 'Artikel',
         author_name: cleanNewsText(item.author_name) || 'Redaksi',
         cover_url: String(item.cover_url || '').trim(),
+        tags: cleanNewsText(item.tags),
     };
 }
 
@@ -70,6 +72,15 @@ function newsExcerpt(item, max) {
     const cut = raw.slice(0, max);
     const lastSpace = cut.lastIndexOf(' ');
     return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).trimEnd() + '…';
+}
+
+// Tags diisi bebas oleh writer (pemisah koma) → dipecah untuk ditampilkan.
+function newsTagList(item) {
+    return String(item.tags || '')
+        .split(/[,\n]/)
+        .map(t => t.trim().replace(/^#+/, '').trim())
+        .filter(Boolean)
+        .slice(0, 12);
 }
 
 // Isi artikel adalah input pengguna: escape DULU, baru tambahkan tag
@@ -384,6 +395,10 @@ function renderNewsDetail() {
     const container = document.getElementById('newsDetailContainer');
     if (!item || !container) return;
 
+    const tagChips = newsTagList(item)
+        .map(t => `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300">#${escapeHtml(t)}</span>`)
+        .join('');
+
     container.innerHTML = `
         <article class="rounded-2xl bg-white/[0.04] overflow-hidden text-left">
             ${item.cover_url ? `
@@ -414,6 +429,10 @@ function renderNewsDetail() {
                 ` : ''}
 
                 <div class="news-prose mt-4">${renderNewsBody(item.body)}</div>
+
+                ${tagChips ? `
+                    <div class="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-white/[0.06]">${tagChips}</div>
+                ` : ''}
             </div>
         </article>
     `;
@@ -503,7 +522,7 @@ function newsFormValue(id) {
 }
 
 function resetNewsForm() {
-    ['newsTitleInput', 'newsExcerptInput', 'newsBodyInput', 'newsCoverInput', 'newsAuthorInput']
+    ['newsTitleInput', 'newsExcerptInput', 'newsBodyInput', 'newsCoverInput', 'newsAuthorInput', 'newsTagsInput']
         .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     const category = document.getElementById('newsCategoryInput');
     if (category) category.value = NEWS_CATEGORIES[0];
@@ -559,6 +578,7 @@ async function submitNews(e) {
         p_excerpt: newsFormValue('newsExcerptInput') || null,
         p_cover_url: newsFormValue('newsCoverInput') || null,
         p_category: newsFormValue('newsCategoryInput') || NEWS_CATEGORIES[0],
+        p_tags: newsFormValue('newsTagsInput') || null,
     };
 
     const submitBtn = document.getElementById('newsSubmitBtn');
@@ -601,6 +621,7 @@ function editNews(id) {
     set('newsCoverInput', item.cover_url);
     set('newsAuthorInput', item.author_name);
     set('newsCategoryInput', item.category);
+    set('newsTagsInput', item.tags);
 
     const submitBtn = document.getElementById('newsSubmitBtn');
     if (submitBtn) submitBtn.textContent = 'Simpan Perubahan';
@@ -710,6 +731,11 @@ function renderCeoRow(item) {
                 <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${badge.cls}">${badge.label}</span>
             </div>
             <div class="text-[10px] text-slate-500 uppercase tracking-wide">${escapeHtml(item.category)} · ✍️ ${escapeHtml(item.author_name)} · ${escapeHtml(newsTimeAgo(item.created_at))}</div>
+            ${newsTagList(item).length ? `
+                <div class="flex flex-wrap gap-1.5">
+                    ${newsTagList(item).map(t => `<span class="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-400">#${escapeHtml(t)}</span>`).join('')}
+                </div>
+            ` : ''}
             ${item.cover_url ? `
                 <div class="rounded-xl overflow-hidden bg-black/30 max-h-40">
                     <img src="${escapeHtml(item.cover_url)}" alt="" class="w-full max-h-40 object-cover" loading="lazy" onerror="this.parentNode.style.display='none'">
