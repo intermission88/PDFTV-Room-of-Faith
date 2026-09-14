@@ -16,7 +16,7 @@ Situs statis, live di **https://pdftv.vercel.app/** (multipage, tanpa build step
 | Halaman detail post | `js/post.js` + `feeds/p/index.html` |
 | Game / leaderboard / cheat | `js/arcade.js` + `arcade/index.html` |
 | Berita: daftar, isi artikel, dashboard writer & CEO | `js/news.js` + `news/index.html` + `news/p/index.html` + `news/dashboard/index.html` |
-| Nav, header, bottom nav | **tujuh** HTML (sengaja diduplikasi agar tampil instan tanpa JS): `index.html`, `feeds/index.html`, `feeds/p/index.html`, `arcade/index.html`, `news/index.html`, `news/p/index.html`, `news/dashboard/index.html` |
+| Nav, header, bottom nav | **tujuh** HTML (sengaja diduplikasi agar tampil instan tanpa JS): `index.html`, `feeds/index.html`, `feeds/p/index.html`, `arcade/index.html`, `news/index.html`, `news/p/index.html`, `news/dashboard/index.html`. Urutan menu: HOME · FORUM · NEWS · ARCADE. **Menu Room of Faith berlabel "FORUM" tapi path-nya tetap `/feeds/`** — jangan diubah tanpa redirect, link post lama akan mati. |
 | Domain absolut / tag Open Graph | `scripts/prerender-posts.mjs` **dan** env `SITE_ORIGIN` di `.github/workflows/prerender-posts.yml` **dan** `404.html` |
 | Logika bersama (modal a11y, audio, login, toast) | `js/core.js` |
 | Skema / RPC Supabase | `seed_feeds.sql` lalu `supabase_upgrade.sql` (bagian 11 = News) |

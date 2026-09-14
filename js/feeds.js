@@ -833,7 +833,7 @@ window.addEventListener('DOMContentLoaded', () => {
                              : 'landing';
             if (activeView === 'feeds') {
                 fetchFeeds();
-                showToast('🔄 Feeds dimuat ulang');
+                showToast('🔄 Forum dimuat ulang');
             } else if (activeView === 'arcade' && typeof fetchLeaderboard === 'function') {
                 fetchLeaderboard();
                 showToast('🔄 Leaderboard dimuat ulang');
