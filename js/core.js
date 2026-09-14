@@ -10,6 +10,7 @@ const SUPABASE_URL = 'https://fhpyvnbsreoaiaeqfkvk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_aSPwcLUMW2y7r3nk6cpBpg_3DJH5sky';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
+const SNAKE_LEADERBOARD_TABLE = 'PDFTV Snake Leaderboard';
 
 // --- ROOT SITUS & LINK POST ---
 // Dihitung dari lokasi core.js supaya kedalaman folder tidak pernah salah hitung
@@ -101,7 +102,8 @@ const a11yModalObserver = new MutationObserver((mutations) => {
 // Penting: injeksi HARUS terjadi sebelum observer didaftarkan di bawah.
 injectSharedModals();
 
-['adminModal', 'passiveChoiceModal', 'bossRewardModal', 'dealerEncounterModal', 'scoreSubmitModal'].forEach((id) => {
+['adminModal', 'passiveChoiceModal', 'bossRewardModal', 'dealerEncounterModal', 'scoreSubmitModal',
+ 'snakeScoreSubmitModal', 'snakeRelicModal', 'snakeBossModal'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) a11yModalObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
 });
@@ -120,6 +122,7 @@ document.addEventListener('keydown', (e) => {
             // alur game mewajibkan pemain memilih salah satu opsi.
             if (top.el.id === 'adminModal') { e.preventDefault(); toggleAdminModal(false); }
             else if (top.el.id === 'scoreSubmitModal') { e.preventDefault(); closeScoreModal(); }
+            else if (top.el.id === 'snakeScoreSubmitModal') { e.preventDefault(); closeSnakeScoreModal(); }
         }
         return;
     }
@@ -296,7 +299,7 @@ function updateAdminUI() {
     if (isAdminLoggedIn) {
         if (burgerAdminBadge) {
             burgerAdminBadge.className = "text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold  ";
-            burgerAdminBadge.textContent = "ADMIN (BLACKJACK)";
+            burgerAdminBadge.textContent = "ADMIN (ARCADE)";
         }
         if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
         if (adminResetBtn) adminResetBtn.classList.remove('hidden');
@@ -334,6 +337,12 @@ function updateAdminUI() {
         if (adminResetBtn) adminResetBtn.classList.add('hidden');
         if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
     }
+    // Kontrol khusus Snake (halaman arcade saja): hanya untuk admin.
+    const snakeResetBtn = document.getElementById('adminResetSnakeLeaderboardBtn');
+    const snakeCheatPanel = document.getElementById('adminSnakeCheatPanel');
+    if (snakeResetBtn) snakeResetBtn.classList.toggle('hidden', !isAdminLoggedIn);
+    if (snakeCheatPanel) snakeCheatPanel.classList.toggle('hidden', !isAdminLoggedIn);
+
     if (typeof renderFeeds === 'function') renderFeeds();
     if (typeof renderNewsDashboards === 'function') renderNewsDashboards();
 }

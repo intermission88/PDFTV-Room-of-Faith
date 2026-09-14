@@ -379,3 +379,72 @@ body {
    hanya perlu mematikan margin blok terakhir dan sub-judul pertama. */
 .news-prose > :last-child { margin-bottom: 0; }
 .news-prose > h2:first-child { margin-top: 0; }
+
+/* ── SNAKE ROGUELITE: arena LCD, D-pad, chip relic ─────────────
+   Palet ala LCD Nokia 3310. Sel ular/apel/hazard digambar di canvas
+   (js/snake.js), jadi di sini hanya wadah dan kontrolnya.
+   Semua animasi di bawah ikut mati lewat aturan
+   prefers-reduced-motion global di atas. */
+.snake-lcd {
+    background: linear-gradient(160deg, #b6c76a 0%, #9bbc0f 55%, #8aa807 100%);
+    border: 6px solid #2f3a04;
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: inset 0 0 18px rgba(15, 56, 15, 0.55), 0 10px 30px -12px rgba(0, 0, 0, 0.8);
+}
+
+.snake-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    image-rendering: pixelated;
+    border-radius: 4px;
+    background: #9bbc0f;
+    /* Swipe di arena tidak boleh ikut men-scroll halaman. */
+    touch-action: none;
+}
+
+.snake-dpad-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.06);
+    color: #a7f3d0;
+    font-size: 16px;
+    font-weight: 800;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+    touch-action: manipulation;
+}
+.snake-dpad-btn:hover { background: rgba(255, 255, 255, 0.12); }
+.snake-dpad-btn:active { transform: scale(0.92); background: rgba(110, 231, 183, 0.25); }
+
+.snake-relic-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-family: 'Space Grotesk', monospace;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.06);
+    color: #64748b;
+}
+.snake-relic-active {
+    background: rgba(16, 185, 129, 0.18);
+    color: #6ee7b7;
+}
+
+/* Kartu pilihan relic di dalam modal (satu kartu per opsi). */
+.snake-relic-option { transition: background-color 0.2s ease, transform 0.2s ease; }
+.snake-relic-option:hover { background-color: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
+.snake-relic-option:active { transform: translateY(0) scale(0.99); }
+
+.snake-boss-pulse { animation: snakeBossPulse 1.4s ease-in-out infinite; }
+@keyframes snakeBossPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45); }
+    50%      { box-shadow: 0 0 22px 4px rgba(239, 68, 68, 0.55); }
+}

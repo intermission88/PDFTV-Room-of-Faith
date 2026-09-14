@@ -5,7 +5,7 @@ Situs statis, live di **https://pdftv.vercel.app/** (multipage, tanpa build step
 ## Hemat context (baca dulu)
 - **Jangan baca**: `forum/p/<angka>/` dan `news/p/<angka>/` (halaman hasil pre-render — turunan, bukan sumber), `assets/og/` (35 PNG), `assets/*.webp` (biner), `scripts/node_modules/` (16 MB), `scripts/package-lock.json`. Cukup `glob`/`ls` untuk memastikan keberadaannya.
 - Yang diedit hanya dua template: `forum/p/index.html` (125 baris) dan `news/p/index.html`. Halaman berangka di dalamnya ditimpa `scripts/prerender-posts.mjs` — jangan disentuh.
-- `js/arcade.js` (~1200 baris), `js/feeds.js` (~870), `js/core.js` (~790): **grep dulu, baru `read` dengan offset/limit** — jangan pernah dibaca utuh.
+- `js/arcade.js` (~1200 baris), `js/snake.js` (~1190), `js/feeds.js` (~870), `js/core.js` (~870): **grep dulu, baru `read` dengan offset/limit** — jangan pernah dibaca utuh.
 - Edit presisi (`edit`) lebih baik daripada menulis ulang file. Ukuran file cek cepat dengan `wc -l`.
 
 ## Di mana harus ubah
@@ -14,21 +14,24 @@ Situs statis, live di **https://pdftv.vercel.app/** (multipage, tanpa build step
 | Landing (manifesto, slider, kartu, statistik) | `index.html` + `js/landing.js` + `css/style.css` |
 | Feed / komentar / upvote / moderasi | `js/feeds.js` |
 | Halaman detail post | `js/post.js` + `forum/p/index.html` |
-| Game / leaderboard / cheat | `js/arcade.js` + `arcade/index.html` |
+| Blackjack: gameplay, leaderboard, cheat | `js/arcade.js` + `arcade/index.html` |
+| Snake: gameplay, leaderboard, cheat | `js/snake.js` + `arcade/index.html` |
 | Berita: daftar, isi artikel, dashboard writer & CEO | `js/news.js` + `news/index.html` + `news/p/index.html` + `news/dashboard/index.html` |
 | Nav, header, bottom nav | **tujuh** HTML (sengaja diduplikasi agar tampil instan tanpa JS): `index.html`, `forum/index.html`, `forum/p/index.html`, `arcade/index.html`, `news/index.html`, `news/p/index.html`, `news/dashboard/index.html`. Urutan menu: HOME · FORUM · NEWS · ARCADE. Menu Room of Faith: label **FORUM**, path **`/forum/`** — dulu `/feeds/` dan URL lama sengaja **tidak** di-redirect, jadi link `/feeds/*` yang lama mati. |
 | Domain absolut / tag Open Graph | `scripts/prerender-posts.mjs` **dan** env `SITE_ORIGIN` di `.github/workflows/prerender-posts.yml` **dan** `404.html` |
 | Logika bersama (modal a11y, audio, login, toast) | `js/core.js` |
-| Skema / RPC Supabase | `seed_feeds.sql` lalu `supabase_upgrade.sql` (bagian 11 = News) |
+| Skema / RPC Supabase | `seed_feeds.sql` lalu `supabase_upgrade.sql` (bagian 11 = News, bagian 12 = Snake) |
 
 ## Path & urutan script
 - Pakai path relatif, jangan absolut (`/js/...`). `forum/p/` dan `news/p/` **dua tingkat**: aset `../../`, home `../../`, arcade `../../arcade/`; forum `../`, news `../../news/` (dari `forum/p/`) atau `../` (dari `news/p/`).
-- Urutan `<script>` penting: `feeds-data.js` → `core.js` (menyediakan `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`) → `feeds.js` → lalu `landing.js` (landing; jangan dimuat tanpa `#slider`) / `post.js` (detail) / `arcade.js` (arcade, tanpa `feeds.js`). Halaman `news/*` **tidak** memuat `feeds.js`/`feeds-data.js` — cukup `core.js` → `news.js`.
+- Urutan `<script>` penting: `feeds-data.js` → `core.js` (menyediakan `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`) → `feeds.js` → lalu `landing.js` (landing; jangan dimuat tanpa `#slider`) / `post.js` (detail) / `arcade.js` lalu `snake.js` (arcade, tanpa `feeds.js`). Halaman `news/*` **tidak** memuat `feeds.js`/`feeds-data.js` — cukup `core.js` → `news.js`.
+- Dua game berbagi satu halaman `/arcade/`: Blackjack (`#arcadeGameUI`) dan Snake (`#snakeGameUI`) sama-sama disembunyikan/ditampilkan dari `#arcadeLobby`, yang kini memuat **dua** kartu game + dua Hall of Fame. Tidak ada registry game — pasangan `enter*Game()`/`exit*Game()` ditulis per game.
+- Snake memakai `<canvas>` + `requestAnimationFrame` dan **handler `keydown` sendiri** (dipasang di `enterSnakeGame()`, dilepas di `exitSnakeGame()`). Kalau menambah game berbasis canvas lain, ikuti pola itu; jangan menaruh listener global permanen.
 - Modal admin disuntik dari `core.js`; observer a11y didaftarkan **setelah** injeksi.
 
 ## Link post, state, data
 - URL share `forum/p/<id>/` (`buildPostUrl()`) dan `news/p/<id>/` (`buildNewsUrl()`), keduanya dihitung dari lokasi `core.js`. Template `?id=<id>` tetap hidup sebagai cadangan yang diarahkan `404.html` (dua pola: `forum/p/` dan `news/p/`). Drawer komentar inline sudah dihapus — jangan dihidupkan lagi.
-- `sessionStorage`: `pdftv_run_v1` (run), `pdftv_session_v1` (login admin/moderator/writer/CEO), `pdftv_bgm_on`. Run disimpan `saveRun()` (+event `pagehide`), dipulihkan `restoreRun()`.
+- `sessionStorage`: `pdftv_run_v1` (run blackjack), `pdftv_snake_run_v1` (run snake), `pdftv_session_v1` (login admin/moderator/writer/CEO), `pdftv_bgm_on`. Run blackjack disimpan `saveRun()` (+event `pagehide`), dipulihkan `restoreRun()`; Snake memakai pasangan `saveSnakeRun()`/`restoreSnakeRun()` dengan pola yang sama (termasuk jeda otomatis saat tab disembunyikan).
 - **Semua penulisan lewat RPC** — tidak ada insert/update/delete langsung dari client. Password keempat role tidak ada di repo; setel via `*.local.sql` (gitignored) memakai `private.set_credential`; jangan tulis nilai asli ke doc/README.
 - Alur News: writer submit (`writer_submit_news`, selalu `pending`) → CEO setujui/tolak/tarik (`ceo_set_news_status`). **RLS hanya membuka `status='approved'`**; daftar pending dibaca lewat RPC `SECURITY DEFINER`, bukan select langsung. Tampilan satu artikel dirender `renderNewsArticleHtml()` — dipakai bersama oleh halaman publik `/news/p/` dan pratinjau writer (`openNewsPreview()`), jadi ubah layout artikel **di situ saja**, jangan di dua tempat. Login memakai satu modal dengan rantai verifikasi `verify_admin` → `verify_moderator` → `verify_writer` → `verify_ceo`.
 

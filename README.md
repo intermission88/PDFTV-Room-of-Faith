@@ -1,6 +1,6 @@
 # PDFTV | Experience Room 🎮🔥
 
-Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of Faith** (feed pengakuan anonim real-time), game roguelite **Blackjack Arcade** bergaya Balatro, dan **PDFTV News** (berita redaksi dengan dashboard writer & CEO). Semua berjalan di browser dengan Supabase sebagai backend.
+Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of Faith** (feed pengakuan anonim real-time), dua game roguelite — **Blackjack Arcade** bergaya Balatro dan **Snake Roguelite** retro Nokia — serta **PDFTV News** (berita redaksi dengan dashboard writer & CEO). Semua berjalan di browser dengan Supabase sebagai backend.
 
 ---
 
@@ -18,7 +18,15 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 - **Hall of Fame**: leaderboard Top 5 berdasarkan Cash, plus statistik end-game yang bisa dibagikan.
 - Panel admin (login diperlukan) untuk reset leaderboard dan uji coba mekanik.
 
-### 3. PDFTV News 📰
+### 3. Snake Roguelite 🐍📟
+- Snake retro ala **Nokia 3310** di atas `<canvas>` berpalet LCD hijau, lengkap dengan scanline CRT.
+- **Struktur roguelike**: tiap floor punya target apel, kecepatan naik, dan hazard bertambah. Selesai floor = memilih **1 dari 3 relic** (efek permanen sampai run berakhir).
+- **Boss floor tiap kelipatan 5** dengan pola arena sendiri: THE WALL (dinding bergerak), OVERCLOCKER (kecepatan 2x), THE VOID (lubang berpindah), ROOM OF FAITH (kombinasi).
+- Consumable **Freeze** (hentikan gerak 3 detik) dan **Sever** (potong badan jadi 5 segmen); relic Aegis menahan satu kematian.
+- Kontrol lengkap: panah/WASD, swipe di arena, dan D-pad di layar. Run tetap tersimpan walau halaman di-reload.
+- **Hall of Fame Snake** sendiri (Top 5 skor, plus floor dan panjang maksimum), terpisah dari papan Blackjack.
+
+### 4. PDFTV News 📰
 - Halaman berita dengan headline, filter kategori, pencarian, dan **halaman sendiri per artikel** (`/news/p/<id>/`) yang bisa dibagikan.
 - Artikel ditulis lewat **dashboard writer** (perlu login) dan baru tayang setelah disetujui **CEO**: alur `pending` → disetujui / ditolak (dengan alasan yang dilihat writer) / ditarik.
 - Dashboard redaksi di `/news/dashboard/` — satu halaman, panelnya menyesuaikan peran yang login.
@@ -28,7 +36,7 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 - Gambar cover memakai URL gambar eksternal (tanpa upload/storage). Preview saat link dibagikan mengambil **apa adanya dari artikel** — `og:image` = cover, `og:title` = headline, `og:description` = "Oleh <penulis> — <ringkasan>" — jadi tidak ada berkas gambar yang digenerate.
 - Tombol **Bagikan** membuka panel pratinjau berisi gambar, headline, penulis, dan sedikit isi artikel, lengkap dengan tombol Bagikan (share sheet OS) dan Salin link.
 
-### 4. Aksesibilitas & UX ♿
+### 5. Aksesibilitas & UX ♿
 - Seluruh alur dapat diselesaikan dengan keyboard saja; ring fokus `:focus-visible` konsisten.
 - Modal mengunci fokus (Tab), ditutup dengan `Escape`, dan mengembalikan fokus ke pemicunya.
 - Menghormati `prefers-reduced-motion`: carousel tidak berjalan sendiri dan animasi loop berhenti.
@@ -58,7 +66,7 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 | `news/p/index.html` | Halaman isi artikel (sekaligus cadangan `?id=<id>`) |
 | `news/p/<id>/index.html` | Hasil pre-render per artikel: tag Open Graph (dibuat otomatis, jangan diedit manual) |
 | `news/dashboard/index.html` | Dashboard redaksi: writer (tulis artikel) & CEO (persetujuan) |
-| `arcade/index.html` | Halaman Blackjack Arcade |
+| `arcade/index.html` | Halaman Arcade: pemilih dua game (Blackjack + Snake), arena, dan modal |
 | `css/style.css` | Gaya kustom: tema CRT/felt, animasi, ring fokus, reduced-motion |
 | `js/core.js` | Fondasi bersama: Supabase, haptic, audio/BGM, toast, manajer modal, login admin, util |
 | `js/feeds.js` | Logika Room of Faith + pengambilan data statistik untuk landing |
@@ -69,17 +77,18 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 | `vercel.json` | Urutan rute: `handle: filesystem` lebih dulu, lalu fallback `/forum/p/<id>/` & `/news/p/<id>/` → `?id=<id>` |
 | `js/landing.js` | Typewriter + slider (hanya halaman landing) |
 | `js/arcade.js` | Gameplay blackjack, leaderboard, panel cheat, persistensi run |
+| `js/snake.js` | Gameplay Snake Roguelite (canvas, loop, relic, boss), leaderboard, panel cheat, persistensi run |
 | `js/feeds-data.js` | Data feed awal untuk fallback sebelum Supabase termuat |
 | `seed_feeds.sql` | Pembuatan tabel `PDFTV Feeds`, RLS, dan data awal |
 | `supabase_upgrade.sql` | Fungsi RPC, pengetatan RLS, dan penyimpanan kredensial |
 | `assets/` | Logo, favicon, dan gambar slider (WebP) |
 | `watch-and-push.ps1` | Watcher auto commit + push untuk sinkronisasi ke GitHub |
 
-Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`), lalu `js/feeds.js`, kemudian `js/landing.js` (landing) atau `js/arcade.js` (arcade). Halaman `news/*` tidak memuat `feeds.js`/`feeds-data.js` — cukup `js/core.js` lalu `js/news.js`.
+Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`), lalu `js/feeds.js`, kemudian `js/landing.js` (landing) atau `js/arcade.js` lalu `js/snake.js` (arcade). Halaman `news/*` tidak memuat `feeds.js`/`feeds-data.js` — cukup `js/core.js` lalu `js/news.js`.
 
 ### URL & state lintas halaman
 
-- `/` landing, `/forum/` Room of Faith, `/forum/p/<id>/` detail satu post, `/news/` berita, `/news/p/<id>/` isi satu artikel, `/news/dashboard/` dashboard redaksi, `/arcade/` Blackjack Arcade. Halaman lama `/forum/p/?id=<id>` dan `/news/p/?id=<id>` tetap berfungsi sebagai cadangan.
+- `/` landing, `/forum/` Room of Faith, `/forum/p/<id>/` detail satu post, `/news/` berita, `/news/p/<id>/` isi satu artikel, `/news/dashboard/` dashboard redaksi, `/arcade/` Arcade (Blackjack + Snake). Halaman lama `/forum/p/?id=<id>` dan `/news/p/?id=<id>` tetap berfungsi sebagai cadangan.
 - Section Room of Faith dulu berada di `/feeds/`; sekarang `/forum/`. URL lama **tidak** di-redirect, jadi link `/feeds/*` yang sudah tersebar tidak lagi bisa dibuka.
 - Tiap post punya halaman statis hasil pre-render di `/forum/p/<id>/` yang memuat tag Open Graph berisi **isi postingannya**, sehingga preview saat link dibagikan (WhatsApp, Facebook) menampilkan pengakuan itu, bukan template.
 - Preview dihasilkan oleh `.github/workflows/prerender-posts.yml` (jadwal tiap 10 menit + bisa dijalankan manual dari tab Actions). Artikel/post yang baru dibuat menunggu jadwal berikutnya.
@@ -89,7 +98,7 @@ Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, 
 - Tombol **Bagikan** memakai Web Share API, dengan fallback salin ke clipboard.
 - Detail post memuat seluruh komentar dan form komentar. Konten NSFW tetap ter-blur di halaman sampai tombol reveal ditekan.
 - Halaman di dalam folder memakai path relatif (`../assets/...`), karena situs dilayani di subpath `/PDFTV-Room-of-Faith/`. Jangan pakai path absolut.
-- Berpindah halaman berarti reload penuh, jadi state yang perlu bertahan disimpan di `sessionStorage`: `pdftv_run_v1` (run blackjack), `pdftv_session_v1` (login admin/moderator), `pdftv_bgm_on` (preferensi BGM). Semuanya terhapus saat tab ditutup.
+- Berpindah halaman berarti reload penuh, jadi state yang perlu bertahan disimpan di `sessionStorage`: `pdftv_run_v1` (run blackjack), `pdftv_snake_run_v1` (run snake), `pdftv_session_v1` (login admin/moderator), `pdftv_bgm_on` (preferensi BGM). Semuanya terhapus saat tab ditutup.
 - BGM tidak bisa otomatis berbunyi di halaman baru (kebijakan autoplay browser); musik menyala lagi pada interaksi pertama bila sebelumnya aktif.
 
 ### Preview share (Open Graph)
@@ -146,7 +155,7 @@ Kunci yang dipakai adalah *publishable key*, jadi memang aman berada di sisi kli
 Jalankan kedua script berikut di **Supabase → SQL Editor**, berurutan:
 
 1. **`seed_feeds.sql`** — membuat tabel `PDFTV Feeds` (beserta kolom NSFW, komentar, dsb.), mengaktifkan RLS, mengatur policy publik (baca / insert / update), dan memasukkan data awal.
-2. **`supabase_upgrade.sql`** — membuat fungsi RPC (`insert_confession`, `increment_upvote`, `append_comment`, aksi moderator, reset leaderboard), **tabel `PDFTV News` beserta RPC News (bagian 11)**, memindahkan kredensial ke schema `private`, dan mengetatkan RLS. Jalankan bagian perketat RLS **terakhir**, setelah aplikasi memakai RPC.
+2. **`supabase_upgrade.sql`** — membuat fungsi RPC (`insert_confession`, `increment_upvote`, `append_comment`, aksi moderator, reset leaderboard), **tabel `PDFTV News` beserta RPC News (bagian 11)**, **tabel `PDFTV Snake Leaderboard` beserta RPC Snake (bagian 12)**, memindahkan kredensial ke schema `private`, dan mengetatkan RLS. Jalankan bagian perketat RLS **terakhir**, setelah aplikasi memakai RPC.
 
 > Catatan: aplikasi punya jalur fallback ke operasi langsung bila RPC belum tersedia di database. Selama policy insert lama masih ada, fallback itu tetap bekerja.
 
@@ -173,7 +182,7 @@ Hak akses:
 
 | Peran | Kemampuan |
 |---|---|
-| **Admin** | Reset leaderboard + panel uji mekanik game |
+| **Admin** | Reset kedua leaderboard (Blackjack & Snake) + panel uji mekanik game |
 | **Moderator** | Pin, tandai NSFW, dan hapus postingan di Room of Faith |
 | **Writer** | Menulis, mengubah, dan menghapus artikel News miliknya yang masih `pending`/`rejected` |
 | **CEO** | Melihat semua artikel, menyetujui, menolak (dengan alasan), menarik, dan menghapus artikel News |

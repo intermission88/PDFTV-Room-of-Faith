@@ -900,3 +900,116 @@ GRANT EXECUTE ON FUNCTION public.get_news_stats() TO anon, authenticated;
 --   SELECT private.set_credential('ceo',    '<password CEO>');
 -- Verifikasi: SELECT public.verify_writer('<pass>'), public.verify_ceo('<pass>');
 -- ============================================================
+
+-- ============================================================
+-- 12. SNAKE ROGUELITE: LEADERBOARD + RPC
+-- Papan terpisah dari Blackjack (metriknya beda: skor poin, floor, panjang).
+-- Tabel Blackjack dulu dibuat manual di dashboard; di sini tabel Snake
+-- dibuat lewat skrip supaya skemanya bisa direproduksi dari repo.
+-- Anti-cheat sama seperti submit_score: skor dihitung di browser, jadi
+-- yang bisa dilakukan server hanya menolak insert langsung, memvalidasi
+-- rentang, dan membatasi spam per IP.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public."PDFTV Snake Leaderboard" (
+    id          BIGSERIAL PRIMARY KEY,
+    player_name TEXT    NOT NULL,
+    score       BIGINT  NOT NULL DEFAULT 0,
+    max_floor   INTEGER NOT NULL DEFAULT 1,
+    max_length  INTEGER NOT NULL DEFAULT 3,
+    submit_ip   TEXT,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public."PDFTV Snake Leaderboard" ENABLE ROW LEVEL SECURITY;
+
+-- Publik hanya boleh membaca. Tidak ada policy INSERT/UPDATE/DELETE,
+-- sehingga penulisan langsung dari anon selalu ditolak.
+DROP POLICY IF EXISTS "Snake Public Insert Access" ON public."PDFTV Snake Leaderboard";
+DROP POLICY IF EXISTS "Snake Public Update Access" ON public."PDFTV Snake Leaderboard";
+DROP POLICY IF EXISTS "Snake Public Delete Access" ON public."PDFTV Snake Leaderboard";
+DROP POLICY IF EXISTS "Snake Public Read Access"   ON public."PDFTV Snake Leaderboard";
+CREATE POLICY "Snake Public Read Access" ON public."PDFTV Snake Leaderboard"
+    FOR SELECT USING (true);
+
+CREATE INDEX IF NOT EXISTS idx_snake_score
+    ON public."PDFTV Snake Leaderboard" (score DESC);
+
+CREATE INDEX IF NOT EXISTS idx_snake_submit_ip
+    ON public."PDFTV Snake Leaderboard" (submit_ip, created_at DESC);
+
+CREATE OR REPLACE FUNCTION public.submit_snake_score(
+    p_name   TEXT,
+    p_score  BIGINT,
+    p_floor  INTEGER DEFAULT 1,
+    p_length INTEGER DEFAULT 3
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, extensions
+AS $$
+DECLARE
+    clean_name  TEXT;
+    client_ip   TEXT;
+    last_submit TIMESTAMPTZ;
+BEGIN
+    clean_name := NULLIF(btrim(regexp_replace(COALESCE(p_name, ''), '[[:cntrl:]]', '', 'g')), '');
+
+    IF clean_name IS NULL OR length(clean_name) > 12 THEN
+        RAISE EXCEPTION 'nama tidak valid (1-12 karakter)';
+    END IF;
+    -- Batas bawah mengikuti syarat minimum di UI; batas atas menahan nilai mustahil.
+    IF p_score IS NULL OR p_score < 100 OR p_score > 100000000 THEN
+        RAISE EXCEPTION 'skor di luar rentang yang wajar';
+    END IF;
+    IF p_floor IS NULL OR p_floor < 1 OR p_floor > 999 THEN
+        RAISE EXCEPTION 'floor di luar rentang yang wajar';
+    END IF;
+    IF p_length IS NULL OR p_length < 3 OR p_length > 500 THEN
+        RAISE EXCEPTION 'panjang ular di luar rentang yang wajar';
+    END IF;
+
+    -- Rate limit per IP: maksimal 1 skor per menit.
+    client_ip := COALESCE(
+        split_part(COALESCE(current_setting('request.headers', true)::json->>'x-forwarded-for', ''), ',', 1),
+        ''
+    );
+    IF client_ip <> '' THEN
+        SELECT created_at INTO last_submit
+            FROM public."PDFTV Snake Leaderboard"
+            WHERE submit_ip = encode(digest(client_ip || 'pdftv-snake', 'sha256'), 'hex')
+            ORDER BY created_at DESC LIMIT 1;
+        IF last_submit IS NOT NULL AND last_submit > NOW() - INTERVAL '60 seconds' THEN
+            RAISE EXCEPTION 'terlalu cepat! tunggu sebentar sebelum mengirim skor lagi';
+        END IF;
+    END IF;
+
+    INSERT INTO public."PDFTV Snake Leaderboard" (player_name, score, max_floor, max_length, submit_ip)
+    VALUES (
+        clean_name,
+        p_score,
+        p_floor,
+        p_length,
+        NULLIF(encode(digest(client_ip || 'pdftv-snake', 'sha256'), 'hex'), '')
+    );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.admin_reset_snake_leaderboard(p_pass TEXT)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    IF NOT public.verify_admin(p_pass) THEN
+        RAISE EXCEPTION 'akses admin ditolak';
+    END IF;
+
+    DELETE FROM public."PDFTV Snake Leaderboard";
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.submit_snake_score(TEXT, BIGINT, INTEGER, INTEGER) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_reset_snake_leaderboard(TEXT) TO anon, authenticated;
+-- ============================================================

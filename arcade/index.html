@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blackjack Arcade · PDFTV</title>
-    <meta name="description" content="Blackjack Arcade roguelite bergaya Balatro: kumpulkan Cash, aktifkan kartu Joker, dan taklukkan Boss tiap 8 ronde.">
+    <title>Arcade · PDFTV</title>
+    <meta name="description" content="Arcade PDFTV: Blackjack Roguelite bergaya Balatro dan Snake Roguelite retro Nokia dengan relic, hazard, dan boss.">
     <meta name="theme-color" content="#030a06">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Blackjack Arcade · PDFTV">
-    <meta property="og:description" content="Blackjack Arcade roguelite bergaya Balatro: kumpulkan Cash, aktifkan kartu Joker, dan taklukkan Boss tiap 8 ronde.">
+    <meta property="og:title" content="Arcade · PDFTV">
+    <meta property="og:description" content="Arcade PDFTV: Blackjack Roguelite bergaya Balatro dan Snake Roguelite retro Nokia dengan relic, hazard, dan boss.">
     <meta property="og:image" content="https://pdftv.vercel.app/assets/slider01_roster.webp">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/webp" href="../assets/PDFTV_favicon.webp">
@@ -80,7 +80,7 @@
                         <span>📰 News</span>
                     </a>
                     <a href="./" onclick="toggleBurgerMenu(false)" class="w-full text-left p-2 rounded-xl hover:bg-white/10 text-xs text-slate-300 font-mono-custom flex items-center gap-2 transition">
-                        <span>🎰 Arcade (Balatro)</span>
+                        <span>🎰 Arcade</span>
                     </a>
                 </div>
             </div>
@@ -131,6 +131,36 @@
                 </div>
             </div>
 
+            <!-- ADMIN CHEAT PANEL: SNAKE -->
+            <div id="adminSnakeCheatPanel" class="hidden glass p-3.5 rounded-2xl   bg-red-950/20 space-y-2 text-xs font-mono-custom shadow-2xl">
+                <div class="flex items-center justify-between   pb-1.5">
+                    <span class="font-black text-red-400 flex items-center gap-1">
+                        🛠️ CHEAT PANEL (SNAKE ADMIN)
+                    </span>
+                    <span class="text-[10px] bg-red-500/20   text-red-300 px-2 py-0.5 rounded-full font-bold">READY</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 pt-1">
+                    <button onclick="snakeCheatAddScore(500)" class="py-1.5 px-2 bg-amber-500/20 hover:bg-amber-500/40 text-amber-200   rounded-xl text-[10px] font-bold transition active:scale-95">
+                        🏆 +500 Skor
+                    </button>
+                    <button onclick="snakeCheatGrantRelic()" class="py-1.5 px-2 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-200   rounded-xl text-[10px] font-bold transition active:scale-95">
+                        💎 Random Relic
+                    </button>
+                    <button onclick="snakeCheatSkipFloor()" class="py-1.5 px-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200   rounded-xl text-[10px] font-bold transition active:scale-95">
+                        ⏭️ Selesaikan Floor
+                    </button>
+                    <button onclick="snakeCheatKillBoss()" class="py-1.5 px-2 bg-red-500/20 hover:bg-red-500/40 text-red-200   rounded-xl text-[10px] font-bold transition active:scale-95">
+                        ⚔️ Kill Boss
+                    </button>
+                    <button onclick="snakeCheatAddAegis(3)" class="py-1.5 px-2 bg-sky-500/20 hover:bg-sky-500/40 text-sky-200   rounded-xl text-[10px] font-bold transition active:scale-95">
+                        🛡️ +3 Aegis
+                    </button>
+                    <button onclick="snakeCheatFillConsumables()" class="py-1.5 px-2 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200   rounded-xl text-[10px] font-bold transition active:scale-95">
+                        🧪 Max Items (2/2)
+                    </button>
+                </div>
+            </div>
+
             <!-- LOBBY -->
             <div id="arcadeLobby" class="space-y-4">
                 <div class="relative overflow-hidden rounded-3xl p-5   balatro-felt-bg shadow-2xl text-center">
@@ -166,6 +196,49 @@
                     </div>
                     
                     <div id="leaderboardList" class="space-y-1.5">
+                        <div class="space-y-1.5">
+                            <div class="skeleton-card p-2 flex items-center justify-between"><div class="flex items-center gap-2"><div class="skeleton-bar w-5 h-5 rounded-full"></div><div class="skeleton-bar w-24 h-3"></div></div><div class="skeleton-bar w-16 h-3"></div></div>
+                            <div class="skeleton-card p-2 flex items-center justify-between"><div class="flex items-center gap-2"><div class="skeleton-bar w-5 h-5 rounded-full"></div><div class="skeleton-bar w-24 h-3"></div></div><div class="skeleton-bar w-16 h-3"></div></div>
+                            <div class="skeleton-card p-2 flex items-center justify-between"><div class="flex items-center gap-2"><div class="skeleton-bar w-5 h-5 rounded-full"></div><div class="skeleton-bar w-24 h-3"></div></div><div class="skeleton-bar w-16 h-3"></div></div>
+                            <div class="skeleton-card p-2 flex items-center justify-between"><div class="flex items-center gap-2"><div class="skeleton-bar w-5 h-5 rounded-full"></div><div class="skeleton-bar w-24 h-3"></div></div><div class="skeleton-bar w-16 h-3"></div></div>
+                            <div class="skeleton-card p-2 flex items-center justify-between"><div class="flex items-center gap-2"><div class="skeleton-bar w-5 h-5 rounded-full"></div><div class="skeleton-bar w-24 h-3"></div></div><div class="skeleton-bar w-16 h-3"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="relative overflow-hidden rounded-3xl p-5   balatro-felt-bg shadow-2xl text-center">
+                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10   text-emerald-400 text-[10px] font-mono-custom font-bold tracking-widest uppercase mb-2">
+                        <span>🐍</span> Nokia Retro Edition
+                    </div>
+
+                    <h2 class="text-xl font-black text-white tracking-tight">SNAKE <span class="text-emerald-400">ROGUELITE</span></h2>
+                    <p class="text-slate-300 text-[11px] mt-1 max-w-xs mx-auto leading-relaxed">
+                        Makan apel, lintasi <b>Floor</b>, pilih <b>Relic</b>, dan kalahkan <b>Boss tiap 5 Floor</b>. Sekali menabrak, run selesai!
+                    </p>
+
+                    <button onclick="enterSnakeGame()" class="w-full mt-4 py-3.5 rounded-2xl text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 btn-dopamine">
+                        <span>🐍</span> MAIN SEKARANG <span>➔</span>
+                    </button>
+                </div>
+
+                <section id="lobbySnakeHallOfFame" class="glass p-4 rounded-3xl   shadow-2xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-base">🏆</span>
+                            <div>
+                                <h3 class="text-[11px] font-black text-white tracking-widest uppercase">Hall of Fame Snake</h3>
+                                <p class="text-[10px] text-slate-400 font-mono-custom">TOP 5 SKOR TERTINGGI</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button id="adminResetSnakeLeaderboardBtn" onclick="adminResetSnakeLeaderboard()" class="hidden text-[10px] font-mono-custom font-bold bg-red-500/20 text-red-400   px-2 py-0.5 rounded-lg hover:bg-red-500/30 transition">
+                                🔄 RESET
+                            </button>
+                            <span class="text-[10px] font-mono-custom text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg  ">LIVE RANKING</span>
+                        </div>
+                    </div>
+
+                    <div id="snakeLeaderboardList" class="space-y-1.5">
                         <div class="space-y-1.5">
                             <div class="skeleton-card p-2 flex items-center justify-between"><div class="flex items-center gap-2"><div class="skeleton-bar w-5 h-5 rounded-full"></div><div class="skeleton-bar w-24 h-3"></div></div><div class="skeleton-bar w-16 h-3"></div></div>
                             <div class="skeleton-card p-2 flex items-center justify-between"><div class="flex items-center gap-2"><div class="skeleton-bar w-5 h-5 rounded-full"></div><div class="skeleton-bar w-24 h-3"></div></div><div class="skeleton-bar w-16 h-3"></div></div>
@@ -374,6 +447,118 @@
                 </div>
             </div>
 
+            <!-- SNAKE GAMEPLAY UI -->
+            <div id="snakeGameUI" class="hidden space-y-2.5">
+
+                <div class="flex items-center justify-between glass px-3 py-2 rounded-xl  ">
+                    <button onclick="exitSnakeGame()" class="text-slate-300 hover:text-white text-[11px] font-bold flex items-center gap-1 transition active:scale-95">
+                        <span>⬅</span> LOBBY
+                    </button>
+                    <div id="snakeHeaderTitle" class="text-[11px] font-black tracking-wider text-emerald-400 flex items-center gap-1">
+                        <span>🐍</span> FLOOR 1
+                    </div>
+                    <button onclick="toggleSnakeRules()" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2 py-0.5 rounded-lg transition   flex items-center gap-1">
+                        📜 Rules
+                    </button>
+                </div>
+
+                <div id="snakeRulesAccordion" class="hidden p-3 rounded-2xl glass   text-[10px] text-slate-300 space-y-1.5">
+                    <div class="font-bold text-emerald-400   pb-0.5">📜 Cara Main Snake Roguelite:</div>
+                    <p class="text-[10px] text-slate-300 leading-relaxed">Belok dengan panah / WASD, swipe di arena, atau tombol D-pad. Makan apel sampai target floor terpenuhi.</p>
+                    <div class="grid grid-cols-1 gap-1 text-[10px] pt-0.5">
+                        <div class="text-emerald-300">🎯 <b>TARGET FLOOR:</b> Tiap floor makin cepat dan makin padat hazard. Skor per apel naik mengikuti floor.</div>
+                        <div class="text-amber-300">💎 <b>RELIC:</b> Selesai floor = pilih 1 dari 3 relic. Efeknya permanen sampai run berakhir.</div>
+                        <div class="text-rose-400">⚔️ <b>BOSS FLOOR (tiap 5):</b> Makan orb bos untuk lanjut. Tiap bos punya pola hazard sendiri.</div>
+                        <div class="text-sky-300">🧊 <b>FREEZE (Max 2):</b> Menghentikan gerak 3 detik saat kamu mepet.</div>
+                        <div class="text-purple-300">✂️ <b>SEVER (Max 2):</b> Memotong badan jadi 5 segmen.</div>
+                        <div class="text-red-400">💀 <b>KEMATIAN:</b> Menabrak dinding, hazard, atau badan sendiri mengakhiri run (kecuali punya Aegis).</div>
+                    </div>
+                </div>
+
+                <!-- BOSS BANNER ALERT -->
+                <div id="snakeBossAlertBanner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-red-950 via-rose-900 to-red-950 border-2 border-red-500 text-center space-y-1 snake-boss-pulse">
+                    <div class="text-[11px] font-black text-white uppercase tracking-widest font-mono-custom flex items-center justify-center gap-1.5">
+                        <span>⚔️</span> BOSS FLOOR <span>⚔️</span>
+                    </div>
+                    <div id="snakeBossNameTitle" class="text-sm font-black text-amber-400 tracking-wider">THE BOSS</div>
+                    <div id="snakeBossPerkDescription" class="text-[10px] text-rose-200 font-medium">Perk: Efek khusus bos aktif!</div>
+                    <div id="snakeBossHpText" class="text-sm pt-1">🟡🟡🟡🟡🟡</div>
+                </div>
+
+                <!-- HUD -->
+                <div class="glass p-2.5 rounded-2xl grid grid-cols-4 gap-1.5 text-center font-mono-custom">
+                    <div class="bg-amber-500/10 py-1 rounded-lg">
+                        <div class="text-[10px] text-amber-300 uppercase tracking-widest font-bold">SKOR</div>
+                        <div id="snakeScoreText" class="text-[11px] font-pixel font-bold text-amber-400">0</div>
+                    </div>
+                    <div class="bg-emerald-500/10 py-1 rounded-lg">
+                        <div class="text-[10px] text-emerald-300 uppercase tracking-widest font-bold">FLOOR</div>
+                        <div id="snakeFloorText" class="text-[11px] font-pixel font-bold text-emerald-400">1</div>
+                    </div>
+                    <div class="bg-white/5 py-1 rounded-lg">
+                        <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">APEL</div>
+                        <div id="snakeAppleText" class="text-[11px] font-pixel font-bold text-white">0/5</div>
+                    </div>
+                    <div class="bg-white/5 py-1 rounded-lg">
+                        <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">PANJANG</div>
+                        <div id="snakeLengthText" class="text-[11px] font-pixel font-bold text-slate-200">3</div>
+                    </div>
+                </div>
+
+                <!-- ARENA LCD -->
+                <div class="snake-lcd crt-container relative">
+                    <canvas id="snakeCanvas" width="400" height="400" class="snake-canvas" role="img" aria-label="Arena Snake"></canvas>
+                    <div id="snakeOverlay" class="hidden absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-black/75 text-center px-4">
+                        <div id="snakeOverlayTitle" class="text-sm font-black text-amber-400 font-pixel uppercase tracking-wider">JEDA</div>
+                        <div id="snakeOverlayText" class="text-[10px] text-slate-300 font-mono-custom">Run ditahan sementara.</div>
+                        <button onclick="toggleSnakePause()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[10px] font-black uppercase tracking-wider transition active:scale-95">LANJUT ➔</button>
+                    </div>
+                </div>
+
+                <div id="snakeStatus" aria-live="polite" aria-atomic="true" class="text-center text-[10px] font-black min-h-[16px] text-emerald-400 uppercase tracking-widest font-mono-custom"></div>
+
+                <!-- RELIC AKTIF -->
+                <div class="glass p-2 rounded-2xl space-y-1">
+                    <div class="flex justify-between items-center text-[10px] font-mono-custom font-bold text-emerald-400 uppercase">
+                        <span>💎 Relic Aktif</span>
+                        <span id="snakeAegisText" class="text-slate-400 font-normal">🛡️ Aegis: 0</span>
+                    </div>
+                    <div id="snakeRelicList" class="flex flex-wrap gap-1">
+                        <span class="snake-relic-chip">Belum ada relic</span>
+                    </div>
+                </div>
+
+                <!-- CONSUMABLES -->
+                <div class="bg-indigo-950/50 p-2 rounded-2xl   space-y-1">
+                    <div class="text-[10px] font-bold tracking-wider text-indigo-300 uppercase">🧪 Tactical Items</div>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="useSnakeFreeze()" id="btnSnakeFreeze" class="py-1.5 px-2 bg-sky-600/30 hover:bg-sky-600/50 text-sky-200   text-[10px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-between">
+                            <span>🧊 Freeze 3s</span>
+                            <span id="countSnakeFreeze" class="font-mono-custom bg-sky-500/30 px-1.5 py-0.5 rounded text-[10px]">0/2</span>
+                        </button>
+                        <button onclick="useSnakeSever()" id="btnSnakeSever" class="py-1.5 px-2 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200   text-[10px] font-bold rounded-lg transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none flex items-center justify-between">
+                            <span>✂️ Sever</span>
+                            <span id="countSnakeSever" class="font-mono-custom bg-purple-500/30 px-1.5 py-0.5 rounded text-[10px]">0/2</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- D-PAD -->
+                <div class="glass p-3 rounded-2xl">
+                    <div class="grid grid-cols-3 gap-1.5 max-w-[200px] mx-auto">
+                        <div aria-hidden="true"></div>
+                        <button onclick="snakeTurn('up')" aria-label="Belok atas" class="snake-dpad-btn">▲</button>
+                        <div aria-hidden="true"></div>
+                        <button onclick="snakeTurn('left')" aria-label="Belok kiri" class="snake-dpad-btn">◀</button>
+                        <button onclick="toggleSnakePause()" id="btnSnakePause" aria-label="Jeda permainan" class="snake-dpad-btn">⏸</button>
+                        <button onclick="snakeTurn('right')" aria-label="Belok kanan" class="snake-dpad-btn">▶</button>
+                        <div aria-hidden="true"></div>
+                        <button onclick="snakeTurn('down')" aria-label="Belok bawah" class="snake-dpad-btn">▼</button>
+                        <div aria-hidden="true"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -492,8 +677,84 @@
         </div>
     </div>
 
+    <!-- Modal Submit Skor Snake -->
+    <div id="snakeScoreSubmitModal" role="dialog" aria-modal="true" aria-labelledby="snakeScoreModalTitle" tabindex="-1" class="modal-base hidden-modal fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#07170e] relative space-y-3 max-h-[90vh] overflow-y-auto scrollbar-hide">
+
+            <div class="w-10 h-10 mx-auto rounded-full bg-emerald-500/10   flex items-center justify-center text-emerald-400 text-lg shadow" aria-hidden="true">
+                🐍
+            </div>
+
+            <div>
+                <h3 id="snakeScoreModalTitle" class="text-sm font-black text-emerald-400 uppercase tracking-wider font-pixel">Run Berakhir!</h3>
+                <p class="text-slate-300 text-[11px] mt-0.5">Skor Akhir: <span id="snakeFinalScore" class="text-emerald-400 font-pixel font-bold">0</span></p>
+                <p class="text-[10px] text-slate-400 font-mono-custom">Tumbang di <span id="snakeFinalFloor" class="text-white font-bold">Floor 1</span></p>
+            </div>
+
+            <div class="bg-black/60 p-3 rounded-2xl   text-left space-y-1.5 font-mono-custom text-[10px]">
+                <div class="text-emerald-400 font-black uppercase text-[10px]   pb-1 flex justify-between items-center">
+                    <span>📊 Statistik Run</span>
+                    <span id="snakeDeathReason" class="text-[10px] text-slate-400 font-normal">Sebab</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1 text-slate-300 pt-0.5">
+                    <div>🍎 Apel: <b id="statSnakeApples" class="text-emerald-400">0</b></div>
+                    <div>📏 Panjang Maks: <b id="statSnakeLength" class="text-indigo-400">3</b></div>
+                    <div>💎 Relic: <b id="statSnakeRelics" class="text-amber-400">0</b></div>
+                    <div>⚔️ Boss: <b id="statSnakeBoss" class="text-rose-400">0</b></div>
+                    <div class="col-span-2">🏁 Floor Tercapai: <b id="statSnakeFloor" class="text-white">1</b></div>
+                </div>
+            </div>
+
+            <div id="snakeMinScoreWarning" class="hidden text-[10px] text-amber-300 bg-amber-500/10   py-2 px-3 rounded-xl">
+                ⚠️ Minimal <b>100 poin</b> untuk mencatat rekor ke Leaderboard.
+            </div>
+
+            <form id="snakeScoreForm" onsubmit="submitSnakeScore(event)" class="space-y-2.5">
+                <div id="snakeNameInputContainer" class="space-y-1">
+                    <label for="snakePlayerName" class="sr-only">Nama atau alias pemain</label>
+                    <input type="text" id="snakePlayerName" data-autofocus maxlength="12" autocomplete="nickname" placeholder="Masukkan Nama / Alias..." required class="w-full bg-white/5 text-white text-base sm:text-xs p-3 rounded-xl text-center focus:bg-white/10 transition font-mono-custom tracking-wide">
+                </div>
+
+                <div class="space-y-1.5 pt-1">
+                    <button type="submit" id="btnSubmitSnakeScore" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black rounded-xl active:scale-[0.98] transition shadow uppercase tracking-wider">
+                        SIMPAN REKOR 🏆
+                    </button>
+                    <button type="button" onclick="closeSnakeScoreModal()" class="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] font-bold rounded-xl transition">
+                        Tutup
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Pilihan Relic (paksa-pilih, tanpa tombol tutup) -->
+    <div id="snakeRelicModal" role="dialog" aria-modal="true" aria-labelledby="snakeRelicModalTitle" tabindex="-1" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#07170e] relative max-h-[90vh] overflow-y-auto scrollbar-hide">
+            <div class="text-3xl mb-1" aria-hidden="true">💎</div>
+            <h3 id="snakeRelicModalTitle" class="text-sm font-black text-emerald-400 uppercase tracking-wider font-pixel">PILIH 1 RELIC</h3>
+            <p class="text-slate-400 text-[10px] mb-3">Efeknya permanen sampai run berakhir.</p>
+            <div id="snakeRelicOptions" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Modal Peringatan Boss (paksa-pilih, tanpa tombol tutup) -->
+    <div id="snakeBossModal" role="dialog" aria-modal="true" aria-labelledby="snakeBossModalTitle" tabindex="-1" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#1a0707] relative">
+            <div class="text-3xl mb-1" aria-hidden="true">⚔️</div>
+            <h3 id="snakeBossModalTitle" class="text-sm font-black text-red-400 uppercase tracking-wider font-pixel">BOSS FLOOR!</h3>
+            <div id="snakeBossModalName" class="text-base font-black text-amber-400 tracking-wider mt-1">THE BOSS</div>
+            <p id="snakeBossModalPerk" class="text-[10px] text-rose-200 mt-1">Perk bos aktif.</p>
+            <p class="text-[10px] text-slate-400 mt-2">Makan <b id="snakeBossModalTarget" class="text-emerald-400">5</b> orb untuk menutup floor ini.</p>
+
+            <button data-autofocus onclick="closeSnakeBossModal()" class="w-full mt-4 py-2.5 bg-red-500 hover:bg-red-400 text-black text-xs font-black rounded-xl active:scale-[0.98] transition shadow uppercase tracking-wider">
+                MULAI BOSS ⚔️
+            </button>
+        </div>
+    </div>
+
     <!-- SCRIPT ENGINE LOGIC -->
     <script src="../js/core.js"></script>
     <script src="../js/arcade.js"></script>
+    <script src="../js/snake.js"></script>
 </body>
 </html>
