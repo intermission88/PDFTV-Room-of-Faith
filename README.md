@@ -22,6 +22,8 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 - Halaman berita dengan headline, filter kategori, pencarian, dan **halaman sendiri per artikel** (`/news/p/<id>/`) yang bisa dibagikan.
 - Artikel ditulis lewat **dashboard writer** (perlu login) dan baru tayang setelah disetujui **CEO**: alur `pending` → disetujui / ditolak (dengan alasan yang dilihat writer) / ditarik.
 - Dashboard redaksi di `/news/dashboard/` — satu halaman, panelnya menyesuaikan peran yang login.
+- Tampilan artikel dibuat seperti halaman berita: kicker kategori, **headline besar**, lead, byline (penulis · tanggal · estimasi waktu baca), cover, lalu isi artikel dan deretan `#tag`.
+- Writer punya tombol **👁️ Pratinjau** — dari form (isi yang belum dikirim) maupun dari daftar "Artikel Saya" — untuk melihat tampilannya persis seperti saat tayang, tanpa menunggu persetujuan CEO. Pratinjau memakai perender yang sama dengan halaman publik, jadi tidak ada beda tampilan.
 - Publik **hanya** bisa membaca artikel berstatus `approved`; itu dijaga RLS di database, bukan sekadar filter tampilan.
 - Gambar cover memakai URL gambar eksternal (tanpa upload/storage), dan ikut dipakai sebagai `og:image` saat link dibagikan.
 

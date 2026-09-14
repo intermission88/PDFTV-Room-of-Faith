@@ -27,6 +27,7 @@ let writerNewsData = [];
 let ceoNewsData = [];
 let ceoNewsFilter = 'pending';
 let editingNewsId = null;
+let newsPreviewOpen = false;
 
 // ── Helper ───────────────────────────────────────────────────
 function cleanNewsText(str) {
@@ -84,18 +85,18 @@ function newsTagList(item) {
 }
 
 // Isi artikel adalah input pengguna: escape DULU, baru tambahkan tag
-// sendiri (subset minimal: paragraf, ## heading, **bold**).
+// sendiri (subset minimal: paragraf, ## sub-judul, **bold**).
 function renderNewsBody(text) {
     const safe = escapeHtml(String(text || ''));
     return safe.split(/\n{2,}/).map(block => {
         const trimmed = block.trim();
         if (!trimmed) return '';
         if (/^##\s+/.test(trimmed)) {
-            return `<h2 class="text-sm font-bold text-white mt-5 mb-2">${trimmed.replace(/^##\s+/, '')}</h2>`;
+            return `<h2 class="text-base font-black text-white mt-6 mb-2.5 tracking-tight">${trimmed.replace(/^##\s+/, '')}</h2>`;
         }
         const withBreaks = trimmed.replace(/\n/g, '<br>')
             .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white">$1</strong>');
-        return `<p class="text-[13px] text-slate-300 leading-relaxed mb-3">${withBreaks}</p>`;
+        return `<p class="text-[14px] text-slate-300 leading-[1.75] mb-4">${withBreaks}</p>`;
     }).join('');
 }
 
@@ -239,7 +240,7 @@ function renderNewsHero(item) {
                     <span class="text-slate-600" aria-hidden="true">•</span>
                     <span class="news-time text-slate-500" data-ts="${escapeHtml(item.created_at || '')}">${newsTimeAgo(item.created_at)}</span>
                 </div>
-                <h2 class="text-base font-black text-white mt-1.5 leading-snug">${escapeHtml(item.title)}</h2>
+                <h2 class="text-lg font-black text-white mt-1.5 leading-snug tracking-tight">${escapeHtml(item.title)}</h2>
                 <p class="text-[12px] text-slate-400 leading-relaxed mt-1.5 news-clamp-3">${escapeHtml(newsExcerpt(item, 190))}</p>
                 <div class="flex items-center justify-between mt-3">
                     <span class="text-[11px] text-slate-500">✍️ ${escapeHtml(item.author_name)}</span>
@@ -390,52 +391,74 @@ function renderNewsNotFound(reason) {
     if (heading) heading.focus({ preventScroll: true });
 }
 
-function renderNewsDetail() {
-    const item = currentNews;
-    const container = document.getElementById('newsDetailContainer');
-    if (!item || !container) return;
+function newsReadingTime(item) {
+    const words = String(item.body || '').split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+}
+
+// Satu-satunya perender tampilan artikel — dipakai halaman publik
+// (news/p/) DAN panel pratinjau dashboard, supaya yang dilihat writer
+// di pratinjau benar-benar sama dengan yang tayang.
+function renderNewsArticleHtml(item, opts = {}) {
+    const preview = opts.preview === true;
 
     const tagChips = newsTagList(item)
         .map(t => `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300">#${escapeHtml(t)}</span>`)
         .join('');
 
-    container.innerHTML = `
+    const shareAction = preview
+        ? "showToast('🔗 Link share aktif setelah artikel tayang.')"
+        : `shareNews('${item.id}')`;
+
+    return `
         <article class="rounded-2xl bg-white/[0.04] overflow-hidden text-left">
-            ${item.cover_url ? `
-                <div class="aspect-[16/9] bg-black/30 overflow-hidden">
-                    <img src="${escapeHtml(item.cover_url)}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover" onerror="this.parentNode.style.display='none'">
-                </div>
-            ` : ''}
-
-            <div class="p-4">
-                <div class="flex items-center gap-2 text-[10px] uppercase tracking-wide">
-                    <span class="text-emerald-300 font-bold">${escapeHtml(item.category)}</span>
-                    <span class="text-slate-600" aria-hidden="true">•</span>
-                    <span class="text-slate-500">${escapeHtml(newsFullDate(item.created_at))}</span>
+            <div class="p-4 pb-0">
+                <div class="text-[10px] uppercase tracking-[0.18em]">
+                    <span class="text-emerald-300 font-black">${escapeHtml(item.category)}</span>
                 </div>
 
-                <h1 id="headingArticle" tabindex="-1" class="text-lg font-black text-white mt-2 leading-snug">${escapeHtml(item.title)}</h1>
+                <h1 id="headingArticle" tabindex="-1" class="text-xl sm:text-2xl font-black text-white leading-[1.15] tracking-tight mt-2">${escapeHtml(item.title)}</h1>
 
-                <div class="flex items-center justify-between gap-3 pt-2.5 mt-2.5 border-t border-white/[0.06]">
-                    <span class="text-[11px] text-slate-400">✍️ ${escapeHtml(item.author_name)}</span>
-                    <button onclick="shareNews('${item.id}')" class="flex items-center gap-1.5 text-slate-400 hover:text-emerald-300 transition" aria-label="Bagikan link artikel ini">
+                ${item.excerpt ? `
+                    <p class="text-[15px] text-slate-300 leading-relaxed mt-3 font-medium">${escapeHtml(item.excerpt)}</p>
+                ` : ''}
+
+                <div class="flex items-center justify-between gap-3 mt-4 pb-4 border-b border-white/[0.08]">
+                    <div class="text-[11px] text-slate-400 min-w-0">
+                        <span class="text-slate-200 font-semibold">${escapeHtml(item.author_name)}</span>
+                        <span class="text-slate-600" aria-hidden="true"> · </span>${escapeHtml(newsFullDate(item.created_at))}
+                        <span class="text-slate-600" aria-hidden="true"> · </span>${newsReadingTime(item)} menit baca
+                    </div>
+                    <button onclick="${shareAction}" class="shrink-0 flex items-center gap-1.5 text-slate-400 hover:text-emerald-300 transition" aria-label="Bagikan link artikel ini">
                         <span class="text-xs font-medium">Bagikan</span>
                         <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/></svg>
                     </button>
                 </div>
+            </div>
 
-                ${item.excerpt ? `
-                    <p class="text-[13px] text-slate-300 leading-relaxed mt-4 pl-3 border-l-2 border-emerald-500/40">${escapeHtml(item.excerpt)}</p>
-                ` : ''}
+            ${item.cover_url ? `
+                <div class="bg-black/30 overflow-hidden">
+                    <img src="${escapeHtml(item.cover_url)}" alt="${escapeHtml(item.title)}" class="w-full max-h-[420px] object-cover" onerror="this.parentNode.style.display='none'">
+                </div>
+            ` : ''}
 
-                <div class="news-prose mt-4">${renderNewsBody(item.body)}</div>
+            <div class="p-4">
+                <div class="news-prose">${renderNewsBody(item.body)}</div>
 
                 ${tagChips ? `
-                    <div class="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-white/[0.06]">${tagChips}</div>
+                    <div class="flex flex-wrap gap-1.5 mt-5 pt-4 border-t border-white/[0.06]">${tagChips}</div>
                 ` : ''}
             </div>
         </article>
     `;
+}
+
+function renderNewsDetail() {
+    const item = currentNews;
+    const container = document.getElementById('newsDetailContainer');
+    if (!item || !container) return;
+
+    container.innerHTML = renderNewsArticleHtml(item);
 
     document.title = `${item.title} · PDFTV News`;
     const heading = document.getElementById('headingArticle');
@@ -505,15 +528,102 @@ function renderNewsDashboards() {
     const locked = document.getElementById('newsDashLocked');
     const writerPanel = document.getElementById('writerPanel');
     const ceoPanel = document.getElementById('ceoPanel');
+    const previewWrap = document.getElementById('newsPreviewWrap');
     if (!locked && !writerPanel && !ceoPanel) return;
 
     const loggedIn = isWriterLoggedIn || isCeoLoggedIn;
-    if (locked) locked.classList.toggle('hidden', loggedIn);
-    if (writerPanel) writerPanel.classList.toggle('hidden', !isWriterLoggedIn);
-    if (ceoPanel) ceoPanel.classList.toggle('hidden', !isCeoLoggedIn);
+
+    // Sesi berakhir saat pratinjau terbuka → tutup pratinjaunya juga.
+    if (!loggedIn && newsPreviewOpen) {
+        newsPreviewOpen = false;
+        if (previewWrap) previewWrap.classList.add('hidden');
+    }
+
+    // Pratinjau menempati layar penuh, jadi panel disembunyikan selama terbuka.
+    const panelHidden = !loggedIn || newsPreviewOpen;
+    if (locked) locked.classList.toggle('hidden', !panelHidden);
+    if (writerPanel) writerPanel.classList.toggle('hidden', panelHidden || !isWriterLoggedIn);
+    if (ceoPanel) ceoPanel.classList.toggle('hidden', panelHidden || !isCeoLoggedIn);
 
     if (isWriterLoggedIn) loadWriterNews();
     if (isCeoLoggedIn) loadCeoNews();
+}
+
+// ── Pratinjau artikel (writer) ───────────────────────────────
+// Memakai perender yang sama dengan halaman publik, jadi yang dilihat
+// writer di sini benar-benar sama dengan tampilan saat tayang.
+function openNewsPreview(item) {
+    const wrap = document.getElementById('newsPreviewWrap');
+    const body = document.getElementById('newsPreviewBody');
+    const note = document.getElementById('newsPreviewNote');
+    if (!wrap || !body || !item) return;
+
+    const published = item.status === 'approved';
+    if (note) {
+        note.textContent = published
+            ? '👁️ Tampilan tayang — begini artikel ini tampil di halaman berita'
+            : '👁️ Pratinjau — begini tampilannya kalau disetujui CEO';
+    }
+
+    body.innerHTML = renderNewsArticleHtml(item, { preview: !published });
+
+    ['newsDashLocked', 'writerPanel', 'ceoPanel'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+    wrap.classList.remove('hidden');
+    newsPreviewOpen = true;
+
+    playClickSound();
+    triggerHaptic('light');
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeNewsPreview() {
+    const wrap = document.getElementById('newsPreviewWrap');
+    if (wrap) wrap.classList.add('hidden');
+    newsPreviewOpen = false;
+    playClickSound();
+    renderNewsDashboards();
+}
+
+function previewWriterNews(id) {
+    const item = writerNewsData.find(n => String(n.id) === String(id));
+    if (!item) {
+        showToast('⚠️ Artikel tidak ditemukan, coba muat ulang daftar.');
+        return;
+    }
+    openNewsPreview(item);
+}
+
+// Pratinjau dari isi form (belum tersimpan), supaya writer bisa menilai
+// tampilannya sebelum mengirim.
+function previewNewsForm() {
+    if (!isWriterLoggedIn) return;
+
+    const title = newsFormValue('newsTitleInput');
+    const body = newsFormValue('newsBodyInput');
+    if (!title && !body) {
+        showToast('⚠️ Isi judul dan isi artikel dulu untuk pratinjau.');
+        return;
+    }
+
+    const editing = editingNewsId
+        ? writerNewsData.find(n => String(n.id) === String(editingNewsId))
+        : null;
+
+    openNewsPreview(normalizeNews({
+        id: editingNewsId || 'pratinjau',
+        title: title || '(judul belum diisi)',
+        excerpt: newsFormValue('newsExcerptInput'),
+        body,
+        cover_url: newsFormValue('newsCoverInput'),
+        category: newsFormValue('newsCategoryInput') || NEWS_CATEGORIES[0],
+        author_name: newsFormValue('newsAuthorInput') || 'Redaksi',
+        tags: newsFormValue('newsTagsInput'),
+        created_at: new Date().toISOString(),
+        status: editing ? editing.status : 'pending',
+    }));
 }
 
 function newsFormValue(id) {
@@ -671,13 +781,14 @@ function renderWriterRow(item) {
                     <span class="font-bold">Alasan CEO:</span> ${escapeHtml(item.reject_reason)}
                 </div>
             ` : ''}
-            <div class="flex items-center gap-1 pt-1 text-xs">
+            <div class="flex flex-wrap items-center gap-1 pt-1 text-xs">
+                <button onclick="previewWriterNews('${item.id}')" class="px-2 py-1 rounded-md text-slate-400 hover:text-sky-300 hover:bg-white/5 transition">👁️ Pratinjau</button>
                 ${editable ? `
                     <button onclick="editNews('${item.id}')" class="px-2 py-1 rounded-md text-slate-400 hover:text-white hover:bg-white/5 transition">✏️ Edit</button>
                     <button onclick="deleteWriterNews('${item.id}')" class="px-2 py-1 rounded-md text-slate-400 hover:text-red-300 hover:bg-white/5 transition">🗑️ Hapus</button>
                 ` : ''}
                 ${item.status === 'approved' ? `
-                    <a href="${newsArticleLink(item.id)}" class="px-2 py-1 rounded-md text-slate-400 hover:text-emerald-300 hover:bg-white/5 transition">🔗 Lihat tayang</a>
+                    <a href="${newsArticleLink(item.id)}" class="px-2 py-1 rounded-md text-slate-400 hover:text-emerald-300 hover:bg-white/5 transition">🔗 Buka di berita</a>
                 ` : ''}
             </div>
         </div>

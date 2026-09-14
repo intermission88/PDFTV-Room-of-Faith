@@ -374,6 +374,8 @@ body {
     overflow: hidden;
 }
 
-/* Isi artikel: paragraf dari input teks biasa */
-.news-prose p { margin-bottom: 0.75rem; }
+/* Isi artikel: paragraf & sub-judul dari input teks biasa.
+   Jarak antar-blok diatur kelas Tailwind di js/news.js, jadi di sini
+   hanya perlu mematikan margin blok terakhir dan sub-judul pertama. */
 .news-prose > :last-child { margin-bottom: 0; }
+.news-prose > h2:first-child { margin-top: 0; }

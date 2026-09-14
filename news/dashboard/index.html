@@ -179,6 +179,10 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-1">
+                        <button type="button" onclick="previewNewsForm()"
+                            class="mr-auto px-3 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold rounded-xl transition">
+                            👁️ Pratinjau
+                        </button>
                         <button type="button" id="newsCancelEditBtn" onclick="cancelNewsEdit()"
                             class="hidden px-3 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold rounded-xl transition">
                             Batal
@@ -217,6 +221,15 @@
                 </div>
 
                 <div id="ceoNewsList" class="space-y-3"></div>
+            </section>
+
+            <!-- PRATINJAU ARTIKEL (perender sama dengan halaman publik) -->
+            <section id="newsPreviewWrap" class="hidden space-y-3">
+                <div class="flex items-center justify-between gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3.5 py-2.5">
+                    <span id="newsPreviewNote" class="text-[11px] font-bold text-amber-300">👁️ Pratinjau</span>
+                    <button onclick="closeNewsPreview()" class="shrink-0 text-[11px] font-bold text-slate-300 hover:text-white transition">✕ Tutup</button>
+                </div>
+                <div id="newsPreviewBody"></div>
             </section>
         </div>
     </main>
