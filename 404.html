@@ -50,12 +50,12 @@
 
     <script>
         // Host statis menyajikan file ini untuk path yang belum ada, termasuk
-        // link post /feeds/p/<id>/ dan artikel /news/p/<id>/ yang belum
+        // link post /forum/p/<id>/ dan artikel /news/p/<id>/ yang belum
         // di-pre-render. Kalau polanya cocok, alihkan ke halaman ?id= yang
         // selalu tersedia.
         (function () {
             var path = window.location.pathname;
-            var feedMatch = path.match(/^(.*\/feeds\/p\/)(\d+)\/?$/);
+            var feedMatch = path.match(/^(.*\/forum\/p\/)(\d+)\/?$/);
             var newsMatch = path.match(/^(.*\/news\/p\/)(\d+)\/?$/);
             var match = feedMatch || newsMatch;
             if (match) {

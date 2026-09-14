@@ -13,7 +13,7 @@ const LEADERBOARD_TABLE = 'PDFTV Blackjack Leaderboard';
 
 // --- ROOT SITUS & LINK POST ---
 // Dihitung dari lokasi core.js supaya kedalaman folder tidak pernah salah hitung
-// (halaman feeds maupun feeds/p menghasilkan root yang sama).
+// (halaman forum maupun forum/p menghasilkan root yang sama).
 const SITE_ROOT = (() => {
     const s = document.querySelector('script[src$="js/core.js"]');
     return s ? new URL('../', s.src).href : new URL('.', location.href).href;
@@ -22,7 +22,7 @@ const SITE_ROOT = (() => {
 // URL share memakai halaman hasil pre-render (punya tag OG berisi isi post).
 // Halaman ?id= tetap ada sebagai cadangan; lihat 404.html.
 function buildPostUrl(id) {
-    return SITE_ROOT + 'feeds/p/' + encodeURIComponent(String(id)) + '/';
+    return SITE_ROOT + 'forum/p/' + encodeURIComponent(String(id)) + '/';
 }
 
 // Sama untuk artikel News (news/p/<id>/), lihat 404.html untuk cadangannya.

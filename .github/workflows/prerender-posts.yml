@@ -2,7 +2,7 @@ name: Pre-render post (Open Graph)
 
 # WhatsApp/Facebook tidak menjalankan JavaScript, jadi halaman post perlu
 # tag Open Graph yang sudah ada di HTML. Workflow ini menghasilkan halaman
-# statis feeds/p/<id>/ + kartu assets/og/<id>.png, lalu meng-commit hasilnya.
+# statis forum/p/<id>/ + kartu assets/og/<id>.png, lalu meng-commit hasilnya.
 #
 # Post yang baru dibuat butuh menunggu jadwal berikutnya (atau jalankan
 # manual lewat tombol "Run workflow").
@@ -47,8 +47,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # news/p WAJIB ikut: kalau tidak, halaman artikel ter-generate lalu dibuang.
-          git add feeds/p assets/og news/p
+          # forum/p WAJIB ikut: kalau tidak, halaman post ter-generate lalu dibuang.
+          # news/p juga (halaman artikel) — pernah terlewat.
+          git add forum/p assets/og news/p
           if git diff --cached --quiet; then
             echo "Tidak ada perubahan."
             exit 0

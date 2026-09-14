@@ -1,6 +1,6 @@
 // ============================================================
 // ROOM OF FAITH — FULL ONLINE MODE + SUPABASE REALTIME
-// Dimuat di index.html (statistik) dan feeds/index.html (feed penuh).
+// Dimuat di index.html (statistik) dan forum/index.html (feed penuh).
 // Status login moderator ada di core.js karena sesi lintas halaman.
 // ============================================================
 const FEEDS_TABLE = 'PDFTV Feeds';
@@ -474,7 +474,7 @@ async function submitConfession(e) {
 
 // ── Lapisan API bersama (dipakai halaman feeds dan halaman detail post) ──
 
-// Ambil satu post berdasarkan id. Dipakai halaman detail /feeds/p/.
+// Ambil satu post berdasarkan id. Dipakai halaman detail /forum/p/.
 async function fetchFeedById(id) {
     const numericId = Number(id);
     if (!Number.isFinite(numericId)) return null;
@@ -700,7 +700,7 @@ async function moderatorDeleteFeed(id) {
             renderFeeds();
         } else {
             // Dihapus dari halaman detail: post sudah tidak ada, kembali ke daftar
-            setTimeout(() => { window.location.href = SITE_ROOT + 'feeds/'; }, 800);
+            setTimeout(() => { window.location.href = SITE_ROOT + 'forum/'; }, 800);
         }
     }
 }

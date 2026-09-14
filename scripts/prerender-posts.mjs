@@ -4,7 +4,7 @@
 // WhatsApp/Facebook tidak menjalankan JavaScript, jadi tag OG harus
 // sudah ada di HTML yang dikirim server. Skrip ini dijalankan oleh
 // GitHub Actions untuk menghasilkan, per post:
-//   - feeds/p/<id>/index.html  (tag OG berisi isi post + gambar absolut)
+//   - forum/p/<id>/index.html  (tag OG berisi isi post + gambar absolut)
 //   - assets/og/<id>.png       (kartu 1200x630 berisi teks post)
 //
 // Post NSFW TIDAK pernah ditulis isinya ke HTML/PNG — link bisa menyebar
@@ -19,9 +19,9 @@ import path from 'node:path';
 import sharp from 'sharp';
 
 const ROOT = path.resolve(new URL('..', import.meta.url).pathname);
-const TEMPLATE_PATH = path.join(ROOT, 'feeds/p/index.html');
+const TEMPLATE_PATH = path.join(ROOT, 'forum/p/index.html');
 const OG_DIR = path.join(ROOT, 'assets/og');
-const PAGE_DIR = path.join(ROOT, 'feeds/p');
+const PAGE_DIR = path.join(ROOT, 'forum/p');
 
 // Artikel News: template & hasilnya sama-sama 2 level dari root
 // (news/p/ → news/p/<id>/), jadi path relatif template dipakai apa adanya.
@@ -208,7 +208,7 @@ function buildCardSvg({ alias, text, upvotes, comments, sensitive }) {
 
 // ── Halaman HTML ─────────────────────────────────────────────
 // Halaman pre-render berada SATU TINGKAT LEBIH DALAM dari template
-// (feeds/p/<id>/ vs feeds/p/, news/p/<id>/ vs news/p/), jadi setiap path
+// (forum/p/<id>/ vs forum/p/, news/p/<id>/ vs news/p/), jadi setiap path
 // relatif harus ditambah satu "../". Tanpa ini, semua aset (CSS/JS/gambar)
 // dan tautan nav 404.
 function deepenRelativePaths(html) {
@@ -311,7 +311,7 @@ async function removeOrphans(liveIds) {
             if (!entry.isDirectory() || !/^\d+$/.test(entry.name)) continue;
             if (liveIds.has(entry.name)) continue;
             await rm(path.join(PAGE_DIR, entry.name), { recursive: true });
-            console.log(`  - hapus halaman yatim: feeds/p/${entry.name}/`);
+            console.log(`  - hapus halaman yatim: forum/p/${entry.name}/`);
             removed++;
         }
     }
@@ -451,7 +451,7 @@ async function main() {
         const confession = collapse(post.confession);
         const comments = Array.isArray(post.comments) ? post.comments.length : 0;
         const upvotes = Number(post.upvotes || 0);
-        const absoluteUrl = `${SITE_ORIGIN}feeds/p/${id}/`;
+        const absoluteUrl = `${SITE_ORIGIN}forum/p/${id}/`;
 
         const page = isNsfw
             ? {

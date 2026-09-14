@@ -51,9 +51,9 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 | File | Isi |
 |---|---|
 | `index.html` | Halaman landing (manifesto, slider, kartu, statistik) |
-| `feeds/index.html` | Halaman Room of Faith |
-| `feeds/p/index.html` | Halaman detail satu post + seluruh komentarnya (link bisa dibagikan) |
-| `feeds/p/<id>/index.html` | Hasil pre-render per post: tag Open Graph berisi isi post (dibuat otomatis, jangan diedit manual) |
+| `forum/index.html` | Halaman Room of Faith |
+| `forum/p/index.html` | Halaman detail satu post + seluruh komentarnya (link bisa dibagikan) |
+| `forum/p/<id>/index.html` | Hasil pre-render per post: tag Open Graph berisi isi post (dibuat otomatis, jangan diedit manual) |
 | `news/index.html` | Halaman berita (headline, kategori, pencarian) |
 | `news/p/index.html` | Halaman isi artikel (sekaligus cadangan `?id=<id>`) |
 | `news/p/<id>/index.html` | Hasil pre-render per artikel: tag Open Graph (dibuat otomatis, jangan diedit manual) |
@@ -66,7 +66,7 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 | `js/news.js` | Logika halaman berita, isi artikel, dan dashboard writer/CEO |
 | `scripts/prerender-posts.mjs` | Pre-render halaman post + kartu gambar OG (dijalankan CI) |
 | `404.html` | Jaring terakhir untuk path tak dikenal (dan pengalih client-side bila perlu) |
-| `vercel.json` | Urutan rute: `handle: filesystem` lebih dulu, lalu fallback `/feeds/p/<id>/` & `/news/p/<id>/` → `?id=<id>` |
+| `vercel.json` | Urutan rute: `handle: filesystem` lebih dulu, lalu fallback `/forum/p/<id>/` & `/news/p/<id>/` → `?id=<id>` |
 | `js/landing.js` | Typewriter + slider (hanya halaman landing) |
 | `js/arcade.js` | Gameplay blackjack, leaderboard, panel cheat, persistensi run |
 | `js/feeds-data.js` | Data feed awal untuk fallback sebelum Supabase termuat |
@@ -79,10 +79,11 @@ Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, 
 
 ### URL & state lintas halaman
 
-- `/` landing, `/feeds/` Room of Faith, `/feeds/p/<id>/` detail satu post, `/news/` berita, `/news/p/<id>/` isi satu artikel, `/news/dashboard/` dashboard redaksi, `/arcade/` Blackjack Arcade. Halaman lama `/feeds/p/?id=<id>` dan `/news/p/?id=<id>` tetap berfungsi sebagai cadangan.
-- Tiap post punya halaman statis hasil pre-render di `/feeds/p/<id>/` yang memuat tag Open Graph berisi **isi postingannya**, sehingga preview saat link dibagikan (WhatsApp, Facebook) menampilkan pengakuan itu, bukan template.
+- `/` landing, `/forum/` Room of Faith, `/forum/p/<id>/` detail satu post, `/news/` berita, `/news/p/<id>/` isi satu artikel, `/news/dashboard/` dashboard redaksi, `/arcade/` Blackjack Arcade. Halaman lama `/forum/p/?id=<id>` dan `/news/p/?id=<id>` tetap berfungsi sebagai cadangan.
+- Section Room of Faith dulu berada di `/feeds/`; sekarang `/forum/`. URL lama **tidak** di-redirect, jadi link `/feeds/*` yang sudah tersebar tidak lagi bisa dibuka.
+- Tiap post punya halaman statis hasil pre-render di `/forum/p/<id>/` yang memuat tag Open Graph berisi **isi postingannya**, sehingga preview saat link dibagikan (WhatsApp, Facebook) menampilkan pengakuan itu, bukan template.
 - Preview dihasilkan oleh `.github/workflows/prerender-posts.yml` (jadwal tiap 10 menit + bisa dijalankan manual dari tab Actions). Artikel/post yang baru dibuat menunggu jadwal berikutnya.
-- Supaya link **tetap berfungsi sebelum halaman pre-render-nya ada**, `vercel.json` memakai urutan `handle: filesystem` lalu mengalihkan `/feeds/p/<id>/` dan `/news/p/<id>/` ke halaman `?id=<id>` (yang selalu tersedia). Jadi share link tidak pernah mendarat di 404 — dan crawler WhatsApp/Facebook tidak lagi membaca judul halaman 404. `404.html` tetap ada sebagai jaring terakhir untuk path yang benar-benar tidak dikenal.
+- Supaya link **tetap berfungsi sebelum halaman pre-render-nya ada**, `vercel.json` memakai urutan `handle: filesystem` lalu mengalihkan `/forum/p/<id>/` dan `/news/p/<id>/` ke halaman `?id=<id>` (yang selalu tersedia). Jadi share link tidak pernah mendarat di 404 — dan crawler WhatsApp/Facebook tidak lagi membaca judul halaman 404. `404.html` tetap ada sebagai jaring terakhir untuk path yang benar-benar tidak dikenal.
 - Post bertanda NSFW **tidak** pernah menuliskan isinya ke tag OG maupun gambar preview: preview-nya hanya "Konten sensitif". Ini disengaja karena link menyebar bebas.
 - Artikel News ikut di-pre-render (hanya yang sudah `approved`) tapi **tanpa** kartu PNG: `og:image` memakai URL cover artikel, dengan `assets/og/fallback.png` sebagai cadangan. Halaman artikel yang ditolak atau ditarik ikut dihapus, jadi link lama tidak lagi menampilkan artikel yang sudah dicabut. Kalau tabel `PDFTV News` belum dibuat, skrip hanya memberi peringatan dan feed tetap diproses.
 - Tombol **Bagikan** memakai Web Share API, dengan fallback salin ke clipboard.
@@ -97,11 +98,11 @@ WhatsApp/Facebook tidak menjalankan JavaScript, jadi tag OG harus ada di HTML ya
 
 | Bagian | Isi |
 |---|---|
-| `scripts/prerender-posts.mjs` | Mengambil post **dan artikel** dari Supabase REST: menulis `feeds/p/<id>/index.html` + kartu `assets/og/<id>.png`, serta `news/p/<id>/index.html` (OG-nya memakai `cover_url` artikel) |
+| `scripts/prerender-posts.mjs` | Mengambil post **dan artikel** dari Supabase REST: menulis `forum/p/<id>/index.html` + kartu `assets/og/<id>.png`, serta `news/p/<id>/index.html` (OG-nya memakai `cover_url` artikel) |
 | `scripts/package.json` | Dependensi `sharp` untuk merasterkan kartu SVG → PNG |
 | `.github/workflows/prerender-posts.yml` | Menjalankan skrip di runner, commit hasilnya, lalu push |
 | `assets/og/fallback.png` | Kartu brand, dipakai untuk post NSFW dan sebagai cadangan |
-| `404.html` | Mengalihkan `/feeds/p/<id>/` yang belum ter-generate ke `?id=<id>` |
+| `404.html` | Mengalihkan `/forum/p/<id>/` yang belum ter-generate ke `?id=<id>` |
 
 Menjalankan manual (butuh Node 20+):
 
@@ -113,7 +114,7 @@ node scripts/prerender-posts.mjs --limit=3  # hanya 3 terbaru
 
 Skrip hanya menulis berkas yang isinya berubah, jadi jadwal berulang tidak menghasilkan commit kosong. Kartu yang teksnya melebihi batas diukur ulang setelah render dan dilaporkan sebagai peringatan. Skrip juga membersihkan halaman dan kartu untuk post yang sudah dihapus, supaya link lama tidak lagi menampilkan konten yang sudah tidak ada.
 
-> **Penting saat menjalankan lokal:** PNG hanya boleh digenerate oleh CI. macOS tidak memiliki font DejaVu Sans yang dipakai runner Ubuntu, sehingga hasil render lokal selalu berbeda byte-nya dan akan membuat commit bolak-balik. Setelah menjalankan skrip lokal, kembalikan gambarnya dengan `git checkout -- assets/og/`. Perubahan HTML di `feeds/p/` aman di-commit karena tidak bergantung pada font.
+> **Penting saat menjalankan lokal:** PNG hanya boleh digenerate oleh CI. macOS tidak memiliki font DejaVu Sans yang dipakai runner Ubuntu, sehingga hasil render lokal selalu berbeda byte-nya dan akan membuat commit bolak-balik. Setelah menjalankan skrip lokal, kembalikan gambarnya dengan `git checkout -- assets/og/`. Perubahan HTML di `forum/p/` aman di-commit karena tidak bergantung pada font.
 
 ---
 

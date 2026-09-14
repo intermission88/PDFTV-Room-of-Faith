@@ -1,7 +1,7 @@
 // ============================================================
-// PDFTV | DETAIL POST (feeds/p/index.html)
+// PDFTV | DETAIL POST (forum/p/index.html)
 // Menampilkan satu post beserta SELURUH komentarnya, dengan link
-// yang bisa dibagikan (/feeds/p/?id=<id>).
+// yang bisa dibagikan (/forum/p/?id=<id>).
 // Memakai lapisan API bersama dari feeds.js — tidak ada RPC langsung.
 // ============================================================
 
@@ -14,12 +14,12 @@ function getPostIdFromUrl() {
     const metaId = meta && meta.getAttribute('content');
     if (metaId && /^\d+$/.test(metaId)) return metaId;
 
-    // 2) Query string: /feeds/p/?id=<id>
+    // 2) Query string: /forum/p/?id=<id>
     const raw = new URLSearchParams(window.location.search).get('id');
     if (raw && /^\d+$/.test(raw)) return raw;
 
-    // 3) Path cantik: /feeds/p/<id>/
-    const m = window.location.pathname.match(/\/feeds\/p\/(\d+)\/?$/);
+    // 3) Path cantik: /forum/p/<id>/
+    const m = window.location.pathname.match(/\/forum\/p\/(\d+)\/?$/);
     if (m) return m[1];
 
     return null;
