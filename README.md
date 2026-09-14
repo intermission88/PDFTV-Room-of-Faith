@@ -65,7 +65,8 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 | `js/post.js` | Logika halaman detail post (render post, komentar, upvote, tombol bagikan) |
 | `js/news.js` | Logika halaman berita, isi artikel, dan dashboard writer/CEO |
 | `scripts/prerender-posts.mjs` | Pre-render halaman post + kartu gambar OG (dijalankan CI) |
-| `404.html` | Pengalih untuk link post yang belum di-pre-render |
+| `404.html` | Jaring terakhir untuk path tak dikenal (dan pengalih client-side bila perlu) |
+| `vercel.json` | Urutan rute: `handle: filesystem` lebih dulu, lalu fallback `/feeds/p/<id>/` & `/news/p/<id>/` → `?id=<id>` |
 | `js/landing.js` | Typewriter + slider (hanya halaman landing) |
 | `js/arcade.js` | Gameplay blackjack, leaderboard, panel cheat, persistensi run |
 | `js/feeds-data.js` | Data feed awal untuk fallback sebelum Supabase termuat |
@@ -80,7 +81,8 @@ Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, 
 
 - `/` landing, `/feeds/` Room of Faith, `/feeds/p/<id>/` detail satu post, `/news/` berita, `/news/p/<id>/` isi satu artikel, `/news/dashboard/` dashboard redaksi, `/arcade/` Blackjack Arcade. Halaman lama `/feeds/p/?id=<id>` dan `/news/p/?id=<id>` tetap berfungsi sebagai cadangan.
 - Tiap post punya halaman statis hasil pre-render di `/feeds/p/<id>/` yang memuat tag Open Graph berisi **isi postingannya**, sehingga preview saat link dibagikan (WhatsApp, Facebook) menampilkan pengakuan itu, bukan template.
-- Preview dihasilkan oleh `.github/workflows/prerender-posts.yml` (jadwal tiap 10 menit + bisa dijalankan manual dari tab Actions). Post yang baru dibuat menunggu jadwal berikutnya; link tetap bisa dibuka sebelum itu lewat `404.html` yang mengalihkan ke halaman `?id=`.
+- Preview dihasilkan oleh `.github/workflows/prerender-posts.yml` (jadwal tiap 10 menit + bisa dijalankan manual dari tab Actions). Artikel/post yang baru dibuat menunggu jadwal berikutnya.
+- Supaya link **tetap berfungsi sebelum halaman pre-render-nya ada**, `vercel.json` memakai urutan `handle: filesystem` lalu mengalihkan `/feeds/p/<id>/` dan `/news/p/<id>/` ke halaman `?id=<id>` (yang selalu tersedia). Jadi share link tidak pernah mendarat di 404 — dan crawler WhatsApp/Facebook tidak lagi membaca judul halaman 404. `404.html` tetap ada sebagai jaring terakhir untuk path yang benar-benar tidak dikenal.
 - Post bertanda NSFW **tidak** pernah menuliskan isinya ke tag OG maupun gambar preview: preview-nya hanya "Konten sensitif". Ini disengaja karena link menyebar bebas.
 - Artikel News ikut di-pre-render (hanya yang sudah `approved`) tapi **tanpa** kartu PNG: `og:image` memakai URL cover artikel, dengan `assets/og/fallback.png` sebagai cadangan. Halaman artikel yang ditolak atau ditarik ikut dihapus, jadi link lama tidak lagi menampilkan artikel yang sudah dicabut. Kalau tabel `PDFTV News` belum dibuat, skrip hanya memberi peringatan dan feed tetap diproses.
 - Tombol **Bagikan** memakai Web Share API, dengan fallback salin ke clipboard.

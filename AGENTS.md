@@ -34,7 +34,8 @@ Situs statis, live di **https://pdftv.vercel.app/** (multipage, tanpa build step
 
 ## Preview share (Open Graph)
 - WhatsApp/Facebook tidak menjalankan JS, jadi tag OG harus ada di HTML yang dikirim server → itu sebabnya ada pre-render.
-- CI `.github/workflows/prerender-posts.yml` (cron 10 menit + manual) menjalankan `scripts/prerender-posts.mjs`, lalu commit `feeds/p/<id>/` + `assets/og/<id>.png`.
+- CI `.github/workflows/prerender-posts.yml` (cron 10 menit + manual) menjalankan `scripts/prerender-posts.mjs`, lalu commit `feeds/p/<id>/` + `assets/og/<id>.png` **dan `news/p/<id>/`** (jangan lupa `news/p` di `git add` — pernah terlewat sehingga halaman artikel tidak pernah ter-push).
+- `vercel.json` (repo root) mengurutkan rute: `handle: filesystem` dulu, baru fallback `/feeds/p/<id>/` & `/news/p/<id>/` → `?id=<id>`. Tanpa ini, link share yang belum ter-pre-render mendarat di `404.html` → preview WhatsApp hanya menampilkan judul "Halaman tidak ditemukan".
 - Artikel News ikut di-pre-render ke `news/p/<id>/` (hanya yang `approved`), tapi **tanpa PNG**: `og:image` memakai `cover_url` artikel apa adanya (cadangan `assets/og/fallback.png`) dan `og:description` = `Oleh <penulis> — <ringkasan>`, jadi tidak ada churn font. Kalau tabel `PDFTV News` belum ada, skrip hanya memberi warning dan feed tetap diproses.
 - Post NSFW **tidak pernah** menulis isi ke HTML/PNG (pakai `assets/og/fallback.png`). Skrip mengukur ulang hasil render untuk deteksi teks meluber (warning, bukan error).
 - Skrip juga **menghapus** `feeds/p/<id>/` + `assets/og/<id>.png` untuk post yang sudah tidak ada di database, dan `news/p/<id>/` untuk artikel yang tidak lagi `approved` (kalau tidak, link lama tetap menampilkan konten yang sudah dihapus/ditarik). Pembersihan ini dilewati saat `--limit` dipakai.

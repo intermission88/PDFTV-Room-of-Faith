@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/feeds/p/(\\d+)/?", "dest": "/feeds/p/?id=$1" },
+    { "src": "/news/p/(\\d+)/?", "dest": "/news/p/?id=$1" }
+  ]
+}
