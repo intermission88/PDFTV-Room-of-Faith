@@ -330,3 +330,50 @@ body {
     #viewLanding.space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.65rem; }
     main.pb-8 { padding-bottom: 8rem; }
 }
+
+/* ── NEWS: halaman berita, kartu, chip kategori, dashboard ─────
+   Aksen emerald sama dengan aksi feed/news yang lain. Hanya
+   transform/background yang dianimasikan, dan semuanya ikut mati
+   lewat aturan prefers-reduced-motion di atas. */
+.news-hero { transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
+.news-hero:hover {
+    background-color: rgba(16, 185, 129, 0.07);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -12px rgba(16, 185, 129, 0.25);
+}
+.news-hero:active { transform: translateY(0); }
+
+.news-card { transition: background-color 0.2s ease, transform 0.2s ease; }
+.news-card:hover { background-color: rgba(255, 255, 255, 0.07); transform: translateY(-2px); }
+.news-card:active { transform: translateY(0) scale(0.995); }
+
+.news-chip {
+    padding: 0.3rem 0.7rem;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.news-chip:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.news-chip-active { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+
+/* Batasi blok teks tanpa bergantung pada util line-clamp CDN */
+.news-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.news-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Isi artikel: paragraf dari input teks biasa */
+.news-prose p { margin-bottom: 0.75rem; }
+.news-prose > :last-child { margin-bottom: 0; }

@@ -25,6 +25,11 @@ function buildPostUrl(id) {
     return SITE_ROOT + 'feeds/p/' + encodeURIComponent(String(id)) + '/';
 }
 
+// Sama untuk artikel News (news/p/<id>/), lihat 404.html untuk cadangannya.
+function buildNewsUrl(id) {
+    return SITE_ROOT + 'news/p/' + encodeURIComponent(String(id)) + '/';
+}
+
 // --- HAPTIC FEEDBACK ENGINE ---
 function triggerHaptic(type = 'light') {
     if (!('vibrate' in navigator)) return;
@@ -45,8 +50,13 @@ function triggerHaptic(type = 'light') {
 // bertahan saat berpindah halaman.
 let isAdminLoggedIn = false;
 let isModeratorLoggedIn = false;
+// Peran khusus News: writer mengirim artikel, CEO menyetujui/menolak.
+let isWriterLoggedIn = false;
+let isCeoLoggedIn = false;
 let adminPass = null;
 let moderatorPass = null;
+let writerPass = null;
+let ceoPass = null;
 let cheatUnlimitedConsumables = false;
 
 function toggleAdminModal(open) {
@@ -138,6 +148,14 @@ async function verifyPasswordServerSide(pass, rpcName) {
     return { ok: result.data === true, error: result.error };
 }
 
+// Hanya satu peran aktif pada satu waktu.
+function setActiveRole(role) {
+    isAdminLoggedIn = role === 'admin';
+    isModeratorLoggedIn = role === 'moderator';
+    isWriterLoggedIn = role === 'writer';
+    isCeoLoggedIn = role === 'ceo';
+}
+
 async function handleAdminLogin(e) {
     e.preventDefault();
     const passwordInput = document.getElementById('adminPasswordInput').value;
@@ -160,15 +178,24 @@ async function handleAdminLogin(e) {
             alert("Verifikasi server belum aktif. Jalankan supabase_upgrade.sql di Supabase, lalu coba lagi.");
             return;
         } else {
+            // Berurutan: moderator (feeds) -> writer (news) -> CEO (approval news).
             const modCheck = await verifyPasswordServerSide(passwordInput, 'verify_moderator');
             if (modCheck.ok === true) {
                 role = 'moderator';
+            } else {
+                const writerCheck = await verifyPasswordServerSide(passwordInput, 'verify_writer');
+                if (writerCheck.ok === true) {
+                    role = 'writer';
+                } else {
+                    const ceoCheck = await verifyPasswordServerSide(passwordInput, 'verify_ceo');
+                    if (ceoCheck.ok === true) role = 'ceo';
+                }
             }
         }
 
         if (role === 'admin') {
-            isAdminLoggedIn = true;
-            isModeratorLoggedIn = false;
+            setActiveRole('admin');
+            adminPass = passwordInput;
             toggleAdminModal(false);
             updateAdminUI();
             playAdminSound();
@@ -176,8 +203,7 @@ async function handleAdminLogin(e) {
             showToast("🔓 Akses Admin Blackjack (Cheat Panel) Aktif!");
             saveSession();
         } else if (role === 'moderator') {
-            isModeratorLoggedIn = true;
-            isAdminLoggedIn = false;
+            setActiveRole('moderator');
             moderatorPass = passwordInput;
             toggleAdminModal(false);
             updateAdminUI();
@@ -185,10 +211,28 @@ async function handleAdminLogin(e) {
             triggerHaptic('heavy');
             showToast("🛡️ Akses Moderator Feeds (Pin & NSFW) Aktif!");
             saveSession();
+        } else if (role === 'writer') {
+            setActiveRole('writer');
+            writerPass = passwordInput;
+            toggleAdminModal(false);
+            updateAdminUI();
+            playAdminSound();
+            triggerHaptic('heavy');
+            showToast("✍️ Akses Writer News Aktif! Tulis & kirim artikel untuk direview.");
+            saveSession();
+        } else if (role === 'ceo') {
+            setActiveRole('ceo');
+            ceoPass = passwordInput;
+            toggleAdminModal(false);
+            updateAdminUI();
+            playAdminSound();
+            triggerHaptic('heavy');
+            showToast("👑 Akses CEO News Aktif! Panel persetujuan artikel terbuka.");
+            saveSession();
         } else {
             playBustSound();
             triggerHaptic('bust');
-            alert("Password Admin / Moderator Salah!");
+            alert("Password Admin / Moderator / Writer / CEO Salah!");
         }
     } catch (err) {
         console.error('Login error:', err);
@@ -205,14 +249,15 @@ async function handleAdminLogin(e) {
 function handleAdminLogout() {
     playClickSound();
     triggerHaptic('light');
-    isAdminLoggedIn = false;
-    isModeratorLoggedIn = false;
+    setActiveRole(null);
     adminPass = null;
     moderatorPass = null;
+    writerPass = null;
+    ceoPass = null;
     cheatUnlimitedConsumables = false;
     saveSession();
     updateAdminUI();
-    showToast("🔒 Sesi Admin / Moderator Berakhir.");
+    showToast("🔒 Sesi Admin / Moderator / Writer / CEO Berakhir.");
 }
 
 function toggleBurgerMenu(open) {
@@ -243,6 +288,10 @@ function updateAdminUI() {
     const adminCheatPanel = document.getElementById('adminCheatPanel');
     const burgerAdminBadge = document.getElementById('burgerAdminBadge');
     const burgerAdminActions = document.getElementById('burgerAdminActions');
+    const burgerNewsDashLink = document.getElementById('burgerNewsDashLink');
+
+    // Tautan dashboard News hanya untuk writer/CEO.
+    if (burgerNewsDashLink) burgerNewsDashLink.classList.toggle('hidden', !(isWriterLoggedIn || isCeoLoggedIn));
 
     if (isAdminLoggedIn) {
         if (burgerAdminBadge) {
@@ -260,6 +309,22 @@ function updateAdminUI() {
         if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
         if (adminResetBtn) adminResetBtn.classList.add('hidden');
         if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
+    } else if (isWriterLoggedIn) {
+        if (burgerAdminBadge) {
+            burgerAdminBadge.className = "text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold  ";
+            burgerAdminBadge.textContent = "WRITER (NEWS)";
+        }
+        if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
+        if (adminResetBtn) adminResetBtn.classList.add('hidden');
+        if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
+    } else if (isCeoLoggedIn) {
+        if (burgerAdminBadge) {
+            burgerAdminBadge.className = "text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold  ";
+            burgerAdminBadge.textContent = "CEO (NEWS)";
+        }
+        if (burgerAdminActions) burgerAdminActions.classList.remove('hidden');
+        if (adminResetBtn) adminResetBtn.classList.add('hidden');
+        if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
     } else {
         if (burgerAdminBadge) {
             burgerAdminBadge.className = "text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300";
@@ -270,6 +335,7 @@ function updateAdminUI() {
         if (adminCheatPanel) adminCheatPanel.classList.add('hidden');
     }
     if (typeof renderFeeds === 'function') renderFeeds();
+    if (typeof renderNewsDashboards === 'function') renderNewsDashboards();
 }
 
 // --- BALATRO SYNTH AUDIO ENGINE & PROCEDURAL CHIPTUNE BGM (WEB AUDIO API) ---
@@ -743,6 +809,10 @@ function saveSession() {
             sessionStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'admin', pass: adminPass }));
         } else if (isModeratorLoggedIn && moderatorPass) {
             sessionStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'moderator', pass: moderatorPass }));
+        } else if (isWriterLoggedIn && writerPass) {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'writer', pass: writerPass }));
+        } else if (isCeoLoggedIn && ceoPass) {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify({ role: 'ceo', pass: ceoPass }));
         } else {
             sessionStorage.removeItem(SESSION_KEY);
         }
@@ -756,13 +826,17 @@ function restoreSession() {
     try {
         const s = JSON.parse(raw);
         if (s.role === 'admin' && s.pass) {
-            isAdminLoggedIn = true;
-            isModeratorLoggedIn = false;
+            setActiveRole('admin');
             adminPass = s.pass;
         } else if (s.role === 'moderator' && s.pass) {
-            isModeratorLoggedIn = true;
-            isAdminLoggedIn = false;
+            setActiveRole('moderator');
             moderatorPass = s.pass;
+        } else if (s.role === 'writer' && s.pass) {
+            setActiveRole('writer');
+            writerPass = s.pass;
+        } else if (s.role === 'ceo' && s.pass) {
+            setActiveRole('ceo');
+            ceoPass = s.pass;
         }
     } catch (e) { /* data rusak; abaikan */ }
 }

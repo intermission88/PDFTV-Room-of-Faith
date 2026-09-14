@@ -23,6 +23,11 @@ const TEMPLATE_PATH = path.join(ROOT, 'feeds/p/index.html');
 const OG_DIR = path.join(ROOT, 'assets/og');
 const PAGE_DIR = path.join(ROOT, 'feeds/p');
 
+// Artikel News: template & hasilnya sama-sama 2 level dari root
+// (news/p/ → news/p/<id>/), jadi path relatif template dipakai apa adanya.
+const NEWS_TEMPLATE_PATH = path.join(ROOT, 'news/p/index.html');
+const NEWS_PAGE_DIR = path.join(ROOT, 'news/p');
+
 // Origin situs yang benar-benar melayani halaman ini (Vercel), BUKAN GitHub
 // Pages: repo ini tidak mengaktifkan Pages, jadi gambar dari github.io 404 dan
 // WhatsApp hanya menampilkan preview teks tanpa gambar.
@@ -203,14 +208,15 @@ function buildCardSvg({ alias, text, upvotes, comments, sensitive }) {
 
 // ── Halaman HTML ─────────────────────────────────────────────
 // Halaman pre-render berada SATU TINGKAT LEBIH DALAM dari template
-// (feeds/p/<id>/ vs feeds/p/), jadi setiap path relatif harus ditambah
-// satu "../". Tanpa ini, semua aset (CSS/JS/gambar) dan tautan nav 404.
+// (feeds/p/<id>/ vs feeds/p/, news/p/<id>/ vs news/p/), jadi setiap path
+// relatif harus ditambah satu "../". Tanpa ini, semua aset (CSS/JS/gambar)
+// dan tautan nav 404.
 function deepenRelativePaths(html) {
     return html.replace(/(\b(?:href|src)=")((?:\.\.\/)+)/g, (match, attr, dots) => attr + '../' + dots);
 }
 
-function buildPageHtml(template, { id, title, description, image, imageAlt, absoluteUrl }) {
-    const metaBlock = [
+function ogMetaBlock({ title, description, image, imageAlt, absoluteUrl, imageSize }) {
+    const lines = [
         `<title>${escapeHtml(title)}</title>`,
         `<meta name="description" content="${escapeHtml(description)}">`,
         `<link rel="canonical" href="${escapeHtml(absoluteUrl)}">`,
@@ -219,22 +225,41 @@ function buildPageHtml(template, { id, title, description, image, imageAlt, abso
         `<meta property="og:description" content="${escapeHtml(description)}">`,
         `<meta property="og:url" content="${escapeHtml(absoluteUrl)}">`,
         `<meta property="og:image" content="${escapeHtml(image)}">`,
-        `<meta property="og:image:width" content="${CARD_W}">`,
-        `<meta property="og:image:height" content="${CARD_H}">`,
-        `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}">`,
-        `<meta name="twitter:card" content="summary_large_image">`,
-    ].join('\n    ');
+    ];
+    if (imageSize) {
+        lines.push(`<meta property="og:image:width" content="${CARD_W}">`);
+        lines.push(`<meta property="og:image:height" content="${CARD_H}">`);
+    }
+    lines.push(`<meta property="og:image:alt" content="${escapeHtml(imageAlt)}">`);
+    lines.push(`<meta name="twitter:card" content="summary_large_image">`);
+    return lines.join('\n    ');
+}
 
-    const html = template
-        .replace(/<meta name="post-id" content="[^"]*">/, `<meta name="post-id" content="${id}">`)
+// Buang meta lama lalu sisipkan blok OG yang sudah terisi.
+function injectMeta(template, idMetaName, id, metaBlock) {
+    return template
+        .replace(new RegExp(`<meta name="${idMetaName}" content="[^"]*">`), `<meta name="${idMetaName}" content="${id}">`)
         .replace(/<title>[\s\S]*?<\/title>\s*/, '')
         .replace(/<meta name="description"[^>]*>\s*/g, '')
         .replace(/<link rel="canonical"[^>]*>\s*/g, '')
         .replace(/<meta property="og:[^>]*>\s*/g, '')
         .replace(/<meta name="twitter:[^>]*>\s*/g, '')
         .replace(/(<meta name="viewport"[^>]*>)/, `$1\n    ${metaBlock}`);
+}
 
-    return deepenRelativePaths(html);
+function buildPageHtml(template, data) {
+    return deepenRelativePaths(
+        injectMeta(template, 'post-id', data.id, ogMetaBlock({ ...data, imageSize: true }))
+    );
+}
+
+// Artikel News memakai cover_url sebagai og:image (tanpa generate PNG),
+// jadi ukuran gambar TIDAK ditulis (dimensinya milik gambar eksternal).
+// Kedalaman folder diperlakukan sama seperti feed (lihat deepenRelativePaths).
+function buildNewsPageHtml(template, data) {
+    return deepenRelativePaths(
+        injectMeta(template, 'news-id', data.id, ogMetaBlock({ ...data, imageSize: false }))
+    );
 }
 
 // ── Tulis hanya kalau berubah (anti-churn) ───────────────────
@@ -301,6 +326,77 @@ async function removeOrphans(liveIds) {
         }
     }
 
+    return removed;
+}
+
+// ── News: halaman artikel untuk preview share ────────────────
+// Hanya artikel berstatus 'approved' yang di-pre-render (artikel pending
+// memang tidak boleh terbaca publik). og:image memakai cover_url artikel;
+// bila kosong, pakai kartu brand sebagai cadangan.
+async function renderNews(template, supaUrl, supaKey, limit) {
+    console.log('Mengambil daftar artikel dari Supabase...');
+    const res = await fetch(
+        `${supaUrl}/rest/v1/PDFTV%20News?select=*&status=eq.approved&order=id.asc`,
+        { headers: { apikey: supaKey, Authorization: `Bearer ${supaKey}` } }
+    );
+    if (res.status === 404) {
+        // Tabel belum dibuat (bagian 11 supabase_upgrade.sql belum dijalankan).
+        // Jangan menggagalkan seluruh pre-render: post feed harus tetap jalan.
+        console.warn('Tabel "PDFTV News" belum ada — lewati pre-render artikel.');
+        return null;
+    }
+    if (!res.ok) throw new Error(`Supabase menolak (news): HTTP ${res.status} ${await res.text()}`);
+
+    let articles = await res.json();
+    if (limit) articles = articles.slice(0, limit);
+    console.log(`Ditemukan ${articles.length} artikel.`);
+    const liveIds = new Set();
+
+    for (const article of articles) {
+        const id = String(article.id);
+        // Jangan percaya id mentah dari API: dipakai sebagai nama folder.
+        if (!/^\d+$/.test(id)) {
+            console.warn(`  ! lewati artikel dengan id tidak valid: ${JSON.stringify(article.id)}`);
+            continue;
+        }
+        liveIds.add(id);
+
+        const title = collapse(article.title) || 'Artikel';
+        const excerpt = collapse(article.excerpt);
+        const cover = String(article.cover_url || '').trim();
+        const absoluteUrl = `${SITE_ORIGIN}news/p/${id}/`;
+
+        await writeIfChanged(
+            path.join(NEWS_PAGE_DIR, id, 'index.html'),
+            buildNewsPageHtml(template, {
+                id,
+                title: `${title} · PDFTV News`,
+                description: excerpt
+                    || truncate(collapse(article.body), 200)
+                    || 'Baca artikel ini di PDFTV News.',
+                image: /^https?:\/\//i.test(cover) ? cover : OG_FALLBACK,
+                imageAlt: title,
+                absoluteUrl,
+            })
+        );
+    }
+
+    return liveIds;
+}
+
+// Buang halaman artikel yang sudah tidak tayang (ditarik/ditolak/dihapus),
+// supaya link share lama tidak lagi menampilkan artikel yang sudah dicabut.
+async function removeNewsOrphans(liveIds) {
+    if (!existsSync(NEWS_PAGE_DIR)) return 0;
+
+    let removed = 0;
+    for (const entry of await readdir(NEWS_PAGE_DIR, { withFileTypes: true })) {
+        if (!entry.isDirectory() || !/^\d+$/.test(entry.name)) continue;
+        if (liveIds.has(entry.name)) continue;
+        await rm(path.join(NEWS_PAGE_DIR, entry.name), { recursive: true });
+        console.log(`  - hapus halaman artikel yatim: news/p/${entry.name}/`);
+        removed++;
+    }
     return removed;
 }
 
@@ -410,7 +506,17 @@ async function main() {
         orphanRemoved = await removeOrphans(liveIds);
     }
 
-    console.log(`Selesai. berubah: ${written.changed}, tetap: ${written.unchanged}, dihapus: ${written.removed}, meluber: ${overflowIds.length}, yatim dibersihkan: ${orphanRemoved}`);
+    // Artikel News: halaman OG-nya memakai cover_url (tanpa generate PNG),
+    // jadi tidak ada berkas gambar yang perlu di-commit.
+    const newsTemplate = await readFile(NEWS_TEMPLATE_PATH, 'utf8');
+    const newsLiveIds = await renderNews(newsTemplate, supaUrl, supaKey, limit);
+    let newsOrphanRemoved = 0;
+    // newsLiveIds null = tabel News belum ada; jangan hapus apa pun.
+    if (!limit && newsLiveIds) {
+        newsOrphanRemoved = await removeNewsOrphans(newsLiveIds);
+    }
+
+    console.log(`Selesai. berubah: ${written.changed}, tetap: ${written.unchanged}, dihapus: ${written.removed}, meluber: ${overflowIds.length}, yatim feed dibersihkan: ${orphanRemoved}, yatim artikel dibersihkan: ${newsOrphanRemoved}`);
     return overflowIds.length;
 }
 

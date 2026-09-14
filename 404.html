@@ -42,23 +42,30 @@
         <div class="emoji" aria-hidden="true">🕊️</div>
         <h1 id="title">Halaman tidak ditemukan</h1>
         <p id="message">
-            Halaman yang kamu cari tidak ada. Kalau ini tautan sebuah postingan, halamannya
-            mungkin sedang disiapkan — coba muat ulang sebentar lagi.
+            Halaman yang kamu cari tidak ada. Kalau ini tautan sebuah postingan atau artikel,
+            halamannya mungkin sedang disiapkan — coba muat ulang sebentar lagi.
         </p>
         <a id="homeLink" href="https://pdftv.vercel.app/">Buka Room of Faith</a>
     </div>
 
     <script>
         // Host statis menyajikan file ini untuk path yang belum ada, termasuk
-        // link post /feeds/p/<id>/ yang belum di-pre-render. Kalau polanya cocok,
-        // alihkan ke halaman ?id= yang selalu tersedia.
+        // link post /feeds/p/<id>/ dan artikel /news/p/<id>/ yang belum
+        // di-pre-render. Kalau polanya cocok, alihkan ke halaman ?id= yang
+        // selalu tersedia.
         (function () {
-            var match = window.location.pathname.match(/^(.*\/feeds\/p\/)(\d+)\/?$/);
+            var path = window.location.pathname;
+            var feedMatch = path.match(/^(.*\/feeds\/p\/)(\d+)\/?$/);
+            var newsMatch = path.match(/^(.*\/news\/p\/)(\d+)\/?$/);
+            var match = feedMatch || newsMatch;
             if (match) {
                 var target = match[1] + '?id=' + match[2];
-                document.getElementById('title').textContent = 'Menyiapkan postingan…';
-                document.getElementById('message').textContent =
-                    'Sebentar, kami membuka postingannya.';
+                var isNews = !!newsMatch;
+                document.getElementById('title').textContent =
+                    isNews ? 'Menyiapkan artikel…' : 'Menyiapkan postingan…';
+                document.getElementById('message').textContent = isNews
+                    ? 'Sebentar, kami membuka artikelnya.'
+                    : 'Sebentar, kami membuka postingannya.';
                 document.getElementById('homeLink').setAttribute('href', target);
                 window.location.replace(target);
             }

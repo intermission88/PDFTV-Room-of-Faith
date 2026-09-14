@@ -1,6 +1,6 @@
 # PDFTV | Experience Room 🎮🔥
 
-Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of Faith** (feed pengakuan anonim real-time), dan game roguelite **Blackjack Arcade** bergaya Balatro. Semua berjalan di browser dengan Supabase sebagai backend.
+Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of Faith** (feed pengakuan anonim real-time), game roguelite **Blackjack Arcade** bergaya Balatro, dan **PDFTV News** (berita redaksi dengan dashboard writer & CEO). Semua berjalan di browser dengan Supabase sebagai backend.
 
 ---
 
@@ -18,7 +18,14 @@ Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of F
 - **Hall of Fame**: leaderboard Top 5 berdasarkan Cash, plus statistik end-game yang bisa dibagikan.
 - Panel admin (login diperlukan) untuk reset leaderboard dan uji coba mekanik.
 
-### 3. Aksesibilitas & UX ♿
+### 3. PDFTV News 📰
+- Halaman berita dengan headline, filter kategori, pencarian, dan **halaman sendiri per artikel** (`/news/p/<id>/`) yang bisa dibagikan.
+- Artikel ditulis lewat **dashboard writer** (perlu login) dan baru tayang setelah disetujui **CEO**: alur `pending` → disetujui / ditolak (dengan alasan yang dilihat writer) / ditarik.
+- Dashboard redaksi di `/news/dashboard/` — satu halaman, panelnya menyesuaikan peran yang login.
+- Publik **hanya** bisa membaca artikel berstatus `approved`; itu dijaga RLS di database, bukan sekadar filter tampilan.
+- Gambar cover memakai URL gambar eksternal (tanpa upload/storage), dan ikut dipakai sebagai `og:image` saat link dibagikan.
+
+### 4. Aksesibilitas & UX ♿
 - Seluruh alur dapat diselesaikan dengan keyboard saja; ring fokus `:focus-visible` konsisten.
 - Modal mengunci fokus (Tab), ditutup dengan `Escape`, dan mengembalikan fokus ke pemicunya.
 - Menghormati `prefers-reduced-motion`: carousel tidak berjalan sendiri dan animasi loop berhenti.
@@ -44,11 +51,16 @@ Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of F
 | `feeds/index.html` | Halaman Room of Faith |
 | `feeds/p/index.html` | Halaman detail satu post + seluruh komentarnya (link bisa dibagikan) |
 | `feeds/p/<id>/index.html` | Hasil pre-render per post: tag Open Graph berisi isi post (dibuat otomatis, jangan diedit manual) |
+| `news/index.html` | Halaman berita (headline, kategori, pencarian) |
+| `news/p/index.html` | Halaman isi artikel (sekaligus cadangan `?id=<id>`) |
+| `news/p/<id>/index.html` | Hasil pre-render per artikel: tag Open Graph (dibuat otomatis, jangan diedit manual) |
+| `news/dashboard/index.html` | Dashboard redaksi: writer (tulis artikel) & CEO (persetujuan) |
 | `arcade/index.html` | Halaman Blackjack Arcade |
 | `css/style.css` | Gaya kustom: tema CRT/felt, animasi, ring fokus, reduced-motion |
 | `js/core.js` | Fondasi bersama: Supabase, haptic, audio/BGM, toast, manajer modal, login admin, util |
 | `js/feeds.js` | Logika Room of Faith + pengambilan data statistik untuk landing |
 | `js/post.js` | Logika halaman detail post (render post, komentar, upvote, tombol bagikan) |
+| `js/news.js` | Logika halaman berita, isi artikel, dan dashboard writer/CEO |
 | `scripts/prerender-posts.mjs` | Pre-render halaman post + kartu gambar OG (dijalankan CI) |
 | `404.html` | Pengalih untuk link post yang belum di-pre-render |
 | `js/landing.js` | Typewriter + slider (hanya halaman landing) |
@@ -59,14 +71,15 @@ Web app satu halaman yang menggabungkan landing page bertema arcade, **Room of F
 | `assets/` | Logo, favicon, dan gambar slider (WebP) |
 | `watch-and-push.ps1` | Watcher auto commit + push untuk sinkronisasi ke GitHub |
 
-Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`), lalu `js/feeds.js`, kemudian `js/landing.js` (landing) atau `js/arcade.js` (arcade).
+Urutan `<script>` penting: `js/core.js` dimuat lebih dulu (berisi `escapeHtml`, `isMissingRpcError`, `rpcErrorMessage`), lalu `js/feeds.js`, kemudian `js/landing.js` (landing) atau `js/arcade.js` (arcade). Halaman `news/*` tidak memuat `feeds.js`/`feeds-data.js` — cukup `js/core.js` lalu `js/news.js`.
 
 ### URL & state lintas halaman
 
-- `/` landing, `/feeds/` Room of Faith, `/feeds/p/<id>/` detail satu post, `/arcade/` Blackjack Arcade. Halaman lama `/feeds/p/?id=<id>` tetap berfungsi sebagai cadangan.
+- `/` landing, `/feeds/` Room of Faith, `/feeds/p/<id>/` detail satu post, `/news/` berita, `/news/p/<id>/` isi satu artikel, `/news/dashboard/` dashboard redaksi, `/arcade/` Blackjack Arcade. Halaman lama `/feeds/p/?id=<id>` dan `/news/p/?id=<id>` tetap berfungsi sebagai cadangan.
 - Tiap post punya halaman statis hasil pre-render di `/feeds/p/<id>/` yang memuat tag Open Graph berisi **isi postingannya**, sehingga preview saat link dibagikan (WhatsApp, Facebook) menampilkan pengakuan itu, bukan template.
 - Preview dihasilkan oleh `.github/workflows/prerender-posts.yml` (jadwal tiap 10 menit + bisa dijalankan manual dari tab Actions). Post yang baru dibuat menunggu jadwal berikutnya; link tetap bisa dibuka sebelum itu lewat `404.html` yang mengalihkan ke halaman `?id=`.
 - Post bertanda NSFW **tidak** pernah menuliskan isinya ke tag OG maupun gambar preview: preview-nya hanya "Konten sensitif". Ini disengaja karena link menyebar bebas.
+- Artikel News ikut di-pre-render (hanya yang sudah `approved`) tapi **tanpa** kartu PNG: `og:image` memakai URL cover artikel, dengan `assets/og/fallback.png` sebagai cadangan. Halaman artikel yang ditolak atau ditarik ikut dihapus, jadi link lama tidak lagi menampilkan artikel yang sudah dicabut. Kalau tabel `PDFTV News` belum dibuat, skrip hanya memberi peringatan dan feed tetap diproses.
 - Tombol **Bagikan** memakai Web Share API, dengan fallback salin ke clipboard.
 - Detail post memuat seluruh komentar dan form komentar. Konten NSFW tetap ter-blur di halaman sampai tombol reveal ditekan.
 - Halaman di dalam folder memakai path relatif (`../assets/...`), karena situs dilayani di subpath `/PDFTV-Room-of-Faith/`. Jangan pakai path absolut.
@@ -79,7 +92,7 @@ WhatsApp/Facebook tidak menjalankan JavaScript, jadi tag OG harus ada di HTML ya
 
 | Bagian | Isi |
 |---|---|
-| `scripts/prerender-posts.mjs` | Mengambil post dari Supabase REST, menulis `feeds/p/<id>/index.html` + kartu `assets/og/<id>.png` |
+| `scripts/prerender-posts.mjs` | Mengambil post **dan artikel** dari Supabase REST: menulis `feeds/p/<id>/index.html` + kartu `assets/og/<id>.png`, serta `news/p/<id>/index.html` (OG-nya memakai `cover_url` artikel) |
 | `scripts/package.json` | Dependensi `sharp` untuk merasterkan kartu SVG → PNG |
 | `.github/workflows/prerender-posts.yml` | Menjalankan skrip di runner, commit hasilnya, lalu push |
 | `assets/og/fallback.png` | Kartu brand, dipakai untuk post NSFW dan sebagai cadangan |
@@ -127,23 +140,27 @@ Kunci yang dipakai adalah *publishable key*, jadi memang aman berada di sisi kli
 Jalankan kedua script berikut di **Supabase → SQL Editor**, berurutan:
 
 1. **`seed_feeds.sql`** — membuat tabel `PDFTV Feeds` (beserta kolom NSFW, komentar, dsb.), mengaktifkan RLS, mengatur policy publik (baca / insert / update), dan memasukkan data awal.
-2. **`supabase_upgrade.sql`** — membuat fungsi RPC (`insert_confession`, `increment_upvote`, `append_comment`, aksi moderator, reset leaderboard), memindahkan kredensial ke schema `private`, dan mengetatkan RLS. Jalankan bagian perketat RLS **terakhir**, setelah aplikasi memakai RPC.
+2. **`supabase_upgrade.sql`** — membuat fungsi RPC (`insert_confession`, `increment_upvote`, `append_comment`, aksi moderator, reset leaderboard), **tabel `PDFTV News` beserta RPC News (bagian 11)**, memindahkan kredensial ke schema `private`, dan mengetatkan RLS. Jalankan bagian perketat RLS **terakhir**, setelah aplikasi memakai RPC.
 
 > Catatan: aplikasi punya jalur fallback ke operasi langsung bila RPC belum tersedia di database. Selama policy insert lama masih ada, fallback itu tetap bekerja.
 
 ---
 
-## 🔐 Akses Admin & Moderator
+## 🔐 Akses Admin, Moderator, Writer & CEO
 
-Password **tidak disimpan di kode klien maupun di repo ini**. Verifikasi dilakukan di server melalui RPC `verify_admin` / `verify_moderator`, yang membandingkan input dengan hash **bcrypt** di tabel `private.admin_credentials`.
+Password **tidak disimpan di kode klien maupun di repo ini**. Verifikasi dilakukan di server melalui RPC `verify_admin` / `verify_moderator` / `verify_writer` / `verify_ceo`, yang membandingkan input dengan hash **bcrypt** di tabel `private.admin_credentials`.
 
 Schema `private` tidak diekspos PostgREST, akses dari `anon` dicabut, dan tabelnya berada dalam RLS tanpa policy, sehingga hash tidak bisa dibaca dari luar. Fungsi verifikasi berjalan `SECURITY DEFINER` sebagai pemilik tabel.
+
+Satu modal login dipakai untuk semua peran: setelah password dikirim, server mencoba berurutan `verify_admin` → `verify_moderator` → `verify_writer` → `verify_ceo` dan mengaktifkan peran yang cocok.
 
 Untuk memasang atau mengganti password, jalankan di SQL Editor (nilai tidak boleh di-commit ke repo):
 
 ```sql
 SELECT private.set_credential('admin',     'PASSWORD_BARU');
 SELECT private.set_credential('moderator', 'PASSWORD_BARU');
+SELECT private.set_credential('writer',    'PASSWORD_BARU');
+SELECT private.set_credential('ceo',       'PASSWORD_BARU');
 ```
 
 Hak akses:
@@ -152,11 +169,14 @@ Hak akses:
 |---|---|
 | **Admin** | Reset leaderboard + panel uji mekanik game |
 | **Moderator** | Pin, tandai NSFW, dan hapus postingan di Room of Faith |
+| **Writer** | Menulis, mengubah, dan menghapus artikel News miliknya yang masih `pending`/`rejected` |
+| **CEO** | Melihat semua artikel, menyetujui, menolak (dengan alasan), menarik, dan menghapus artikel News |
 
 Cek apakah kredensial sudah terpasang tanpa membuka hash-nya:
 
 ```sql
 SELECT role, updated_at FROM private.admin_credentials;
+SELECT public.verify_writer('PASSWORD_WRITER'), public.verify_ceo('PASSWORD_CEO');
 ```
 
 ---
