@@ -135,12 +135,28 @@ function snakeRandomEmptyCell() {
 }
 
 // --- SETUP FLOOR ---
+// Floor 1-4 adalah pemanasan supaya pemain sempat sampai boss pertama di
+// floor 5. Sejak floor 5 kurvanya TIDAK dilunakkan: angkanya sama seperti
+// sebelum pemanasan ditambahkan.
+const SNAKE_WARMUP_FLOOR = 4;
+
+function snakeSpeedMs(floor) {
+    if (floor <= SNAKE_WARMUP_FLOOR + 1) return 150 - 13 * (floor - 1);
+    return 138 - 8 * floor;
+}
+
 function snakeFloorApples(floor) {
+    if (floor <= SNAKE_WARMUP_FLOOR) return 3 + floor;
     return 5 + floor * 2;
 }
 
+function snakeHazardCount(floor) {
+    if (floor <= SNAKE_WARMUP_FLOOR) return Math.max(0, floor - 1);
+    return Math.min(20, 2 * floor - 2);
+}
+
 function recomputeSnakeSpeed() {
-    let ms = Math.max(35, 138 - snake.floor * 8);
+    let ms = Math.max(35, snakeSpeedMs(snake.floor));
     if (hasRelic('slow')) ms += 25;
     if (hasRelic('overclock')) ms -= 15;
     const bossSpeed = snake.isBoss && snake.boss ? snake.boss.speed : 1;
@@ -177,7 +193,7 @@ function snakeSetupHazards() {
     snake.movingHazards = [];
     snake.hazardTick = 0;
 
-    const count = Math.min(20, Math.max(0, snake.floor * 2 - 2));
+    const count = snakeHazardCount(snake.floor);
     for (let i = 0; i < count; i++) {
         const cell = snakeRandomEmptyCell();
         if (cell) snake.hazards.push(cell);
@@ -386,10 +402,13 @@ function snakeTick() {
     const head = snake.body[0];
     const next = { x: head.x + d.x, y: head.y + d.y };
 
-    if (next.x < 0 || next.y < 0 || next.x >= SNAKE_GRID || next.y >= SNAKE_GRID) {
-        snakeDie('menabrak dinding');
-        return;
-    }
+    // Tepi arena tembus: keluar lewat kanan muncul di kiri, dan sebaliknya.
+    // Jadi tidak ada lagi kematian karena menabrak dinding.
+    if (next.x < 0) next.x = SNAKE_GRID - 1;
+    else if (next.x >= SNAKE_GRID) next.x = 0;
+    if (next.y < 0) next.y = SNAKE_GRID - 1;
+    else if (next.y >= SNAKE_GRID) next.y = 0;
+
     // Ekor akan bergeser, jadi sel terakhir tidak dihitung sebagai tabrakan.
     if (snake.body.slice(0, -1).some((s) => s.x === next.x && s.y === next.y)) {
         snakeDie('menabrak badan sendiri');
@@ -1082,7 +1101,7 @@ function retrySnakeRun() {
     snakeHideOverlay();
     snakeBindInput();
     startSnakeLoop();
-    snakeSetStatus('FLOOR 1 • 7 APEL');
+    snakeSetStatus(`FLOOR 1 • ${snake.applesNeeded} APEL`);
     refreshSnakeUI();
     saveSnakeRun();
     snakeStartCountdown();
@@ -1307,7 +1326,7 @@ function enterSnakeGame() {
     if (!snake || snake.over) {
         snake = createSnakeState();
         snakeSetupFloor();
-        snakeSetStatus('FLOOR 1 • 7 APEL');
+        snakeSetStatus(`FLOOR 1 • ${snake.applesNeeded} APEL`);
     }
 
     snake.paused = false;
