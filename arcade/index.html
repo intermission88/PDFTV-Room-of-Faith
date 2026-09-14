@@ -466,6 +466,7 @@
                     <p class="text-[10px] text-slate-300 leading-relaxed">Di HP: <b>geser jari di arena</b> ke arah yang dituju. Di desktop: panah atau WASD. Makan apel sampai target floor terpenuhi.</p>
                     <div class="grid grid-cols-1 gap-1 text-[10px] pt-0.5">
                         <div class="text-sky-300">📱 <b>SWIPE:</b> Cukup geser jari di layar LCD — belokan terjadi saat gerakan melewati ambang, jadi tidak perlu mengangkat jari.</div>
+                        <div class="text-emerald-300">⏱️ <b>SIAP-SIAP:</b> Tiap floor diawali hitungan 3 detik. Tekan <b>MULAI SEKARANG</b> kalau tidak mau menunggu.</div>
                         <div class="text-emerald-300">🎯 <b>TARGET FLOOR:</b> Tiap floor makin cepat dan makin padat hazard. Skor per apel naik mengikuti floor.</div>
                         <div class="text-amber-300">💎 <b>RELIC (GACHA):</b> Tiap kali kalahkan boss ada peluang dapat relic — tidak selalu, bos bisa zonk. Efeknya permanen sampai run berakhir.</div>
                         <div class="text-rose-400">⚔️ <b>BOSS FLOOR (tiap 5):</b> Makan orb bos untuk lanjut. Tiap bos punya pola hazard sendiri.</div>
@@ -508,6 +509,16 @@
                 <!-- ARENA LCD -->
                 <div class="snake-lcd crt-container relative">
                     <canvas id="snakeCanvas" width="400" height="400" class="snake-canvas" role="img" aria-label="Arena Snake"></canvas>
+
+                    <!-- Hitungan siap-siap sebelum ular bergerak -->
+                    <div id="snakeCountdown" class="hidden absolute inset-0 z-20 flex flex-col items-center justify-center gap-1 bg-black/60 text-center px-4">
+                        <div id="snakeCountdownText" class="text-5xl font-black text-emerald-400 font-pixel leading-none">3</div>
+                        <div id="snakeCountdownLabel" class="text-[10px] font-black text-slate-300 font-mono-custom uppercase tracking-widest">SIAP-SIAP</div>
+                        <button onclick="snakeSkipCountdown()" class="mt-2 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-[10px] font-black uppercase tracking-wider transition active:scale-95">
+                            ⚡ MULAI SEKARANG
+                        </button>
+                    </div>
+
                     <div id="snakeOverlay" class="hidden absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-black/75 text-center px-4">
                         <div id="snakeOverlayTitle" class="text-sm font-black text-amber-400 font-pixel uppercase tracking-wider">JEDA</div>
                         <div id="snakeOverlayText" class="text-[10px] text-slate-300 font-mono-custom">Run ditahan sementara.</div>
@@ -715,18 +726,26 @@
         </div>
     </div>
 
-    <!-- Modal Gacha Relic (paksa-pilih: tombol baru aktif setelah gulungan berhenti) -->
-    <div id="snakeGachaModal" role="dialog" aria-modal="true" aria-labelledby="snakeGachaModalTitle" tabindex="-1" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+    <!-- Popup antar-floor (di floor boss ditambah gulungan gacha relic) -->
+    <div id="snakeFloorModal" role="dialog" aria-modal="true" aria-labelledby="snakeFloorModalTitle" tabindex="-1" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#07170e] relative max-h-[90vh] overflow-y-auto scrollbar-hide">
-            <div class="text-3xl mb-1" aria-hidden="true">🎰</div>
-            <h3 id="snakeGachaModalTitle" class="text-sm font-black text-emerald-400 uppercase tracking-wider font-pixel">RELIC GACHA</h3>
-            <p class="text-slate-400 text-[10px] mb-3">Kalahkan boss belum tentu memberi relic.</p>
+            <div class="text-3xl mb-1" aria-hidden="true">🏁</div>
+            <h3 id="snakeFloorModalTitle" class="text-sm font-black text-emerald-400 uppercase tracking-wider font-pixel">FLOOR 1 SELESAI!</h3>
+            <p id="snakeFloorModalSub" class="text-slate-400 text-[10px] mt-0.5">Bersiap ke floor berikutnya.</p>
 
-            <div id="snakeGachaReel" class="p-4 bg-emerald-950/60 border border-emerald-500/40 rounded-2xl text-3xl flex items-center justify-center min-h-[72px] shadow-inner" aria-hidden="true">🎁</div>
+            <div class="mt-3 bg-black/60 p-3 rounded-2xl   space-y-1 font-mono-custom text-[10px]">
+                <div class="text-slate-300"><span id="snakeFloorSummary">🍎 7 • 📏 3 segmen • 🏆 0</span></div>
+                <div class="text-emerald-400 font-bold"><span id="snakeFloorNextTarget">Floor 2: 9 apel</span></div>
+            </div>
 
-            <div id="snakeGachaResult" class="hidden mt-3 bg-black/60 p-3 rounded-2xl   min-h-[52px] flex flex-col items-center justify-center"></div>
+            <!-- Gacha relic: hanya tampil di floor boss -->
+            <div id="snakeGachaSection" class="hidden mt-3 space-y-2">
+                <div class="text-[10px] font-mono-custom font-bold uppercase tracking-widest text-amber-400">🎰 Gacha Relic</div>
+                <div id="snakeGachaReel" class="p-3 bg-emerald-950/60 border border-emerald-500/40 rounded-2xl text-3xl flex items-center justify-center min-h-[64px] shadow-inner" aria-hidden="true">🎁</div>
+                <div id="snakeGachaResult" class="hidden bg-black/60 p-2.5 rounded-2xl   min-h-[46px] flex flex-col items-center justify-center"></div>
+            </div>
 
-            <button data-autofocus onclick="closeSnakeGachaModal()" id="btnSnakeGachaContinue" disabled class="w-full mt-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-30 disabled:pointer-events-none text-black text-xs font-black rounded-xl active:scale-[0.98] transition shadow uppercase tracking-wider">
+            <button data-autofocus onclick="closeSnakeFloorModal()" id="btnSnakeFloorContinue" class="w-full mt-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-30 disabled:pointer-events-none text-black text-xs font-black rounded-xl active:scale-[0.98] transition shadow uppercase tracking-wider">
                 LANJUT ➔
             </button>
         </div>

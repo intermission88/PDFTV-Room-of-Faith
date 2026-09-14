@@ -22,7 +22,8 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 - Snake retro ala **Nokia 3310** di atas `<canvas>` berpalet LCD hijau, lengkap dengan scanline CRT.
 - **Struktur roguelike**: tiap floor target apelnya makin besar, ular makin cepat, dan hazard makin padat — mulai floor 12 muncul hazard yang bergerak. Panjang badan tidak lagi dipangkas pendek tiap ganti floor.
 - **Boss floor tiap kelipatan 5** dengan pola arena sendiri: THE WALL (dinding bergerak), OVERCLOCKER (kecepatan 2x), THE VOID (lubang berpindah), ROOM OF FAITH (kombinasi).
-- **Relic lewat gacha**: boss yang tumbang belum tentu menjatuhkan relic (peluang 60%) — kalau dapat, muncul popup gacha yang menggulung lalu membuka satu relic acak. Efeknya permanen sampai run berakhir.
+- **Alur tiap floor**: diawali hitungan siap-siap **3 detik** (bisa dilewati lewat tombol "⚡ Mulai Sekarang"), dan saat floor selesai muncul **popup ringkasan** dengan tombol lanjut ke floor berikutnya. Di floor boss popup itu sekaligus memuat gulungan gacha.
+- **Relic lewat gacha**: boss yang tumbang belum tentu menjatuhkan relic (peluang 60%) — kalau dapat, gulungan gacha berhenti di satu relic acak. Efeknya permanen sampai run berakhir.
 - Consumable **Freeze** (hentikan gerak 3 detik) dan **Sever** (potong badan jadi 5 segmen). Tidak ada pelindung kematian: sekali menabrak, run langsung selesai.
 - Kontrol: **swipe di arena** untuk HP, panah/WASD untuk desktop. Belokan terbaca begitu jari bergerak, jadi tidak perlu mengangkat jari. Run tetap tersimpan walau halaman di-reload.
 - Saat run berakhir muncul popup statistik dengan tombol **🔄 Main Lagi** (langsung mulai run baru tanpa lewat lobby), **Simpan Rekor** (kalau skor ≥ 100), dan kembali ke lobby.

@@ -103,7 +103,7 @@ const a11yModalObserver = new MutationObserver((mutations) => {
 injectSharedModals();
 
 ['adminModal', 'passiveChoiceModal', 'bossRewardModal', 'dealerEncounterModal', 'scoreSubmitModal',
- 'snakeScoreSubmitModal', 'snakeGachaModal', 'snakeBossModal'].forEach((id) => {
+ 'snakeScoreSubmitModal', 'snakeFloorModal', 'snakeBossModal'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) a11yModalObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
 });

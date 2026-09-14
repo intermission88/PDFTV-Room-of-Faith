@@ -16,6 +16,8 @@ const SNAKE_PX = SNAKE_GRID * SNAKE_CELL;
 // Panjang badan yang dibawa antar floor naik seiring floor, dengan plafon ini.
 const SNAKE_CARRY_CAP = 24;
 const SNAKE_FREEZE_MS = 3000;
+// Jeda "siap-siap" sebelum ular mulai bergerak; bisa dilewati pemain.
+const SNAKE_COUNTDOWN_MS = 3000;
 // Jarak geser minimum sebelum swipe dianggap sebagai belokan.
 const SNAKE_SWIPE_PX = 18;
 // Gacha relic: peluang drop dari boss + tempo animasi gulungannya.
@@ -95,6 +97,7 @@ function createSnakeState() {
         awaitingChoice: false,
         pendingModal: null,
         gachaResult: null,
+        countdownMs: 0,
         deathReason: '',
         stats: { apples: 0, maxLength: 3, relics: 0, bosses: 0, maxFloor: 1 }
     };
@@ -257,15 +260,19 @@ function snakeLoop(timestamp) {
     snakeLastFrame = timestamp;
 
     if (!snake.paused && !snake.over && !snake.awaitingChoice) {
-        snakeAccumulator += dt;
-        let guard = 0;
-        while (snakeAccumulator >= snake.tickMs && guard < 8) {
-            snakeAccumulator -= snake.tickMs;
-            guard++;
-            snakeTick();
-            if (snake.over || snake.paused || snake.awaitingChoice) break;
+        if (snake.countdownMs > 0) {
+            snakeRunCountdown(dt);
+        } else {
+            snakeAccumulator += dt;
+            let guard = 0;
+            while (snakeAccumulator >= snake.tickMs && guard < 8) {
+                snakeAccumulator -= snake.tickMs;
+                guard++;
+                snakeTick();
+                if (snake.over || snake.paused || snake.awaitingChoice) break;
+            }
+            if (snakeAccumulator > snake.tickMs) snakeAccumulator = 0;
         }
-        if (snakeAccumulator > snake.tickMs) snakeAccumulator = 0;
     }
 
     snakeDraw();
@@ -283,6 +290,59 @@ function stopSnakeLoop() {
     if (!snakeLoopId) return;
     cancelAnimationFrame(snakeLoopId);
     snakeLoopId = null;
+}
+
+// --- COUNTDOWN SEBELUM MULAI ---
+// Ular baru bergerak setelah jeda ini habis, supaya pemain sempat melihat
+// posisi awal arena. Pemain boleh melewatinya lewat tombol "mulai sekarang".
+function snakeShowCountdown() {
+    if (!snake || snake.countdownMs <= 0) return;
+    snakeUpdateCountdownUI();
+    const el = document.getElementById('snakeCountdown');
+    if (el) el.classList.remove('hidden');
+}
+
+function snakeStartCountdown() {
+    if (!snake) return;
+    snake.countdownMs = SNAKE_COUNTDOWN_MS;
+    snakeAccumulator = 0;
+    snakeShowCountdown();
+}
+
+function snakeHideCountdown() {
+    const el = document.getElementById('snakeCountdown');
+    if (el) el.classList.add('hidden');
+}
+
+function snakeUpdateCountdownUI() {
+    const seconds = Math.max(1, Math.ceil(snake.countdownMs / 1000));
+    snakeSetText('snakeCountdownText', String(seconds));
+    snakeSetText('snakeCountdownLabel', `FLOOR ${snake.floor} • ${snake.isBoss ? 'BOSS' : snake.applesNeeded + ' APEL'}`);
+}
+
+function snakeRunCountdown(dt) {
+    const before = Math.ceil(snake.countdownMs / 1000);
+    snake.countdownMs = Math.max(0, snake.countdownMs - dt);
+
+    if (snake.countdownMs > 0) {
+        if (Math.ceil(snake.countdownMs / 1000) !== before) playGachaTickSound();
+        snakeUpdateCountdownUI();
+        return;
+    }
+
+    snakeHideCountdown();
+    playBossAlertSound();
+    snakeSetStatus(`FLOOR ${snake.floor} DIMULAI!`);
+}
+
+function snakeSkipCountdown() {
+    if (!snake || snake.countdownMs <= 0) return;
+    snake.countdownMs = 0;
+    snakeAccumulator = 0;
+    snakeHideCountdown();
+    playClickSound();
+    triggerHaptic('light');
+    snakeSetStatus(`FLOOR ${snake.floor} DIMULAI!`);
 }
 
 // --- TICK ---
@@ -384,19 +444,11 @@ function snakeAdvanceFloor() {
     snake.stats.maxFloor = Math.max(snake.stats.maxFloor, snake.floor);
     snakeSetStatus(`FLOOR ${snake.floor} SELESAI!`);
 
-    // Floor biasa langsung lanjut tanpa popup — relic hanya dari gacha boss.
-    if (!snake.isBoss) {
-        refreshSnakeUI();
-        snakeStartNextFloor();
-        return;
-    }
-
-    snake.gachaResult = snakeRollGacha();
-    snake.pendingModal = 'gacha';
+    snake.pendingModal = 'floor';
     snake.awaitingChoice = true;
     refreshSnakeUI();
     saveSnakeRun();
-    triggerSnakeGachaModal();
+    triggerSnakeFloorModal();
 }
 
 function snakeStartNextFloor() {
@@ -412,6 +464,8 @@ function snakeStartNextFloor() {
         snake.awaitingChoice = true;
     }
     saveSnakeRun();
+    // Jeda siap-siap dihitung loop, dan otomatis tertahan selama modal boss terbuka.
+    snakeStartCountdown();
     if (snake.isBoss) triggerSnakeBossModal();
 }
 
@@ -431,6 +485,7 @@ function snakeDie(reason) {
     snake.over = true;
     snake.paused = true;
     snake.deathReason = reason;
+    snakeHideCountdown();
     playBustSound();
     triggerHaptic('heavy');
     triggerScreenShake();
@@ -638,8 +693,14 @@ function toggleSnakePause() {
     if (!snake || snake.over || snake.awaitingChoice) return;
     snake.paused = !snake.paused;
     playClickSound();
-    if (snake.paused) snakeShowOverlay('JEDA', 'Run ditahan sementara.');
-    else snakeHideOverlay();
+    if (snake.paused) {
+        // Overlay jeda dan hitungan siap-siap tidak boleh tampil bersamaan.
+        snakeHideCountdown();
+        snakeShowOverlay('JEDA', 'Run ditahan sementara.');
+    } else {
+        snakeHideOverlay();
+        snakeShowCountdown();
+    }
 }
 
 // --- KONTROL ---
@@ -753,9 +814,17 @@ function useSnakeSever() {
     saveSnakeRun();
 }
 
-// --- GACHA RELIC (hanya dari boss) ---
-// Hasil diundi sekali lalu disimpan di state, supaya reload di tengah popup
-// tidak mengubah hadiah — dan hadiah tidak terterap dua kali.
+// --- POPUP ANTAR-FLOOR (+ gacha relic di floor boss) ---
+// Satu popup per floor: ringkasan floor yang baru selesai, dan di floor boss
+// ditambah gulungan gacha. Digabung supaya floor boss tidak menghasilkan dua
+// popup beruntun.
+function snakeNextFloorTarget() {
+    const next = snake.floor + 1;
+    return next % 5 === 0 ? 6 + next : snakeFloorApples(next);
+}
+
+// Hasil gacha diundi sekali lalu disimpan di state, supaya reload di tengah
+// popup tidak mengubah hadiah — dan hadiah tidak terterap dua kali.
 function snakeRollGacha() {
     const pool = SNAKE_RELICS.filter((r) => snake.relics.indexOf(r.id) === -1);
     if (!pool.length) return { relicId: null, bonus: true, applied: false };
@@ -765,22 +834,47 @@ function snakeRollGacha() {
     return { relicId: relic.id, bonus: false, applied: false };
 }
 
+function snakeEnsureGachaRolled() {
+    if (!snake.isBoss || snake.gachaResult) return;
+    snake.gachaResult = snakeRollGacha();
+    saveSnakeRun();
+}
+
 function snakeStopGachaReel() {
     if (snakeGachaTimer === null) return;
     clearInterval(snakeGachaTimer);
     snakeGachaTimer = null;
 }
 
-function triggerSnakeGachaModal(animate) {
+function triggerSnakeFloorModal(animate) {
     if (!snake) return;
     snakeStopGachaReel();
 
-    const modal = document.getElementById('snakeGachaModal');
+    const modal = document.getElementById('snakeFloorModal');
     if (!modal) return;
 
-    if (!snake.gachaResult) snake.gachaResult = snakeRollGacha();
+    snakeEnsureGachaRolled();
 
-    if (animate === false) {
+    const gachaSection = document.getElementById('snakeGachaSection');
+    if (gachaSection) gachaSection.classList.toggle('hidden', !snake.isBoss);
+
+    const nextIsBoss = (snake.floor + 1) % 5 === 0;
+    snakeSetText('snakeFloorModalTitle', `FLOOR ${snake.floor} SELESAI!`);
+    snakeSetText('snakeFloorModalSub', snake.isBoss
+        ? `${snake.boss.icon} ${snake.boss.name} tumbang.`
+        : 'Bersiap ke floor berikutnya.');
+    snakeSetText('snakeFloorSummary', `🍎 ${snake.applesNeeded} • 📏 ${snake.body.length} segmen • 🏆 ${snake.score.toLocaleString()}`);
+    snakeSetText('snakeFloorNextTarget', `Floor ${snake.floor + 1}: ${snakeNextFloorTarget()} ${nextIsBoss ? 'orb boss' : 'apel'}`);
+    snakeSetText('btnSnakeFloorContinue', `LANJUT KE FLOOR ${snake.floor + 1} ➔`);
+
+    // Tombol LANJUT default aktif; hanya gulungan gacha yang menguncinya.
+    // Kalau ini tertinggal terkunci, pemain tidak punya jalan keluar dari popup.
+    const continueBtn = document.getElementById('btnSnakeFloorContinue');
+    if (continueBtn) continueBtn.disabled = false;
+
+    if (!snake.isBoss) {
+        snakeStopGachaReel();
+    } else if (animate === false) {
         // Dipulihkan dari sessionStorage: langsung tampilkan hasil, tanpa undi ulang.
         snakeRevealGacha();
     } else {
@@ -795,7 +889,7 @@ function triggerSnakeGachaModal(animate) {
 function snakeSpinGachaReel() {
     const reel = document.getElementById('snakeGachaReel');
     const resultEl = document.getElementById('snakeGachaResult');
-    const btn = document.getElementById('btnSnakeGachaContinue');
+    const btn = document.getElementById('btnSnakeFloorContinue');
 
     if (resultEl) resultEl.classList.add('hidden');
     if (btn) btn.disabled = true;
@@ -834,7 +928,7 @@ function snakeRevealGacha() {
 
     const reel = document.getElementById('snakeGachaReel');
     const resultEl = document.getElementById('snakeGachaResult');
-    const btn = document.getElementById('btnSnakeGachaContinue');
+    const btn = document.getElementById('btnSnakeFloorContinue');
 
     if (reel) reel.textContent = relic ? relic.icon : (result.bonus ? '🏆' : '🚫');
 
@@ -860,13 +954,13 @@ function snakeRevealGacha() {
     saveSnakeRun();
 }
 
-function closeSnakeGachaModal() {
+function closeSnakeFloorModal() {
     // Gulungan harus selesai dulu; tombol memang disabled selama berputar.
     if (!snake || snakeGachaTimer !== null) return;
     playClickSound();
     snakeStopGachaReel();
 
-    const modal = document.getElementById('snakeGachaModal');
+    const modal = document.getElementById('snakeFloorModal');
     if (modal) {
         modal.classList.remove('show-modal');
         modal.classList.add('hidden-modal');
@@ -875,6 +969,7 @@ function closeSnakeGachaModal() {
     snake.gachaResult = null;
     snake.awaitingChoice = false;
     snake.pendingModal = null;
+    // snakeStartNextFloor() juga memulai jeda siap-siap floor berikutnya.
     snakeStartNextFloor();
 }
 
@@ -987,9 +1082,10 @@ function retrySnakeRun() {
     snakeHideOverlay();
     snakeBindInput();
     startSnakeLoop();
-    snakeSetStatus('FLOOR 1 • 5 APEL');
+    snakeSetStatus('FLOOR 1 • 7 APEL');
     refreshSnakeUI();
     saveSnakeRun();
+    snakeStartCountdown();
     showToast('🔄 Run baru dimulai!');
 }
 
@@ -1220,6 +1316,7 @@ function enterSnakeGame() {
     startSnakeLoop();
     refreshSnakeUI();
     saveSnakeRun();
+    snakeStartCountdown();
 }
 
 function exitSnakeGame() {
@@ -1230,6 +1327,7 @@ function exitSnakeGame() {
     snakeUnbindInput();
     snakeStopGachaReel();
     snakeHideOverlay();
+    snakeHideCountdown();
     if (snake) snake.paused = true;
     saveSnakeRun();
 
@@ -1311,15 +1409,16 @@ window.addEventListener('DOMContentLoaded', () => {
     refreshSnakeUI();
     showToast('🐍 Run Snake dipulihkan.');
 
-    if (snake.pendingModal === 'gacha') {
+    if (snake.pendingModal === 'floor') {
         snake.awaitingChoice = true;
-        triggerSnakeGachaModal(false);
+        triggerSnakeFloorModal(false);
     } else if (snake.pendingModal === 'boss') {
         snake.awaitingChoice = true;
         triggerSnakeBossModal();
     } else {
         snake.awaitingChoice = false;
     }
+    snakeStartCountdown();
 });
 
 window.addEventListener('pagehide', () => {
