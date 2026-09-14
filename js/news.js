@@ -9,7 +9,9 @@
 // ============================================================
 
 const NEWS_TABLE = 'PDFTV News';
-const NEWS_CATEGORIES = ['Berita', 'Pengumuman', 'Prestasi', 'Opini', 'Event'];
+// Kategori=chip di halaman berita + isi dropdown dashboard. Tambah/hapus di sini
+// saja; chip "Semua" selalu ada dan tidak perlu didaftarkan.
+const NEWS_CATEGORIES = ['Movies'];
 
 let newsData = [];
 let currentNewsCategory = 'all';
@@ -37,7 +39,7 @@ function normalizeNews(item) {
         title: cleanNewsText(item.title),
         excerpt: cleanNewsText(item.excerpt),
         body: String(item.body || '').replace(/\r\n?/g, '\n').trim(),
-        category: cleanNewsText(item.category) || 'Berita',
+        category: cleanNewsText(item.category) || 'Movies',
         author_name: cleanNewsText(item.author_name) || 'Redaksi',
         cover_url: String(item.cover_url || '').trim(),
     };
