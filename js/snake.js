@@ -839,20 +839,30 @@ function showSnakeScoreModal() {
 
     const container = document.getElementById('snakeNameInputContainer');
     const submitBtn = document.getElementById('btnSubmitSnakeScore');
+    const retryBtn = document.getElementById('btnRetrySnakeRun');
     const warningEl = document.getElementById('snakeMinScoreWarning');
     const nameInput = document.getElementById('snakePlayerName');
+    const canSubmit = snakeScoreToSubmit >= SNAKE_MIN_SCORE;
 
-    if (snakeScoreToSubmit < SNAKE_MIN_SCORE) {
-        if (warningEl) warningEl.classList.remove('hidden');
-        if (container) container.classList.add('hidden');
-        if (submitBtn) submitBtn.classList.add('hidden');
-        if (nameInput) nameInput.required = false;
-    } else {
+    if (canSubmit) {
         if (warningEl) warningEl.classList.add('hidden');
         if (container) container.classList.remove('hidden');
         if (submitBtn) submitBtn.classList.remove('hidden');
         if (nameInput) { nameInput.required = true; nameInput.value = ''; }
+    } else {
+        if (warningEl) warningEl.classList.remove('hidden');
+        if (container) container.classList.add('hidden');
+        if (submitBtn) submitBtn.classList.add('hidden');
+        if (nameInput) nameInput.required = false;
     }
+
+    // Elemen display:none tidak bisa difokus, jadi penanda autofocus dipindah
+    // ke tombol MAIN LAGI saat input nama ikut disembunyikan. Diubah SEBELUM
+    // kelas show-modal supaya observer a11y di core.js membaca nilai terbaru.
+    if (nameInput) nameInput.removeAttribute('data-autofocus');
+    if (retryBtn) retryBtn.removeAttribute('data-autofocus');
+    const autofocusTarget = canSubmit ? nameInput : retryBtn;
+    if (autofocusTarget) autofocusTarget.setAttribute('data-autofocus', '');
 
     const modal = document.getElementById('snakeScoreSubmitModal');
     if (!modal) return;
@@ -860,13 +870,40 @@ function showSnakeScoreModal() {
     modal.classList.add('show-modal');
 }
 
-function closeSnakeScoreModal() {
-    playClickSound();
-    triggerHaptic('light');
+function hideSnakeScoreModal() {
     const modal = document.getElementById('snakeScoreSubmitModal');
     if (!modal) return;
     modal.classList.remove('show-modal');
     modal.classList.add('hidden-modal');
+}
+
+function closeSnakeScoreModal() {
+    playClickSound();
+    triggerHaptic('light');
+    hideSnakeScoreModal();
+}
+
+// "MAIN LAGI": mulai run baru tanpa harus lewat lobby.
+function retrySnakeRun() {
+    hideSnakeScoreModal();
+    playJackpotSound();
+    triggerHaptic('heavy');
+
+    snake = createSnakeState();
+    snakeSetupFloor();
+    snakeFrozenUntil = 0;
+    snakeHideOverlay();
+    snakeBindInput();
+    startSnakeLoop();
+    snakeSetStatus('FLOOR 1 • 5 APEL');
+    refreshSnakeUI();
+    saveSnakeRun();
+    showToast('🔄 Run baru dimulai!');
+}
+
+function snakeBackToLobby() {
+    hideSnakeScoreModal();
+    exitSnakeGame();
 }
 
 async function submitSnakeScore(e) {

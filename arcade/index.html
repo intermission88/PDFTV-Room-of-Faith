@@ -707,8 +707,11 @@
                     <button type="submit" id="btnSubmitSnakeScore" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-black rounded-xl active:scale-[0.98] transition shadow uppercase tracking-wider">
                         SIMPAN REKOR 🏆
                     </button>
-                    <button type="button" onclick="closeSnakeScoreModal()" class="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] font-bold rounded-xl transition">
-                        Tutup
+                    <button type="button" id="btnRetrySnakeRun" onclick="retrySnakeRun()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-black rounded-xl active:scale-[0.98] transition shadow uppercase tracking-wider">
+                        🔄 MAIN LAGI
+                    </button>
+                    <button type="button" onclick="snakeBackToLobby()" class="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] font-bold rounded-xl transition">
+                        ⬅ Kembali ke Lobby
                     </button>
                 </div>
             </form>
