@@ -223,6 +223,75 @@ body {
 }
 .feed-card:active { transform: translateY(0) scale(0.995); }
 
+/* ── Kartu yang disematkan: dibuat lebih hidup ────────────────
+   Tujuannya menarik perhatian ke SATU post itu saja, lalu mengarahkan
+   mata ke ajakan komentar. Hanya transform/opacity yang dianimasikan
+   supaya tidak memicu reflow, dan semuanya ikut mati oleh aturan
+   prefers-reduced-motion di bawah. */
+.feed-card-pinned {
+    position: relative;
+    overflow: hidden;
+}
+.feed-card-pinned:hover {
+    /* Kartu pinned tetap bernuansa amber, tidak ikut jadi emerald */
+    background-color: rgba(245, 158, 11, 0.10);
+    box-shadow: 0 8px 28px rgba(245, 158, 11, 0.18);
+}
+
+/* Cincin amber yang "bernapas" pelan */
+.feed-card-pinned::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.45),
+                inset 0 0 34px rgba(245, 158, 11, 0.14);
+    animation: pinnedBreathe 3.2s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes pinnedBreathe {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 1; }
+}
+
+/* Kilau yang melintas berkala, memberi kesan "baru" tiap beberapa detik */
+.feed-card-pinned::after {
+    content: "";
+    position: absolute;
+    top: -25%;
+    bottom: -25%;
+    width: 38%;
+    background: linear-gradient(100deg, transparent, rgba(251, 191, 36, 0.14), transparent);
+    transform: translateX(-170%) rotate(8deg);
+    animation: pinnedSheen 6s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes pinnedSheen {
+    0%, 62%   { transform: translateX(-170%) rotate(8deg); }
+    88%, 100% { transform: translateX(340%) rotate(8deg); }
+}
+
+/* Ikon pin bergoyang sesaat, seperti menancap ulang */
+.pinned-badge svg {
+    transform-origin: 50% 25%;
+    animation: pinnedWiggle 3.2s ease-in-out infinite;
+}
+@keyframes pinnedWiggle {
+    0%, 68%, 100% { transform: rotate(0deg); }
+    74%           { transform: rotate(-14deg); }
+    80%           { transform: rotate(11deg); }
+    86%           { transform: rotate(-5deg); }
+}
+
+/* Ikon komentar berdenyut halus: jadi ajakan, bukan sekadar angka */
+.pinned-comment-cta svg {
+    animation: pinnedCommentPulse 2.6s ease-in-out infinite;
+}
+@keyframes pinnedCommentPulse {
+    0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(245, 158, 11, 0)); }
+    50%      { transform: scale(1.14); filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6)); }
+}
+
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.3); border-radius: 2px; }

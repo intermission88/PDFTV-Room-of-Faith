@@ -315,11 +315,17 @@ function renderFeeds() {
         const timeAgoStr    = formatTimeAgo(item.timestamp || item.id);
         const hasUpvoted    = upvotedFeedIds.includes(String(item.id));
 
+        // Kartu yang disematkan dapat perlakuan visual lebih hidup (lihat
+        // .feed-card-pinned di css/style.css), termasuk ajakan komentar.
+        const commentCtaClass = isPinned
+            ? 'pinned-comment-cta text-amber-300 hover:text-amber-200'
+            : `${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white`;
+
         return `
-            <div class="feed-card rounded-2xl ${isPinned ? 'bg-amber-400/[0.06]' : isNsfw ? 'bg-red-300/[0.04]' : 'bg-white/[0.04]'} p-4 text-left w-full transition">
+            <div class="feed-card ${isPinned ? 'feed-card-pinned bg-amber-400/[0.06]' : isNsfw ? 'bg-red-300/[0.04]' : 'bg-white/[0.04]'} rounded-2xl p-4 text-left w-full transition">
                 ${isPinned ? `
-                    <div class="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-amber-300/90 mb-2.5">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 011 1v13a1 1 0 01-1.4.9L12 15.9l-5.6 3A1 1 0 015 18V5a1 1 0 011-1z"/></svg>
+                    <div class="pinned-badge flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-amber-300 mb-2.5">
+                        <svg class="w-3 h-3" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h12a1 1 0 011 1v13a1 1 0 01-1.4.9L12 15.9l-5.6 3A1 1 0 015 18V5a1 1 0 011-1z"/></svg>
                         Disematkan
                     </div>
                 ` : ''}
@@ -368,10 +374,10 @@ function renderFeeds() {
                 ` : ''}
 
                 <div class="flex items-center justify-between pt-3 mt-3 text-[13px] text-left">
-                    <a href="p/?id=${encodeURIComponent(String(item.id))}" aria-label="Lihat komentar" class="flex items-center gap-1.5 ${commentsList.length ? 'text-slate-300' : 'text-slate-500'} hover:text-white transition">
+                    <a href="p/?id=${encodeURIComponent(String(item.id))}" aria-label="Lihat komentar" class="flex items-center gap-1.5 ${commentCtaClass} transition">
                         <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.42-4.03 8-9 8a9.9 9.9 0 01-4.2-.9L3 20l1.05-3.3A7.9 7.9 0 013 12c0-4.42 4.03-8 9-8s9 3.58 9 8z"/></svg>
                         <span class="font-medium">${commentsList.length}</span>
-                        <span class="text-xs text-slate-500 font-normal">Komentar</span>
+                        <span class="text-xs font-normal ${isPinned ? 'text-amber-200/80' : 'text-slate-500'}">Komentar</span>
                     </a>
                     <button onclick="upvoteFeed('${item.id}')" aria-label="Upvote" class="flex items-center gap-1.5 ${hasUpvoted ? 'text-amber-400' : 'text-slate-400 hover:text-amber-300'} transition">
                         <span class="text-xs text-slate-500 font-normal">${hasUpvoted ? 'Upvoted' : 'Upvote'}</span>
