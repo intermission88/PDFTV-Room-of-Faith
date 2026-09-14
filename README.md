@@ -23,7 +23,7 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 - **Struktur roguelike**: tiap floor punya target apel, kecepatan naik, dan hazard bertambah. Selesai floor = memilih **1 dari 3 relic** (efek permanen sampai run berakhir).
 - **Boss floor tiap kelipatan 5** dengan pola arena sendiri: THE WALL (dinding bergerak), OVERCLOCKER (kecepatan 2x), THE VOID (lubang berpindah), ROOM OF FAITH (kombinasi).
 - Consumable **Freeze** (hentikan gerak 3 detik) dan **Sever** (potong badan jadi 5 segmen); relic Aegis menahan satu kematian.
-- Kontrol lengkap: panah/WASD, swipe di arena, dan D-pad di layar. Run tetap tersimpan walau halaman di-reload.
+- Kontrol: **swipe di arena** untuk HP, panah/WASD untuk desktop. Belokan terbaca begitu jari bergerak, jadi tidak perlu mengangkat jari. Run tetap tersimpan walau halaman di-reload.
 - **Hall of Fame Snake** sendiri (Top 5 skor, plus floor dan panjang maksimum), terpisah dari papan Blackjack.
 
 ### 4. PDFTV News 📰

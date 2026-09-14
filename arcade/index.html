@@ -454,15 +454,21 @@
                     <div id="snakeHeaderTitle" class="text-[11px] font-black tracking-wider text-emerald-400 flex items-center gap-1">
                         <span>🐍</span> FLOOR 1
                     </div>
-                    <button onclick="toggleSnakeRules()" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2 py-0.5 rounded-lg transition   flex items-center gap-1">
-                        📜 Rules
-                    </button>
+                    <div class="flex items-center gap-1">
+                        <button onclick="toggleSnakePause()" id="btnSnakePause" aria-label="Jeda permainan" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] flex items-center justify-center transition active:scale-95">
+                            ⏸
+                        </button>
+                        <button onclick="toggleSnakeRules()" class="text-[10px] bg-white/5 hover:bg-white/10 text-slate-300 font-bold px-2 py-0.5 rounded-lg transition   flex items-center gap-1">
+                            📜 Rules
+                        </button>
+                    </div>
                 </div>
 
                 <div id="snakeRulesAccordion" class="hidden p-3 rounded-2xl glass   text-[10px] text-slate-300 space-y-1.5">
                     <div class="font-bold text-emerald-400   pb-0.5">📜 Cara Main Snake Roguelite:</div>
-                    <p class="text-[10px] text-slate-300 leading-relaxed">Belok dengan panah / WASD, swipe di arena, atau tombol D-pad. Makan apel sampai target floor terpenuhi.</p>
+                    <p class="text-[10px] text-slate-300 leading-relaxed">Di HP: <b>geser jari di arena</b> ke arah yang dituju. Di desktop: panah atau WASD. Makan apel sampai target floor terpenuhi.</p>
                     <div class="grid grid-cols-1 gap-1 text-[10px] pt-0.5">
+                        <div class="text-sky-300">📱 <b>SWIPE:</b> Cukup geser jari di layar LCD — belokan terjadi saat gerakan melewati ambang, jadi tidak perlu mengangkat jari.</div>
                         <div class="text-emerald-300">🎯 <b>TARGET FLOOR:</b> Tiap floor makin cepat dan makin padat hazard. Skor per apel naik mengikuti floor.</div>
                         <div class="text-amber-300">💎 <b>RELIC:</b> Selesai floor = pilih 1 dari 3 relic. Efeknya permanen sampai run berakhir.</div>
                         <div class="text-rose-400">⚔️ <b>BOSS FLOOR (tiap 5):</b> Makan orb bos untuk lanjut. Tiap bos punya pola hazard sendiri.</div>
@@ -537,21 +543,6 @@
                             <span>✂️ Sever</span>
                             <span id="countSnakeSever" class="font-mono-custom bg-purple-500/30 px-1.5 py-0.5 rounded text-[10px]">0/2</span>
                         </button>
-                    </div>
-                </div>
-
-                <!-- D-PAD -->
-                <div class="glass p-3 rounded-2xl">
-                    <div class="grid grid-cols-3 gap-1.5 max-w-[200px] mx-auto">
-                        <div aria-hidden="true"></div>
-                        <button onclick="snakeTurn('up')" aria-label="Belok atas" class="snake-dpad-btn">▲</button>
-                        <div aria-hidden="true"></div>
-                        <button onclick="snakeTurn('left')" aria-label="Belok kiri" class="snake-dpad-btn">◀</button>
-                        <button onclick="toggleSnakePause()" id="btnSnakePause" aria-label="Jeda permainan" class="snake-dpad-btn">⏸</button>
-                        <button onclick="snakeTurn('right')" aria-label="Belok kanan" class="snake-dpad-btn">▶</button>
-                        <div aria-hidden="true"></div>
-                        <button onclick="snakeTurn('down')" aria-label="Belok bawah" class="snake-dpad-btn">▼</button>
-                        <div aria-hidden="true"></div>
                     </div>
                 </div>
             </div>

@@ -380,9 +380,10 @@ body {
 .news-prose > :last-child { margin-bottom: 0; }
 .news-prose > h2:first-child { margin-top: 0; }
 
-/* ── SNAKE ROGUELITE: arena LCD, D-pad, chip relic ─────────────
+/* ── SNAKE ROGUELITE: arena LCD & chip relic ───────────────────
    Palet ala LCD Nokia 3310. Sel ular/apel/hazard digambar di canvas
-   (js/snake.js), jadi di sini hanya wadah dan kontrolnya.
+   (js/snake.js), jadi di sini hanya wadahnya. Kontrol arah di HP
+   memakai swipe (lihat snakeBindCanvasTouch), bukan tombol fisik.
    Semua animasi di bawah ikut mati lewat aturan
    prefers-reduced-motion global di atas. */
 .snake-lcd {
@@ -404,22 +405,6 @@ body {
     /* Swipe di arena tidak boleh ikut men-scroll halaman. */
     touch-action: none;
 }
-
-.snake-dpad-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 3rem;
-    border-radius: 0.9rem;
-    background: rgba(255, 255, 255, 0.06);
-    color: #a7f3d0;
-    font-size: 16px;
-    font-weight: 800;
-    transition: background-color 0.15s ease, transform 0.15s ease;
-    touch-action: manipulation;
-}
-.snake-dpad-btn:hover { background: rgba(255, 255, 255, 0.12); }
-.snake-dpad-btn:active { transform: scale(0.92); background: rgba(110, 231, 183, 0.25); }
 
 .snake-relic-chip {
     display: inline-flex;

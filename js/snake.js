@@ -15,6 +15,8 @@ const SNAKE_CELL = 20;
 const SNAKE_PX = SNAKE_GRID * SNAKE_CELL;
 const SNAKE_MAX_SEGMENTS = 10;
 const SNAKE_FREEZE_MS = 3000;
+// Jarak geser minimum sebelum swipe dianggap sebagai belokan.
+const SNAKE_SWIPE_PX = 18;
 
 const SNAKE_COLORS = {
     lcd: '#9bbc0f',
@@ -667,20 +669,38 @@ function snakeBindCanvasTouch() {
     if (!canvas || canvas._snakeTouchBound) return;
     canvas._snakeTouchBound = true;
 
+    // Satu-satunya kontrol arah di HP: geser jari di arena.
+    const readSwipe = (t) => {
+        if (!snakeTouchStart) return;
+        const dx = t.clientX - snakeTouchStart.x;
+        const dy = t.clientY - snakeTouchStart.y;
+        if (Math.abs(dx) < SNAKE_SWIPE_PX && Math.abs(dy) < SNAKE_SWIPE_PX) return;
+
+        if (Math.abs(dx) > Math.abs(dy)) snakeTurn(dx > 0 ? 'right' : 'left');
+        else snakeTurn(dy > 0 ? 'down' : 'up');
+
+        // Titik acuan digeser supaya swipe berikutnya tidak perlu angkat jari.
+        snakeTouchStart = { x: t.clientX, y: t.clientY };
+    };
+
     canvas.addEventListener('touchstart', (e) => {
         const t = e.changedTouches[0];
         snakeTouchStart = { x: t.clientX, y: t.clientY };
     }, { passive: true });
 
+    // Dibaca saat touchmove, bukan touchend: belokan terasa langsung dan
+    // pemain tidak perlu mengangkat jari di game yang makin cepat.
+    canvas.addEventListener('touchmove', (e) => {
+        readSwipe(e.changedTouches[0]);
+    }, { passive: true });
+
     canvas.addEventListener('touchend', (e) => {
-        if (!snakeTouchStart) return;
-        const t = e.changedTouches[0];
-        const dx = t.clientX - snakeTouchStart.x;
-        const dy = t.clientY - snakeTouchStart.y;
+        readSwipe(e.changedTouches[0]);
         snakeTouchStart = null;
-        if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
-        if (Math.abs(dx) > Math.abs(dy)) snakeTurn(dx > 0 ? 'right' : 'left');
-        else snakeTurn(dy > 0 ? 'down' : 'up');
+    }, { passive: true });
+
+    canvas.addEventListener('touchcancel', () => {
+        snakeTouchStart = null;
     }, { passive: true });
 }
 
