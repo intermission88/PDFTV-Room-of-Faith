@@ -25,7 +25,8 @@ Situs statis multipage yang menggabungkan landing page bertema arcade, **Room of
 - Tampilan artikel dibuat seperti halaman berita: kicker kategori, **headline besar**, lead, byline (penulis · tanggal · estimasi waktu baca), cover, lalu isi artikel dan deretan `#tag`.
 - Writer punya tombol **👁️ Pratinjau** — dari form (isi yang belum dikirim) maupun dari daftar "Artikel Saya" — untuk melihat tampilannya persis seperti saat tayang, tanpa menunggu persetujuan CEO. Pratinjau memakai perender yang sama dengan halaman publik, jadi tidak ada beda tampilan.
 - Publik **hanya** bisa membaca artikel berstatus `approved`; itu dijaga RLS di database, bukan sekadar filter tampilan.
-- Gambar cover memakai URL gambar eksternal (tanpa upload/storage), dan ikut dipakai sebagai `og:image` saat link dibagikan.
+- Gambar cover memakai URL gambar eksternal (tanpa upload/storage). Preview saat link dibagikan mengambil **apa adanya dari artikel** — `og:image` = cover, `og:title` = headline, `og:description` = "Oleh <penulis> — <ringkasan>" — jadi tidak ada berkas gambar yang digenerate.
+- Tombol **Bagikan** membuka panel pratinjau berisi gambar, headline, penulis, dan sedikit isi artikel, lengkap dengan tombol Bagikan (share sheet OS) dan Salin link.
 
 ### 4. Aksesibilitas & UX ♿
 - Seluruh alur dapat diselesaikan dengan keyboard saja; ring fokus `:focus-visible` konsisten.

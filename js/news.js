@@ -406,9 +406,40 @@ function renderNewsArticleHtml(item, opts = {}) {
         .map(t => `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300">#${escapeHtml(t)}</span>`)
         .join('');
 
-    const shareAction = preview
-        ? "showToast('🔗 Link share aktif setelah artikel tayang.')"
-        : `shareNews('${item.id}')`;
+    const shareUrl = preview ? '' : buildNewsUrl(item.id);
+    const blockedAction = "showToast('🔗 Link share aktif setelah artikel tayang.')";
+    const shareAction = preview ? blockedAction : `shareNews('${item.id}')`;
+    const copyAction = preview ? blockedAction : `copyNewsLink('${item.id}')`;
+
+    // Kartu yang muncul saat tombol Bagikan ditekan: gambar, headline,
+    // penulis, dan sedikit isi — semuanya diambil dari data artikel yang
+    // sudah ada, tanpa generate berkas apa pun.
+    const sharePreview = `
+        <div id="newsSharePanel" class="hidden mt-3 rounded-2xl bg-white/[0.03] border border-white/[0.08] p-3 text-left">
+            <div class="text-[10px] uppercase tracking-[0.18em] text-slate-500 font-black">Pratinjau share</div>
+            <div class="flex gap-3 mt-2.5">
+                ${item.cover_url ? `
+                    <div class="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-black/30">
+                        <img src="${escapeHtml(item.cover_url)}" alt="" class="w-full h-full object-cover" onerror="this.parentNode.style.display='none'">
+                    </div>
+                ` : `
+                    <div class="w-20 h-20 shrink-0 rounded-xl bg-white/[0.04] flex items-center justify-center text-lg" aria-hidden="true">📰</div>
+                `}
+                <div class="min-w-0 flex-1">
+                    <div class="text-[12px] font-bold text-white leading-snug news-clamp-2">${escapeHtml(item.title)}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">✍️ ${escapeHtml(item.author_name)}</div>
+                    <div class="text-[11px] text-slate-500 mt-1 news-clamp-2">${escapeHtml(newsExcerpt(item, 120))}</div>
+                </div>
+            </div>
+            <div class="text-[10px] text-slate-500 font-mono-custom mt-2.5 pt-2.5 border-t border-white/[0.06] break-all">
+                ${preview ? 'Link aktif setelah artikel tayang.' : escapeHtml(shareUrl)}
+            </div>
+            <div class="flex items-center gap-2 mt-2.5">
+                <button onclick="${shareAction}" class="flex-1 py-2 bg-emerald-500 hover:bg-emerald-400 text-black text-[11px] font-black rounded-lg uppercase tracking-wider transition">Bagikan</button>
+                <button onclick="${copyAction}" class="px-3 py-2 bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-bold rounded-lg transition">Salin link</button>
+            </div>
+        </div>
+    `;
 
     return `
         <article class="rounded-2xl bg-white/[0.04] overflow-hidden text-left">
@@ -429,11 +460,13 @@ function renderNewsArticleHtml(item, opts = {}) {
                         <span class="text-slate-600" aria-hidden="true"> · </span>${escapeHtml(newsFullDate(item.created_at))}
                         <span class="text-slate-600" aria-hidden="true"> · </span>${newsReadingTime(item)} menit baca
                     </div>
-                    <button onclick="${shareAction}" class="shrink-0 flex items-center gap-1.5 text-slate-400 hover:text-emerald-300 transition" aria-label="Bagikan link artikel ini">
+                    <button onclick="toggleNewsSharePanel(this)" aria-expanded="false" aria-controls="newsSharePanel" class="shrink-0 flex items-center gap-1.5 text-slate-400 hover:text-emerald-300 transition" aria-label="Pratinjau dan bagikan artikel ini">
                         <span class="text-xs font-medium">Bagikan</span>
                         <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/></svg>
                     </button>
                 </div>
+
+                ${sharePreview}
             </div>
 
             ${item.cover_url ? `
@@ -463,6 +496,26 @@ function renderNewsDetail() {
     document.title = `${item.title} · PDFTV News`;
     const heading = document.getElementById('headingArticle');
     if (heading) heading.focus({ preventScroll: true });
+}
+
+function toggleNewsSharePanel(btn) {
+    const panel = document.getElementById('newsSharePanel');
+    if (!panel) return;
+    const willOpen = panel.classList.contains('hidden');
+    panel.classList.toggle('hidden', !willOpen);
+    if (btn) btn.setAttribute('aria-expanded', String(willOpen));
+    playClickSound();
+    triggerHaptic('light');
+}
+
+async function copyNewsLink(id) {
+    const url = buildNewsUrl(id);
+    try {
+        await navigator.clipboard.writeText(url);
+        showToast('🔗 Link artikel disalin!');
+    } catch (err) {
+        prompt('Salin link ini:', url);
+    }
 }
 
 async function shareNews(id) {

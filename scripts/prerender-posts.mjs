@@ -215,7 +215,7 @@ function deepenRelativePaths(html) {
     return html.replace(/(\b(?:href|src)=")((?:\.\.\/)+)/g, (match, attr, dots) => attr + '../' + dots);
 }
 
-function ogMetaBlock({ title, description, image, imageAlt, absoluteUrl, imageSize }) {
+function ogMetaBlock({ title, description, image, imageAlt, absoluteUrl, imageSize, author }) {
     const lines = [
         `<title>${escapeHtml(title)}</title>`,
         `<meta name="description" content="${escapeHtml(description)}">`,
@@ -231,6 +231,7 @@ function ogMetaBlock({ title, description, image, imageAlt, absoluteUrl, imageSi
         lines.push(`<meta property="og:image:height" content="${CARD_H}">`);
     }
     lines.push(`<meta property="og:image:alt" content="${escapeHtml(imageAlt)}">`);
+    if (author) lines.push(`<meta property="article:author" content="${escapeHtml(author)}">`);
     lines.push(`<meta name="twitter:card" content="summary_large_image">`);
     return lines.join('\n    ');
 }
@@ -331,8 +332,9 @@ async function removeOrphans(liveIds) {
 
 // ── News: halaman artikel untuk preview share ────────────────
 // Hanya artikel berstatus 'approved' yang di-pre-render (artikel pending
-// memang tidak boleh terbaca publik). og:image memakai cover_url artikel;
-// bila kosong, pakai kartu brand sebagai cadangan.
+// memang tidak boleh terbaca publik). Tidak ada gambar yang digenerate:
+// og:image memakai cover_url artikel apa adanya, dan kalau kosong dipakai
+// kartu brand sebagai cadangan.
 async function renderNews(template, supaUrl, supaKey, limit) {
     console.log('Mengambil daftar artikel dari Supabase...');
     const res = await fetch(
@@ -362,18 +364,23 @@ async function renderNews(template, supaUrl, supaKey, limit) {
         liveIds.add(id);
 
         const title = collapse(article.title) || 'Artikel';
+        const author = collapse(article.author_name) || 'Redaksi';
         const excerpt = collapse(article.excerpt);
         const cover = String(article.cover_url || '').trim();
         const absoluteUrl = `${SITE_ORIGIN}news/p/${id}/`;
+
+        // Isi preview share: headline, penulis, lalu sedikit isi artikel.
+        const snippet = excerpt
+            || truncate(collapse(article.body), 180)
+            || 'Baca artikel ini di PDFTV News.';
 
         await writeIfChanged(
             path.join(NEWS_PAGE_DIR, id, 'index.html'),
             buildNewsPageHtml(template, {
                 id,
                 title: `${title} · PDFTV News`,
-                description: excerpt
-                    || truncate(collapse(article.body), 200)
-                    || 'Baca artikel ini di PDFTV News.',
+                description: `Oleh ${author} — ${snippet}`,
+                author,
                 image: /^https?:\/\//i.test(cover) ? cover : OG_FALLBACK,
                 imageAlt: title,
                 absoluteUrl,
