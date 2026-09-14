@@ -163,19 +163,31 @@
 
             <!-- LOBBY -->
             <div id="arcadeLobby" class="space-y-4">
-                <div class="relative overflow-hidden rounded-3xl p-5   balatro-felt-bg shadow-2xl text-center">
-                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10   text-amber-400 text-[10px] font-mono-custom font-bold tracking-widest uppercase mb-2">
-                        <span>✨</span> Balatro Casino Edition
+                <!-- PILIH GAME: berdampingan; semua papan skor menyusul di bawah -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="relative overflow-hidden rounded-3xl p-3   balatro-felt-bg shadow-2xl text-center flex flex-col">
+                        <div class="text-2xl" aria-hidden="true">🃏</div>
+                        <h2 id="headingArcade" tabindex="-1" class="text-sm font-black text-white tracking-tight leading-tight mt-1">BLACKJACK</h2>
+                        <div class="text-[10px] font-mono-custom font-bold text-amber-400 uppercase tracking-widest">Roguelite</div>
+                        <p class="text-slate-300 text-[10px] mt-1.5 leading-relaxed flex-grow">
+                            Kumpulkan <b>Cash</b>, pasang <b>Joker Pasif</b>, kalahkan <b>Boss tiap 8 Ronde</b>.
+                        </p>
+                        <button onclick="enterCasinoGame()" class="w-full mt-2.5 py-2.5 rounded-2xl text-white font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 btn-dopamine">
+                            <span>▶</span> MAIN
+                        </button>
                     </div>
 
-                    <h2 id="headingArcade" tabindex="-1" class="text-xl font-black text-white tracking-tight">BLACKJACK <span class="text-amber-400">ROGUELITE</span></h2>
-                    <p class="text-slate-300 text-[11px] mt-1 max-w-xs mx-auto leading-relaxed">
-                        Kumpulkan <b>$ (Dollar Cash)</b>, aktifkan kartu <b>Joker Pasif</b>, dan kalahkan Boss setiap <b>8 Ronde</b> per Ante!
-                    </p>
-
-                    <button onclick="enterCasinoGame()" class="w-full mt-4 py-3.5 rounded-2xl text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 btn-dopamine">
-                        <span>🃏</span> MAIN SEKARANG <span>➔</span>
-                    </button>
+                    <div class="relative overflow-hidden rounded-3xl p-3   balatro-felt-bg shadow-2xl text-center flex flex-col">
+                        <div class="text-2xl" aria-hidden="true">🐍</div>
+                        <h2 class="text-sm font-black text-white tracking-tight leading-tight mt-1">SNAKE</h2>
+                        <div class="text-[10px] font-mono-custom font-bold text-emerald-400 uppercase tracking-widest">Roguelite</div>
+                        <p class="text-slate-300 text-[10px] mt-1.5 leading-relaxed flex-grow">
+                            Makan apel, pilih <b>Relic</b>, kalahkan <b>Boss tiap 5 Floor</b>.
+                        </p>
+                        <button onclick="enterSnakeGame()" class="w-full mt-2.5 py-2.5 rounded-2xl text-white font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 btn-dopamine">
+                            <span>▶</span> MAIN
+                        </button>
+                    </div>
                 </div>
 
                 <section id="lobbyHallOfFame" class="glass p-4 rounded-3xl   shadow-2xl">
@@ -183,7 +195,7 @@
                         <div class="flex items-center gap-1.5">
                             <span class="text-base">🏆</span>
                             <div>
-                                <h3 class="text-[11px] font-black text-white tracking-widest uppercase">Hall of Fame</h3>
+                                <h3 class="text-[11px] font-black text-white tracking-widest uppercase">Hall of Fame Blackjack</h3>
                                 <p class="text-[10px] text-slate-400 font-mono-custom">TOP 5 REKOR $ CASH PER RUN</p>
                             </div>
                         </div>
@@ -205,21 +217,6 @@
                         </div>
                     </div>
                 </section>
-
-                <div class="relative overflow-hidden rounded-3xl p-5   balatro-felt-bg shadow-2xl text-center">
-                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10   text-emerald-400 text-[10px] font-mono-custom font-bold tracking-widest uppercase mb-2">
-                        <span>🐍</span> Nokia Retro Edition
-                    </div>
-
-                    <h2 class="text-xl font-black text-white tracking-tight">SNAKE <span class="text-emerald-400">ROGUELITE</span></h2>
-                    <p class="text-slate-300 text-[11px] mt-1 max-w-xs mx-auto leading-relaxed">
-                        Makan apel, lintasi <b>Floor</b>, pilih <b>Relic</b>, dan kalahkan <b>Boss tiap 5 Floor</b>. Sekali menabrak, run selesai!
-                    </p>
-
-                    <button onclick="enterSnakeGame()" class="w-full mt-4 py-3.5 rounded-2xl text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 btn-dopamine">
-                        <span>🐍</span> MAIN SEKARANG <span>➔</span>
-                    </button>
-                </div>
 
                 <section id="lobbySnakeHallOfFame" class="glass p-4 rounded-3xl   shadow-2xl">
                     <div class="flex items-center justify-between mb-3">
