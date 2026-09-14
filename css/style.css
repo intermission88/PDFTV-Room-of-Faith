@@ -423,11 +423,6 @@ body {
     color: #6ee7b7;
 }
 
-/* Kartu pilihan relic di dalam modal (satu kartu per opsi). */
-.snake-relic-option { transition: background-color 0.2s ease, transform 0.2s ease; }
-.snake-relic-option:hover { background-color: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
-.snake-relic-option:active { transform: translateY(0) scale(0.99); }
-
 .snake-boss-pulse { animation: snakeBossPulse 1.4s ease-in-out infinite; }
 @keyframes snakeBossPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45); }

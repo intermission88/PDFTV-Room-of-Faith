@@ -152,9 +152,6 @@
                     <button onclick="snakeCheatKillBoss()" class="py-1.5 px-2 bg-red-500/20 hover:bg-red-500/40 text-red-200   rounded-xl text-[10px] font-bold transition active:scale-95">
                         ⚔️ Kill Boss
                     </button>
-                    <button onclick="snakeCheatAddAegis(3)" class="py-1.5 px-2 bg-sky-500/20 hover:bg-sky-500/40 text-sky-200   rounded-xl text-[10px] font-bold transition active:scale-95">
-                        🛡️ +3 Aegis
-                    </button>
                     <button onclick="snakeCheatFillConsumables()" class="py-1.5 px-2 bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200   rounded-xl text-[10px] font-bold transition active:scale-95">
                         🧪 Max Items (2/2)
                     </button>
@@ -182,7 +179,7 @@
                         <h2 class="text-sm font-black text-white tracking-tight leading-tight mt-1">SNAKE</h2>
                         <div class="text-[10px] font-mono-custom font-bold text-emerald-400 uppercase tracking-widest">Roguelite</div>
                         <p class="text-slate-300 text-[10px] mt-1.5 leading-relaxed flex-grow">
-                            Makan apel, pilih <b>Relic</b>, kalahkan <b>Boss tiap 5 Floor</b>.
+                            Makan apel, kalahkan <b>Boss tiap 5 Floor</b>, gacha <b>Relic</b> dari mereka.
                         </p>
                         <button onclick="enterSnakeGame()" class="w-full mt-2.5 py-2.5 rounded-2xl text-white font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 btn-dopamine">
                             <span>▶</span> MAIN
@@ -470,11 +467,11 @@
                     <div class="grid grid-cols-1 gap-1 text-[10px] pt-0.5">
                         <div class="text-sky-300">📱 <b>SWIPE:</b> Cukup geser jari di layar LCD — belokan terjadi saat gerakan melewati ambang, jadi tidak perlu mengangkat jari.</div>
                         <div class="text-emerald-300">🎯 <b>TARGET FLOOR:</b> Tiap floor makin cepat dan makin padat hazard. Skor per apel naik mengikuti floor.</div>
-                        <div class="text-amber-300">💎 <b>RELIC:</b> Selesai floor = pilih 1 dari 3 relic. Efeknya permanen sampai run berakhir.</div>
+                        <div class="text-amber-300">💎 <b>RELIC (GACHA):</b> Tiap kali kalahkan boss ada peluang dapat relic — tidak selalu, bos bisa zonk. Efeknya permanen sampai run berakhir.</div>
                         <div class="text-rose-400">⚔️ <b>BOSS FLOOR (tiap 5):</b> Makan orb bos untuk lanjut. Tiap bos punya pola hazard sendiri.</div>
                         <div class="text-sky-300">🧊 <b>FREEZE (Max 2):</b> Menghentikan gerak 3 detik saat kamu mepet.</div>
                         <div class="text-purple-300">✂️ <b>SEVER (Max 2):</b> Memotong badan jadi 5 segmen.</div>
-                        <div class="text-red-400">💀 <b>KEMATIAN:</b> Menabrak dinding, hazard, atau badan sendiri mengakhiri run (kecuali punya Aegis).</div>
+                        <div class="text-red-400">💀 <b>KEMATIAN:</b> Menabrak dinding, hazard, atau badan sendiri langsung mengakhiri run — tidak ada penyelamat.</div>
                     </div>
                 </div>
 
@@ -524,7 +521,7 @@
                 <div class="glass p-2 rounded-2xl space-y-1">
                     <div class="flex justify-between items-center text-[10px] font-mono-custom font-bold text-emerald-400 uppercase">
                         <span>💎 Relic Aktif</span>
-                        <span id="snakeAegisText" class="text-slate-400 font-normal">🛡️ Aegis: 0</span>
+                        <span id="snakeRelicCount" class="text-slate-400 font-normal">💎 0/7</span>
                     </div>
                     <div id="snakeRelicList" class="flex flex-wrap gap-1">
                         <span class="snake-relic-chip">Belum ada relic</span>
@@ -718,13 +715,20 @@
         </div>
     </div>
 
-    <!-- Modal Pilihan Relic (paksa-pilih, tanpa tombol tutup) -->
-    <div id="snakeRelicModal" role="dialog" aria-modal="true" aria-labelledby="snakeRelicModalTitle" tabindex="-1" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+    <!-- Modal Gacha Relic (paksa-pilih: tombol baru aktif setelah gulungan berhenti) -->
+    <div id="snakeGachaModal" role="dialog" aria-modal="true" aria-labelledby="snakeGachaModalTitle" tabindex="-1" class="modal-base hidden-modal fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
         <div class="glass w-full max-w-xs p-5 rounded-3xl   shadow-2xl text-center bg-[#07170e] relative max-h-[90vh] overflow-y-auto scrollbar-hide">
-            <div class="text-3xl mb-1" aria-hidden="true">💎</div>
-            <h3 id="snakeRelicModalTitle" class="text-sm font-black text-emerald-400 uppercase tracking-wider font-pixel">PILIH 1 RELIC</h3>
-            <p class="text-slate-400 text-[10px] mb-3">Efeknya permanen sampai run berakhir.</p>
-            <div id="snakeRelicOptions" class="space-y-2"></div>
+            <div class="text-3xl mb-1" aria-hidden="true">🎰</div>
+            <h3 id="snakeGachaModalTitle" class="text-sm font-black text-emerald-400 uppercase tracking-wider font-pixel">RELIC GACHA</h3>
+            <p class="text-slate-400 text-[10px] mb-3">Kalahkan boss belum tentu memberi relic.</p>
+
+            <div id="snakeGachaReel" class="p-4 bg-emerald-950/60 border border-emerald-500/40 rounded-2xl text-3xl flex items-center justify-center min-h-[72px] shadow-inner" aria-hidden="true">🎁</div>
+
+            <div id="snakeGachaResult" class="hidden mt-3 bg-black/60 p-3 rounded-2xl   min-h-[52px] flex flex-col items-center justify-center"></div>
+
+            <button data-autofocus onclick="closeSnakeGachaModal()" id="btnSnakeGachaContinue" disabled class="w-full mt-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-30 disabled:pointer-events-none text-black text-xs font-black rounded-xl active:scale-[0.98] transition shadow uppercase tracking-wider">
+                LANJUT ➔
+            </button>
         </div>
     </div>
 
